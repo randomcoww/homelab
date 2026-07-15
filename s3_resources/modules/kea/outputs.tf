@@ -2,9 +2,58 @@ output "manifests" {
   value = concat([
     module.secret.manifest,
     module.statefulset.manifest,
-    module.kea-tls.manifest,
     ], [
     for _, service in module.service-peer :
     service.manifest
+    ], [
+    for _, m in [
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "ClusterIssuer"
+        metadata = {
+          name = "selfsigned-issuer"
+        }
+        spec = {
+          selfSigned = {
+          }
+        }
+      },
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-ca-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          isCA       = true
+          commonName = var.name
+          secretName = "${var.name}-ca-tls"
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          issuerRef = {
+            name  = "selfsigned-issuer"
+            kind  = "ClusterIssuer"
+            group = "cert-manager.io"
+          }
+        }
+      },
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Issuer"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          ca = {
+            secretName = "${var.name}-ca-tls"
+          }
+        }
+      }
+    ] :
+    yamlencode(m)
   ])
 }

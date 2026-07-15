@@ -221,7 +221,6 @@ module "statefulset" {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.kea_metrics)
     "checksum/secret"      = sha256(module.secret.manifest)
-    "checksum/kea-tls"     = sha256(module.kea-tls.manifest)
   }
   spec = {
     minReadySeconds = 30
@@ -295,19 +294,19 @@ module "statefulset" {
             subPathExpr = "kea-dhcp4-$(POD_NAME).tpl"
           },
           {
-            name      = "kea-tls"
+            name        = "tls"
+            mountPath   = "${local.kea_base_path}/kea-cert.pem"
+            subPathExpr = "tls.crt"
+          },
+          {
+            name        = "tls"
+            mountPath   = "${local.kea_base_path}/kea-key.pem"
+            subPathExpr = "tls.key"
+          },
+          {
+            name      = "tls"
             mountPath = "${local.kea_base_path}/kea-ca-cert.pem"
             subPath   = "ca.crt"
-          },
-          {
-            name        = "kea-tls"
-            mountPath   = "${local.kea_base_path}/kea-cert.pem"
-            subPathExpr = "$(POD_NAME)-tls.crt"
-          },
-          {
-            name        = "kea-tls"
-            mountPath   = "${local.kea_base_path}/kea-key.pem"
-            subPathExpr = "$(POD_NAME)-tls.key"
           },
           {
             name      = "socket-path"
@@ -382,9 +381,22 @@ module "statefulset" {
         }
       },
       {
-        name = "kea-tls"
-        secret = {
-          secretName = module.kea-tls.name
+        name = "tls"
+        csi = {
+          driver   = "csi.cert-manager.io"
+          readOnly = true
+          volumeAttributes = {
+            "csi.cert-manager.io/issuer-name"   = var.name
+            "csi.cert-manager.io/common-name"   = "$${POD_NAME}"
+            "csi.cert-manager.io/issuer-kind"   = "Issuer"
+            "csi.cert-manager.io/key-algorithm" = "ECDSA"
+            "csi.cert-manager.io/key-size"      = "521"
+            "csi.cert-manager.io/key-encoding"  = "PKCS8"
+            "csi.cert-manager.io/key-usages" = join(",", [
+              "digital signature",
+              "key encipherment",
+            ])
+          }
         }
       },
     ]

@@ -374,6 +374,12 @@ module "statefulset" {
               "$${POD_NAME}.${local.headless_service_fqdn}",
               var.service_hostname,
             ])
+            "csi.cert-manager.io/key-algorithm" = "RSA"
+            "csi.cert-manager.io/key-size"      = "4096"
+            "csi.cert-manager.io/key-usages" = join(",", [
+              "digital signature",
+              "key encipherment",
+            ])
           }
         }
       },
