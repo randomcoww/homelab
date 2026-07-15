@@ -334,7 +334,7 @@ locals {
             args = [
               "store",
               "--data-dir=${local.store_data_path}",
-              "--http-address=$(POD_IP):${local.ports.thanos_store_probe}",
+              "--http-address=0.0.0.0:${local.ports.thanos_store_probe}",
               "--grpc-address=0.0.0.0:${local.ports.thanos_store}",
               "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
               "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
@@ -349,14 +349,6 @@ locals {
                 valueFrom = {
                   fieldRef = {
                     fieldPath = "metadata.name"
-                  }
-                }
-              },
-              {
-                name = "POD_IP"
-                valueFrom = {
-                  fieldRef = {
-                    fieldPath = "status.podIP"
                   }
                 }
               },
