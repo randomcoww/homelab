@@ -1,12 +1,34 @@
 locals {
   store_data_path     = "/thanos/store/data"
+  store_tls_path      = "/thanos/store/tls"
   compactor_data_path = "/thanos/compactor/data"
   ports = {
     thanos_querier     = 10906
-    thanos_sidecar     = 10901
+    thanos_sidecar     = 10901 # 10901-10902 not configurable
     thanos_store       = 10903
     thanos_store_probe = 10905
-    prometheus         = 9090
+    prometheus         = 9090 # not configurable
+  }
+
+  headless_service = "${var.name}-kube-prometheus-thanos-discovery" # not configurable
+  members = [
+    for i, _ in range(var.replicas) :
+    "${var.name}-prometheus-kube-prometheus-prometheus-${i}.${local.headless_service}.${var.namespace}"
+  ]
+
+  # Resolution via SRV is possible but requires TLS by POD_IP which is not supported by cert-manager-csi
+  thanos_querier_sd_config = {
+    endpoints = concat([
+      for _, m in local.members :
+      {
+        address = "${m}:${local.ports.thanos_sidecar}"
+      }
+      ], [
+      for _, m in local.members :
+      {
+        address = "${m}:${local.ports.thanos_store}"
+      }
+    ])
   }
 
   thanos_object_config = {
@@ -204,6 +226,7 @@ locals {
         }
       }
       prometheusSpec = {
+        serviceName              = local.headless_service
         disableCompaction        = true
         replicaExternalLabelName = "replica" # value is fixed in thanos
         thanos = {
@@ -218,10 +241,20 @@ locals {
               }
             }
           }
+          grpcServerTlsConfig = {
+            certFile = "${local.store_tls_path}/tls.crt"
+            keyFile  = "${local.store_tls_path}/tls.key"
+            caFile   = "${local.store_tls_path}/ca.crt"
+          }
           volumeMounts = [
             {
               name      = "ca-trust-bundle"
               mountPath = "/etc/ssl/certs/ca-certificates.crt"
+              readOnly  = true
+            },
+            {
+              name      = "tls"
+              mountPath = local.store_tls_path
               readOnly  = true
             },
           ]
@@ -240,8 +273,13 @@ locals {
               "--query.replica-label=replica",
               "--http-address=0.0.0.0:${local.ports.thanos_querier}",
               "--grpc-address=127.0.0.1:50903", # unused
-              "--endpoint=dnssrv+_grpc._tcp.${var.name}-kube-prometheus-thanos-discovery.${var.namespace}:${local.ports.thanos_sidecar}",
-              "--endpoint=dnssrv+_grpc._tcp.${var.name}-kube-prometheus-thanos-discovery.${var.namespace}:${local.ports.thanos_store}",
+              "--grpc-client-tls-secure",
+              "--grpc-client-tls-cert=${local.store_tls_path}/tls.crt",
+              "--grpc-client-tls-key=${local.store_tls_path}/tls.key",
+              "--grpc-client-tls-ca=${local.store_tls_path}/ca.crt",
+              <<-EOF
+              --endpoint.sd-config=${yamlencode(local.thanos_querier_sd_config)}
+              EOF
             ]
             env = [
               {
@@ -252,6 +290,14 @@ locals {
                   }
                 }
               },
+              {
+                name = "POD_IP"
+                valueFrom = {
+                  fieldRef = {
+                    fieldPath = "status.podIP"
+                  }
+                }
+              },
             ]
             ports = [
               {
@@ -259,6 +305,11 @@ locals {
               },
             ]
             volumeMounts = [
+              {
+                name      = "tls"
+                mountPath = local.store_tls_path
+                readOnly  = true
+              },
             ]
             livenessProbe = {
               httpGet = {
@@ -283,8 +334,11 @@ locals {
             args = [
               "store",
               "--data-dir=${local.store_data_path}",
-              "--http-address=0.0.0.0:${local.ports.thanos_store_probe}",
+              "--http-address=$(POD_IP):${local.ports.thanos_store_probe}",
               "--grpc-address=0.0.0.0:${local.ports.thanos_store}",
+              "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
+              "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
+              "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
               <<-EOF
               --objstore.config=${yamlencode(local.thanos_object_config)}
               EOF
@@ -295,6 +349,14 @@ locals {
                 valueFrom = {
                   fieldRef = {
                     fieldPath = "metadata.name"
+                  }
+                }
+              },
+              {
+                name = "POD_IP"
+                valueFrom = {
+                  fieldRef = {
+                    fieldPath = "status.podIP"
                   }
                 }
               },
@@ -326,6 +388,10 @@ locals {
               {
                 name      = "thanos-store-data"
                 mountPath = local.store_data_path
+              },
+              {
+                name      = "tls"
+                mountPath = local.store_tls_path
               },
               {
                 name      = "ca-trust-bundle"
@@ -385,6 +451,26 @@ locals {
             hostPath = {
               path = "/etc/ssl/certs/ca-certificates.crt"
               type = "File"
+            }
+          },
+          {
+            name = "tls"
+            csi = {
+              driver   = "csi.cert-manager.io"
+              readOnly = true
+              volumeAttributes = {
+                "csi.cert-manager.io/issuer-name" = var.name
+                "csi.cert-manager.io/issuer-kind" = "Issuer"
+                "csi.cert-manager.io/dns-names" = join(",", [
+                  "$${POD_NAME}.${local.headless_service}.$${POD_NAMESPACE}",
+                ])
+                "csi.cert-manager.io/key-algorithm" = "ECDSA"
+                "csi.cert-manager.io/key-size"      = "521"
+                "csi.cert-manager.io/key-usages" = join(",", [
+                  "digital signature",
+                  "key encipherment",
+                ])
+              }
             }
           },
         ]

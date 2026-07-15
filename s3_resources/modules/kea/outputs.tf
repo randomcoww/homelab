@@ -9,9 +9,10 @@ output "manifests" {
     for _, m in [
       {
         apiVersion = "cert-manager.io/v1"
-        kind       = "ClusterIssuer"
+        kind       = "Issuer"
         metadata = {
-          name = "selfsigned-issuer"
+          name      = "${var.name}-selfsigned"
+          namespace = var.namespace
         }
         spec = {
           selfSigned = {
@@ -34,8 +35,8 @@ output "manifests" {
             size      = 521
           }
           issuerRef = {
-            name  = "selfsigned-issuer"
-            kind  = "ClusterIssuer"
+            name  = "${var.name}-selfsigned"
+            kind  = "Issuer"
             group = "cert-manager.io"
           }
         }
@@ -52,7 +53,7 @@ output "manifests" {
             secretName = "${var.name}-ca-tls"
           }
         }
-      }
+      },
     ] :
     yamlencode(m)
   ])
