@@ -288,7 +288,7 @@ resource "helm_release" "wrapper" {
   name             = var.name
   namespace        = var.namespace
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   max_history      = 2
   values = [

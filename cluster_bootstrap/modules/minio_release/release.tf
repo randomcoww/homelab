@@ -1,43 +1,15 @@
-module "minio-metrics-proxy" {
-  source    = "../../../modules/configmap"
-  name      = "${var.name}-proxy"
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = {
-    "nginx-proxy.conf" = <<-EOF
-    proxy_request_buffering off;
-    proxy_buffering off;
-    proxy_cache off;
-
-    server {
-      listen ${var.ports.metrics};
-      location /minio/metrics/v3 {
-        proxy_pass https://127.0.0.1:${var.ports.minio};
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      }
-    }
-    EOF
-  }
-}
-
 resource "helm_release" "wrapper" {
   chart            = "../helm-wrapper"
   name             = "${var.name}-resources"
   namespace        = var.namespace
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({
       manifests = [
         module.minio-tls.manifest,
-        module.minio-metrics-proxy.manifest,
       ]
     }),
   ]
@@ -49,7 +21,7 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io"
   chart            = "minio"
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   version          = "5.4.0"
   max_history      = 2
@@ -61,8 +33,7 @@ resource "helm_release" "minio" {
         tag        = var.images.minio.tag
       }
       podAnnotations = {
-        "checksum/tls"           = sha256(module.minio-tls.manifest)
-        "checksum/metrics-proxy" = sha256(module.minio-metrics-proxy.manifest)
+        "checksum/tls" = sha256(module.minio-tls.manifest)
       }
       clusterDomain     = var.cluster_domain
       mode              = "distributed"
@@ -88,9 +59,6 @@ resource "helm_release" "minio" {
         clusterIP         = var.cluster_service_ip
         loadBalancerClass = "kube-vip.io/kube-vip-class"
         annotations = {
-          "prometheus.io/scrape"        = "true"
-          "prometheus.io/port"          = tostring(var.ports.metrics)
-          "prometheus.io/path"          = "/minio/metrics/v3"
           "kube-vip.io/loadbalancerIPs" = var.service_ip
         }
       }
@@ -115,33 +83,6 @@ resource "helm_release" "minio" {
       policies       = []
       customCommands = []
       svcaccts       = []
-      extraContainers = [
-        # bypass TLS for metrics endpoints
-        {
-          name  = "${var.name}-metrics-proxy"
-          image = var.images.nginx
-          ports = [
-            {
-              containerPort = var.ports.metrics
-            },
-          ]
-          volumeMounts = [
-            {
-              name      = "metrics-proxy-config"
-              mountPath = "/etc/nginx/conf.d/default.conf"
-              subPath   = "nginx-proxy.conf"
-            },
-          ]
-        },
-      ]
-      extraVolumes = [
-        {
-          name = "metrics-proxy-config"
-          configMap = {
-            name = module.minio-metrics-proxy.name
-          }
-        },
-      ]
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [

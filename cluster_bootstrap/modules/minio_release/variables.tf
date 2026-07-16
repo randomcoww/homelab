@@ -19,7 +19,6 @@ variable "replicas" {
 
 variable "images" {
   type = object({
-    nginx = string
     minio = object({
       repository = string
       tag        = string

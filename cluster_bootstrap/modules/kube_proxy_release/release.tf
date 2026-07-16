@@ -48,10 +48,6 @@ module "daemonset" {
   app       = var.name
   affinity  = var.affinity
   release   = var.release
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)
-  }
   template_spec = {
     priorityClassName  = "system-node-critical"
     hostNetwork        = true
@@ -235,7 +231,7 @@ resource "helm_release" "wrapper" {
   name             = var.name
   namespace        = var.namespace
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   max_history      = 2
   values = [

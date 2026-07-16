@@ -67,7 +67,7 @@ output "manifests" {
         }
       },
 
-      # data volume
+      # cache volume
       {
         apiVersion = "v1"
         kind       = "PersistentVolume"

@@ -150,6 +150,26 @@ resource "helm_release" "bootstrap" {
   ]
 }
 
+resource "helm_release" "prometheus-operator-crds" {
+  name             = "${local.endpoints.prometheus.name}-crds"
+  namespace        = local.endpoints.prometheus.namespace
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus-operator-crds"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "30.0.1"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
+}
+
 module "kube-proxy" {
   source    = "./modules/kube_proxy_release"
   name      = "kube-proxy"
@@ -167,6 +187,7 @@ module "kube-proxy" {
 
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
 
@@ -189,6 +210,7 @@ module "flannel" {
 
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
 
@@ -198,7 +220,7 @@ resource "helm_release" "kube-dns" {
   repository       = "https://coredns.github.io/helm"
   chart            = "coredns"
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   version          = "1.46.0"
   max_history      = 2
@@ -216,10 +238,6 @@ resource "helm_release" "kube-dns" {
       prometheus = {
         service = {
           enabled = true
-          annotations = {
-            "prometheus.io/scrape" = "true"
-            "prometheus.io/port"   = tostring(local.service_ports.metrics)
-          }
         }
       }
       service = {
@@ -318,6 +336,7 @@ resource "helm_release" "kube-dns" {
   ]
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
 
@@ -361,6 +380,7 @@ module "kube-vip" {
   }
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
 
@@ -370,7 +390,7 @@ resource "helm_release" "local-path-provisioner" {
   namespace        = "kube-system"
   repository       = "https://charts.containeroo.ch"
   create_namespace = true
-  wait             = false
+  wait             = true
   wait_for_jobs    = false
   version          = "0.0.37"
   max_history      = 2
@@ -404,38 +424,7 @@ resource "helm_release" "local-path-provisioner" {
   ]
   depends_on = [
     kubernetes_labels.labels,
-  ]
-}
-
-# fluxCD
-
-resource "helm_release" "fluxcd" {
-  name             = local.endpoints.fluxcd.name
-  namespace        = local.endpoints.fluxcd.namespace
-  repository       = "https://fluxcd-community.github.io/helm-charts"
-  chart            = "flux2"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "2.19.0"
-  timeout          = local.kubernetes.helm_release_timeout
-  max_history      = 2
-  values = [
-    yamlencode({
-      clusterDomain = local.domains.kubernetes
-      imageAutomationController = {
-        create = false
-      }
-      imageReflectionController = {
-        create = false
-      }
-      notificationController = {
-        create = false
-      }
-    }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
 
@@ -457,7 +446,6 @@ module "minio" {
   namespace = local.endpoints.minio.namespace
   timeout   = local.kubernetes.helm_release_timeout
   images = {
-    nginx = local.container_images_digest.nginx
     minio = {
       repository = regex(local.container_image_regex, local.container_images.minio).depName
       tag        = regex(local.container_image_regex, local.container_images.minio).tag
@@ -479,5 +467,42 @@ module "minio" {
 
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.local-path-provisioner,
+    helm_release.kube-dns,
+    module.kube-vip,
+    helm_release.prometheus-operator-crds,
+  ]
+}
+
+# fluxCD
+
+resource "helm_release" "fluxcd" {
+  name             = local.endpoints.fluxcd.name
+  namespace        = local.endpoints.fluxcd.namespace
+  repository       = "https://fluxcd-community.github.io/helm-charts"
+  chart            = "flux2"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "2.19.0"
+  timeout          = local.kubernetes.helm_release_timeout
+  max_history      = 2
+  values = [
+    yamlencode({
+      clusterDomain = local.domains.kubernetes
+      imageAutomationController = {
+        create = false
+      }
+      imageReflectionController = {
+        create = false
+      }
+      notificationController = {
+        create = false
+      }
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+    helm_release.prometheus-operator-crds,
   ]
 }
