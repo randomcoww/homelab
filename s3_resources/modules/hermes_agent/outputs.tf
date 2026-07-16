@@ -1,6 +1,6 @@
 output "manifests" {
   value = concat([
-    module.statefulset.manifest,
+    module.deployment.manifest,
     module.secret.manifest,
     module.juicefs-secret.manifest,
     module.service.manifest,
@@ -119,5 +119,5 @@ output "manifests" {
       },
     ] :
     yamlencode(m)
-  ], module.litestream-overlay.additional_manifests)
+  ])
 }
