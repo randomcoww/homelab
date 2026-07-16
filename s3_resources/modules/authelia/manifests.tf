@@ -40,6 +40,11 @@ locals {
       }
       annotations = {
         "checksum/secret" = sha256(module.secret.manifest)
+        "secret.reloader.stakater.com/reload" = join(",", [
+          "${var.name}-ldap-client-tls",
+          "${var.name}-redis-client-tls",
+          "${var.name}-pg-app",
+        ])
       }
       extraVolumeMounts = [
         {
@@ -54,25 +59,25 @@ locals {
 
         # custom
         {
-          name      = "${var.name}-ldap-client-tls"
+          name      = "ldap-client-tls"
           mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE
           subPath   = "tls.crt"
           readOnly  = true
         },
         {
-          name      = "${var.name}-ldap-client-tls"
+          name      = "ldap-client-tls"
           mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE
           subPath   = "tls.key"
           readOnly  = true
         },
         {
-          name      = "${var.name}-redis-client-tls"
+          name      = "redis-client-tls"
           mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE
           subPath   = "tls.crt"
           readOnly  = true
         },
         {
-          name      = "${var.name}-redis-client-tls"
+          name      = "redis-client-tls"
           mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE
           subPath   = "tls.key"
           readOnly  = true
@@ -90,7 +95,7 @@ locals {
           readOnly  = true
         },
         {
-          name      = "${var.name}-pg-app"
+          name      = "pg-app"
           mountPath = local.envs.AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
           subPath   = "password"
           readOnly  = true
@@ -111,13 +116,13 @@ locals {
           }
         },
         {
-          name = "${var.name}-ldap-client-tls"
+          name = "ldap-client-tls"
           secret = {
             secretName = "${var.name}-ldap-client-tls"
           }
         },
         {
-          name = "${var.name}-redis-client-tls"
+          name = "redis-client-tls"
           secret = {
             secretName = "${var.name}-redis-client-tls"
           }
@@ -129,7 +134,7 @@ locals {
           }
         },
         {
-          name = "${var.name}-pg-app"
+          name = "pg-app"
           secret = {
             secretName = "${var.name}-pg-app"
           }

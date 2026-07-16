@@ -239,6 +239,7 @@ module "statefulset" {
   replicas  = var.replicas
   annotations = merge({
     "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
     }, {
     for i, m in module.litestream-overlay.additional_manifests :

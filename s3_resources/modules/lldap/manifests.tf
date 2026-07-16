@@ -116,6 +116,10 @@ module "deployment" {
   replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
+    "secret.reloader.stakater.com/reload" = join(",", [
+      "${var.name}-tls",
+      "${var.name}-pg-app",
+    ])
   }
   template_spec = {
     resources = {

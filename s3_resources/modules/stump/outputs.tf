@@ -126,6 +126,9 @@ output "manifests" {
         metadata = {
           name      = "${var.name}-pg"
           namespace = var.namespace
+          labels = {
+            "cnpg.io/reload" = "true"
+          }
         }
         spec = {
           instances = 3

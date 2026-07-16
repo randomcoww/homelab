@@ -74,8 +74,9 @@ module "deployment" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = {
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    "checksum/secret"                     = sha256(module.secret.manifest)
+    "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
+    "secret.reloader.stakater.com/reload" = "${var.name}-tls"
   }
   template_spec = {
     priorityClassName = "system-cluster-critical"

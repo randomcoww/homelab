@@ -30,6 +30,7 @@ tls-replication yes
 tls-ca-cert-file ${local.base_path}/ca.crt
 tls-cert-file ${local.base_path}/valkey.crt
 tls-key-file ${local.base_path}/valkey.key
+tls-auto-reload-interval 86400
 
 %{if member.name != local.initial_master~}
 replicaof ${local.initial_master}.${local.headless_service_fqdn} ${local.redis_port}
@@ -56,6 +57,7 @@ tls-cert-file ${local.base_path}/valkey.crt
 tls-key-file ${local.base_path}/valkey.key
 tls-client-cert-file ${local.base_path}/valkey.crt
 tls-client-key-file ${local.base_path}/valkey.key
+tls-auto-reload-interval 86400
 
 sentinel resolve-hostnames yes
 sentinel announce-hostnames yes
@@ -361,6 +363,7 @@ module "statefulset" {
           name = module.configmap.name
         }
       },
+      # tls-auto-reload-interval config auto reloads TLS on every interval
       {
         name = "tls"
         csi = {
