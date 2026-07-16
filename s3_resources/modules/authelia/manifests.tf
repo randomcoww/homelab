@@ -18,13 +18,6 @@ locals {
       repository = var.images.authelia.repository
       tag        = var.images.authelia.tag
     }
-    service = {
-      type = "ClusterIP"
-      annotations = {
-        "prometheus.io/scrape" = "true"
-        "prometheus.io/port"   = tostring(var.metrics_port)
-      }
-    }
     ingress = {
       enabled = true
       gatewayAPI = {
@@ -32,6 +25,11 @@ locals {
         parentRefs = [
           var.gateway_ref,
         ]
+      }
+      traefikCRD = {
+        # chart doesn't allow creating this if gatewayAPI is enabled
+        # create this manually in "traefik-crs"
+        enabled = false
       }
     }
     pod = {
@@ -236,6 +234,9 @@ locals {
         metrics = {
           enabled = true
           port    = var.metrics_port
+          serviceMonitor = {
+            enabled = true
+          }
         }
       }
       default_2fa_method = "webauthn"
