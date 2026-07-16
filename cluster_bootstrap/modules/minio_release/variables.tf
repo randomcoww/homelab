@@ -45,11 +45,8 @@ variable "ca" {
   })
 }
 
-variable "ports" {
-  type = object({
-    minio   = number
-    metrics = number
-  })
+variable "service_port" {
+  type = number
 }
 
 variable "timeout" {

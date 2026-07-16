@@ -451,10 +451,7 @@ module "minio" {
       tag        = regex(local.container_image_regex, local.container_images.minio).tag
     }
   }
-  ports = {
-    minio   = local.service_ports.minio
-    metrics = local.service_ports.metrics
-  }
+  service_port = local.service_ports.minio
   root_user = {
     id     = random_password.minio-access-key-id.result
     secret = random_password.minio-secret-access-key.result

@@ -78,6 +78,27 @@ output "manifests" {
           volumeName = "${var.name}-${var.minio_data_bucket}"
         }
       },
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "ServiceMonitor"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              app = var.name
+            }
+          }
+          endpoints = [
+            {
+              path       = local.extra_envs.ND_PROMETHEUS_METRICSPATH
+              targetPort = local.extra_envs.ND_PORT
+            },
+          ]
+        }
+      },
     ] :
     yamlencode(m)
   ], module.litestream-overlay.additional_manifests)

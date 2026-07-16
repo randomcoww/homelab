@@ -74,6 +74,27 @@ locals {
           },
         ]
       },
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "PodMonitor"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              app = var.name
+            }
+          }
+          podMetricsEndpoints = [
+            {
+              path       = "/metrics"
+              portNumber = var.ports.kube_vip_metrics
+            },
+          ]
+        }
+      },
     ] :
     yamlencode(m)
     ], [
@@ -88,10 +109,6 @@ module "daemonset" {
   app       = var.name
   release   = var.release
   affinity  = var.affinity
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(var.ports.kube_vip_metrics)
-  }
   template_spec = {
     hostNetwork        = true
     priorityClassName  = "system-cluster-critical"
@@ -124,6 +141,11 @@ module "daemonset" {
           "--prometheusHTTPServer=$(bgp_routerid):${var.ports.kube_vip_metrics}",
           "--cleanRoutingTable",
           "--healthCheckPort=${var.ports.kube_vip_health}",
+        ]
+        ports = [
+          {
+            containerPort = var.ports.kube_vip_metrics
+          },
         ]
         env = [
           {

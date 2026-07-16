@@ -131,6 +131,9 @@ module "deployment" {
           {
             containerPort = var.ports.registry
           },
+          {
+            containerPort = var.ports.metrics
+          },
         ]
         volumeMounts = [
           {
@@ -219,8 +222,6 @@ module "service" {
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
     "kube-vip.io/loadbalancerIPs"               = var.service_ip
-    "prometheus.io/scrape"                      = "true"
-    "prometheus.io/port"                        = tostring(var.ports.metrics)
   }
   spec = {
     type              = "LoadBalancer"

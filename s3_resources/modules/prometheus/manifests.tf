@@ -226,9 +226,13 @@ locals {
         }
       }
       prometheusSpec = {
-        serviceName              = local.headless_service
-        disableCompaction        = true
-        replicaExternalLabelName = "replica" # value is fixed in thanos
+        serviceName                             = local.headless_service
+        disableCompaction                       = true
+        replicaExternalLabelName                = "replica" # value is fixed in thanos
+        serviceMonitorSelectorNilUsesHelmValues = false
+        podMonitorSelectorNilUsesHelmValues     = false
+        ruleSelectorNilUsesHelmValues           = false
+        probeSelectorNilUsesHelmValues          = false
         thanos = {
           objectStorageConfig = {
             secret = {
@@ -484,100 +488,8 @@ locals {
         podLabels = {
           app = var.name
         }
-        additionalScrapeConfigs = concat(yamldecode(<<-EOF
-          - job_name: kubernetes-service-endpoints
-            honor_labels: true
-            kubernetes_sd_configs:
-              - role: endpointslice
-            relabel_configs:
-              - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-                action: keep
-                regex: true
-              - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
-                action: drop
-                regex: true
-              - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-                action: replace
-                target_label: __scheme__
-                regex: (https?)
-              - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
-                action: replace
-                target_label: __metrics_path__
-                regex: (.+)
-              - source_labels:
-                - __address__
-                - __meta_kubernetes_service_annotation_prometheus_io_port
-                action: replace
-                target_label: __address__
-                regex: (.+?)(?::\d+)?;(\d+)
-                replacement: $1:$2
-              - action: labelmap
-                regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
-                replacement: __param_$1
-              - action: labelmap
-                regex: __meta_kubernetes_service_label_(.+)
-              - source_labels: [__meta_kubernetes_namespace]
-                action: replace
-                target_label: namespace
-              - source_labels: [__meta_kubernetes_service_name]
-                action: replace
-                target_label: service
-              - source_labels: [__meta_kubernetes_pod_node_name]
-                action: replace
-                target_label: node
-
-          - job_name: kubernetes-pods
-            honor_labels: true
-            kubernetes_sd_configs:
-              - role: pod
-            relabel_configs:
-              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-                action: keep
-                regex: true
-              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]
-                action: drop
-                regex: true
-              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
-                action: replace
-                regex: (https?)
-                target_label: __scheme__
-              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-                action: replace
-                target_label: __metrics_path__
-                regex: (.+)
-              - source_labels:
-                - __meta_kubernetes_pod_annotation_prometheus_io_port
-                - __meta_kubernetes_pod_ip
-                action: replace
-                regex: (\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})
-                replacement: '[$2]:$1'
-                target_label: __address__
-              - source_labels:
-                - __meta_kubernetes_pod_annotation_prometheus_io_port
-                - __meta_kubernetes_pod_ip
-                action: replace
-                regex: (\d+);((([0-9]+?)(\.|$)){4})
-                replacement: $2:$1
-                target_label: __address__
-              - action: labelmap
-                regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
-                replacement: __param_$1
-              - action: labelmap
-                regex: __meta_kubernetes_pod_label_(.+)
-              - source_labels: [__meta_kubernetes_namespace]
-                action: replace
-                target_label: namespace
-              - source_labels: [__meta_kubernetes_pod_name]
-                action: replace
-                target_label: pod
-              - source_labels: [__meta_kubernetes_pod_phase]
-                regex: Pending|Succeeded|Failed|Completed
-                action: drop
-              - source_labels: [__meta_kubernetes_pod_node_name]
-                action: replace
-                target_label: node
-          EOF
-        ), var.extra_scrape_configs)
+        additionalScrapeConfigs = concat([
+        ], var.extra_scrape_configs)
       }
     }
     extraManifests = concat([

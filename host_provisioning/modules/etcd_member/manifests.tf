@@ -79,10 +79,6 @@ module "etcd-wrapper" {
   source    = "../../../modules/static_pod"
   name      = var.name
   namespace = var.namespace
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(var.ports.etcd_metrics)
-  }
   spec = {
     containers = [
       {

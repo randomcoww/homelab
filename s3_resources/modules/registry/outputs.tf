@@ -130,6 +130,28 @@ output "manifests" {
           }
         }
       },
+
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "ServiceMonitor"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              app = var.name
+            }
+          }
+          endpoints = [
+            {
+              path       = "/metrics"
+              targetPort = var.ports.metrics
+            },
+          ]
+        }
+      },
     ] :
     yamlencode(m)
     ], [

@@ -30,11 +30,6 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(local.extra_envs.ND_PORT)
-    "prometheus.io/path"   = local.extra_envs.ND_PROMETHEUS_METRICSPATH
-  }
   spec = {
     type = "ClusterIP"
     ports = [

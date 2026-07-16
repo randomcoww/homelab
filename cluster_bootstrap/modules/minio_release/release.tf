@@ -1,3 +1,45 @@
+locals {
+  manifests = concat([
+    for _, m in [
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "ServiceMonitor"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              app        = var.name
+              monitoring = "true"
+            }
+          }
+          endpoints = [
+            {
+              path       = "/minio/metrics/v3"
+              targetPort = var.service_port
+              scheme     = "https"
+              tlsConfig = {
+                ca = {
+                  secret = {
+                    key  = "tls.crt"
+                    name = module.minio-tls.name
+                  }
+                }
+                serverName = var.name
+              }
+            },
+          ]
+        }
+      },
+    ] :
+    yamlencode(m)
+    ], [
+    module.minio-tls.manifest,
+  ])
+}
+
 resource "helm_release" "wrapper" {
   chart            = "../helm-wrapper"
   name             = "${var.name}-resources"
@@ -8,9 +50,7 @@ resource "helm_release" "wrapper" {
   max_history      = 2
   values = [
     yamlencode({
-      manifests = [
-        module.minio-tls.manifest,
-      ]
+      manifests = local.manifests
     }),
   ]
 }
@@ -55,7 +95,7 @@ resource "helm_release" "minio" {
       }
       service = {
         type              = "LoadBalancer"
-        port              = var.ports.minio
+        port              = var.service_port
         clusterIP         = var.cluster_service_ip
         loadBalancerClass = "kube-vip.io/kube-vip-class"
         annotations = {
@@ -101,6 +141,13 @@ resource "helm_release" "minio" {
               topologyKey = "kubernetes.io/hostname"
             },
           ]
+        }
+      }
+      metrics = {
+        # this configures for old endpoints. Create a serviceMonitor manually
+        serviceMonitor = {
+          enabled     = false
+          includeNode = false
         }
       }
     }),

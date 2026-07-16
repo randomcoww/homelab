@@ -4,10 +4,6 @@ module "daemonset" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(var.metrics_port)
-  }
   template_spec = {
     priorityClassName = "system-node-critical"
     resources = {

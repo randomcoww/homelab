@@ -102,7 +102,7 @@ module "prometheus" {
             {
               alert = "ErasureSetNearingQuorumLoss"
               expr = <<-EOF
-              minio_cluster_erasure_set_write_tolerance{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} <= 1
+              minio_cluster_erasure_set_write_tolerance{job="${local.endpoints.minio.name}"} <= 1
               EOF
               for = "1m"
               labels = {
@@ -115,8 +115,8 @@ module "prometheus" {
             {
               alert = "ErasureSetQuorumLossImminent"
               expr = <<-EOF
-              minio_cluster_erasure_set_write_tolerance{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} <=
-              floor(minio_cluster_erasure_set_write_quorum{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}/2)
+              minio_cluster_erasure_set_write_tolerance{job="${local.endpoints.minio.name}"} <=
+              floor(minio_cluster_erasure_set_write_quorum{job="${local.endpoints.minio.name}"}/2)
               EOF
               for = "5m"
               labels = {
@@ -130,7 +130,7 @@ module "prometheus" {
             {
               alert = "HighServerErrorRate"
               expr  = <<-EOF
-              rate(minio_api_requests_5xx_errors_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[5m]) > 1
+              rate(minio_api_requests_5xx_errors_total{job="${local.endpoints.minio.name}"}[5m]) > 1
               EOF
               for   = "2m"
               labels = {
@@ -143,7 +143,7 @@ module "prometheus" {
             {
               alert = "StorageCapacityDecreasing"
               expr  = <<-EOF
-              deriv(minio_cluster_health_capacity_usable_free_bytes{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1h]) / (1024 * 1024 * 1024) < -1
+              deriv(minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"}[1h]) / (1024 * 1024 * 1024) < -1
               EOF
               for   = "30m"
               labels = {
@@ -156,7 +156,7 @@ module "prometheus" {
             {
               alert = "StorageFreeSpaceIncreasing"
               expr  = <<-EOF
-              deriv(minio_cluster_health_capacity_usable_free_bytes{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1h]) / (1024 * 1024 * 1024) > 1
+              deriv(minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"}[1h]) / (1024 * 1024 * 1024) > 1
               EOF
               for   = "30m"
               labels = {
@@ -169,8 +169,8 @@ module "prometheus" {
             {
               alert = "StorageCapacityCritical"
               expr  = <<-EOF
-              (minio_cluster_health_capacity_usable_free_bytes{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} /
-              minio_cluster_health_capacity_usable_total_bytes{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}) < 0.30
+              (minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"} /
+              minio_cluster_health_capacity_usable_total_bytes{job="${local.endpoints.minio.name}"}) < 0.30
               EOF
               for   = "10m"
               labels = {
@@ -183,7 +183,7 @@ module "prometheus" {
             {
               alert = "GoroutineCountHigh"
               expr  = <<-EOF
-              minio_system_process_go_routine_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} > 10000
+              minio_system_process_go_routine_total{job="${local.endpoints.minio.name}"} > 10000
               EOF
               for   = "10m"
               labels = {
@@ -196,7 +196,7 @@ module "prometheus" {
             {
               alert = "GoroutineCountRapidlyIncreasing"
               expr  = <<-EOF
-              deriv(minio_system_process_go_routine_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[5m]) > 10
+              deriv(minio_system_process_go_routine_total{job="${local.endpoints.minio.name}"}[5m]) > 10
               EOF
               for   = "10m"
               labels = {
@@ -209,7 +209,7 @@ module "prometheus" {
             {
               alert = "HighClientErrorRate"
               expr  = <<-EOF
-              rate(minio_api_requests_4xx_errors_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[5m]) > 1
+              rate(minio_api_requests_4xx_errors_total{job="${local.endpoints.minio.name}"}[5m]) > 1
               EOF
               for   = "2m"
               labels = {
@@ -222,7 +222,7 @@ module "prometheus" {
             {
               alert = "ErasureSetDegraded"
               expr  = <<-EOF
-              minio_cluster_erasure_set_health{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} == 0
+              minio_cluster_erasure_set_health{job="${local.endpoints.minio.name}"} == 0
               EOF
               for   = "15m"
               labels = {
@@ -235,7 +235,7 @@ module "prometheus" {
             {
               alert = "DriveOffline"
               expr  = <<-EOF
-              minio_system_drive_health{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} == 0
+              minio_system_drive_health{job="${local.endpoints.minio.name}"} == 0
               EOF
               for   = "10m"
               labels = {
@@ -248,7 +248,7 @@ module "prometheus" {
             {
               alert = "MemoryUsageHigh"
               expr  = <<-EOF
-              minio_system_memory_used_perc{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} > 90
+              minio_system_memory_used_perc{job="${local.endpoints.minio.name}"} > 90
               EOF
               for   = "10m"
               labels = {
@@ -261,8 +261,8 @@ module "prometheus" {
             {
               alert = "MemoryUsageIncreasing"
               expr  = <<-EOF
-              deriv(minio_system_memory_used_perc{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[15m]) > 1.25 and
-              minio_system_memory_used_perc{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} > 50
+              deriv(minio_system_memory_used_perc{job="${local.endpoints.minio.name}"}[15m]) > 1.25 and
+              minio_system_memory_used_perc{job="${local.endpoints.minio.name}"} > 50
               EOF
               for   = "10m"
               labels = {
@@ -275,7 +275,7 @@ module "prometheus" {
             {
               alert = "ScannerStalled"
               expr  = <<-EOF
-              minio_scanner_last_activity_seconds{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} > 172800
+              minio_scanner_last_activity_seconds{job="${local.endpoints.minio.name}"} > 172800
               EOF
               for   = "2m"
               labels = {
@@ -288,8 +288,8 @@ module "prometheus" {
             {
               alert = "FileDescriptorExhaustion"
               expr  = <<-EOF
-              (minio_system_process_file_descriptor_open_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"} /
-              minio_system_process_file_descriptor_limit_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}) > 0.90
+              (minio_system_process_file_descriptor_open_total{job="${local.endpoints.minio.name}"} /
+              minio_system_process_file_descriptor_limit_total{job="${local.endpoints.minio.name}"}) > 0.90
               EOF
               for   = "2m"
               labels = {
@@ -312,8 +312,8 @@ module "prometheus" {
               alert = "KeaDHCP4PoolUsageHigh"
               expr  = <<-EOF
               max by (subnet_id) (
-                kea_dhcp4_pool_addresses_assigned_total{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"} /
-                (kea_dhcp4_pool_addresses_total{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"} + 1)
+                kea_dhcp4_pool_addresses_assigned_total{job="${local.endpoints.kea.name}"} /
+                (kea_dhcp4_pool_addresses_total{job="${local.endpoints.kea.name}"} + 1)
               ) > 0.90
               EOF
               for   = "10m"
