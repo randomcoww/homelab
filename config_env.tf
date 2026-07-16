@@ -259,9 +259,6 @@ locals {
         name      = "traefik"
         namespace = "traefik"
       }
-      apiserver = {
-        name = "kubernetes"
-      }
       kubernetes_mcp = {
         name = "kubernetes-mcp"
       }
