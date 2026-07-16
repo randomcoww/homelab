@@ -467,9 +467,6 @@ module "minio" {
 
   depends_on = [
     kubernetes_labels.labels,
-    helm_release.local-path-provisioner,
-    helm_release.kube-dns,
-    module.kube-vip,
     helm_release.prometheus-operator-crds,
   ]
 }

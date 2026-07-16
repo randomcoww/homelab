@@ -24,7 +24,7 @@ locals {
                 ca = {
                   secret = {
                     key  = "tls.crt"
-                    name = module.minio-tls.name
+                    name = module.tls.name
                   }
                 }
                 serverName = var.name
@@ -255,7 +255,7 @@ locals {
     ] :
     yamlencode(m)
     ], [
-    module.minio-tls.manifest,
+    module.tls.manifest,
   ])
 }
 
@@ -292,7 +292,7 @@ resource "helm_release" "minio" {
         tag        = var.images.minio.tag
       }
       podAnnotations = {
-        "checksum/tls" = sha256(module.minio-tls.manifest)
+        "checksum/tls" = sha256(module.tls.manifest)
       }
       clusterDomain     = var.cluster_domain
       mode              = "distributed"
@@ -326,9 +326,9 @@ resource "helm_release" "minio" {
         enabled    = true
         publicCrt  = "tls.crt"
         privateKey = "tls.key"
-        certSecret = module.minio-tls.name
+        certSecret = module.tls.name
       }
-      trustedCertsSecret = module.minio-tls.name
+      trustedCertsSecret = module.tls.name
       ingress = {
         enabled = false
       }

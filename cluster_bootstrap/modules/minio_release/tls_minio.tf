@@ -41,7 +41,7 @@ resource "tls_locally_signed_cert" "minio" {
   ]
 }
 
-module "minio-tls" {
+module "tls" {
   source    = "../../../modules/secret"
   name      = "${var.name}-tls"
   namespace = var.namespace
