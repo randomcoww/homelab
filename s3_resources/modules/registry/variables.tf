@@ -22,13 +22,6 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    registry = number
-    metrics  = number
-  })
-}
-
 variable "replicas" {
   type    = number
   default = 1
@@ -41,6 +34,10 @@ variable "ca_issuer_name" {
 variable "config" {
   type    = any
   default = {}
+}
+
+variable "service_port" {
+  type = number
 }
 
 variable "service_ip" {

@@ -19,7 +19,7 @@ output "manifests" {
           podMetricsEndpoints = [
             {
               path       = "/metrics"
-              portNumber = var.metrics_port
+              portNumber = local.metrics_port
             },
           ]
         }

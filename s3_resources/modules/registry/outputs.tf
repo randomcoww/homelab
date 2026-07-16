@@ -131,6 +131,7 @@ output "manifests" {
         }
       },
 
+      # monitoring
       {
         apiVersion = "monitoring.coreos.com/v1"
         kind       = "ServiceMonitor"
@@ -147,7 +148,7 @@ output "manifests" {
           endpoints = [
             {
               path       = "/metrics"
-              targetPort = var.ports.metrics
+              targetPort = local.metrics_port
             },
           ]
         }

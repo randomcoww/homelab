@@ -198,12 +198,12 @@ locals {
   }
 
   service_ports = {
-    minio          = 9000
-    metrics        = 9100
-    registry       = 443 # not configurable
-    ldaps          = 6360
-    redis_sentinel = 26379
-    kubernetes_mcp = 8080
+    minio           = 9000
+    coredns_metrics = 9153
+    registry        = 443 # not configurable
+    ldaps           = 6360
+    redis_sentinel  = 26379
+    kubernetes_mcp  = 8080
   }
 
   ha = {
@@ -255,6 +255,18 @@ locals {
 
   endpoints = {
     for name, e in {
+      kube_proxy = {
+        name      = "kube-proxy"
+        namespace = "kube-system"
+      }
+      etcd = {
+        name      = "etcd"
+        namespace = "kube-system"
+      }
+      kube_dns = {
+        name      = "kube-dns"
+        namespace = "kube-system"
+      }
       traefik = {
         name      = "traefik"
         namespace = "traefik"

@@ -1,5 +1,6 @@
 locals {
-  config_path = "/etc/registry"
+  config_path  = "/etc/registry"
+  metrics_port = 9100
 }
 
 module "secret" {
@@ -15,7 +16,7 @@ module "secret" {
         maxtags = 10000 # renovate compatibility
       }
       http = {
-        addr   = "0.0.0.0:${var.ports.registry}"
+        addr   = "0.0.0.0:${var.service_port}"
         prefix = "/"
         tls = {
           certificate = "${local.config_path}/tls/cert.pem"
@@ -26,7 +27,7 @@ module "secret" {
           clientauth = "require-and-verify-client-cert"
         }
         debug = {
-          addr = "0.0.0.0:${var.ports.metrics}"
+          addr = "0.0.0.0:${local.metrics_port}"
           prometheus = {
             enabled = true
           }
@@ -129,10 +130,10 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = var.ports.registry
+            containerPort = var.service_port
           },
           {
-            containerPort = var.ports.metrics
+            containerPort = local.metrics_port
           },
         ]
         volumeMounts = [
@@ -153,7 +154,7 @@ module "deployment" {
         ]
         livenessProbe = {
           httpGet = {
-            port   = var.ports.metrics
+            port   = local.metrics_port
             path   = "/debug/health"
             scheme = "HTTP"
           }
@@ -161,7 +162,7 @@ module "deployment" {
         }
         readinessProbe = {
           httpGet = {
-            port   = var.ports.metrics
+            port   = local.metrics_port
             path   = "/debug/health"
             scheme = "HTTP"
           }
@@ -229,15 +230,15 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = var.ports.registry
+        port       = var.service_port
         protocol   = "TCP"
-        targetPort = var.ports.registry
+        targetPort = var.service_port
       },
       {
         name       = "${var.name}-metrics"
-        port       = var.ports.metrics
+        port       = local.metrics_port
         protocol   = "TCP"
-        targetPort = var.ports.metrics
+        targetPort = local.metrics_port
       },
     ]
   }

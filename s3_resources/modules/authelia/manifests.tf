@@ -233,7 +233,6 @@ locals {
       telemetry = {
         metrics = {
           enabled = true
-          port    = var.metrics_port
           serviceMonitor = {
             enabled = true
           }

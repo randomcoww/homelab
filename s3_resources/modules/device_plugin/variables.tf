@@ -22,10 +22,6 @@ variable "images" {
   })
 }
 
-variable "metrics_port" {
-  type = number
-}
-
 variable "args" {
   type = list(string)
 }

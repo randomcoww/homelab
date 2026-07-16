@@ -1,3 +1,7 @@
+locals {
+  metrics_port = 9100
+}
+
 module "daemonset" {
   source    = "../../../modules/daemonset"
   name      = var.name
@@ -19,7 +23,7 @@ module "daemonset" {
         name  = var.name
         image = var.images.device_plugin
         args = concat(var.args, [
-          "--listen=0.0.0.0:${var.metrics_port}",
+          "--listen=0.0.0.0:${local.metrics_port}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",
         ])
         securityContext = {
@@ -27,7 +31,7 @@ module "daemonset" {
         }
         ports = [
           {
-            containerPort = var.metrics_port
+            containerPort = local.metrics_port
           },
         ]
         volumeMounts = [

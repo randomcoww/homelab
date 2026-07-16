@@ -28,7 +28,7 @@ module "prometheus" {
         port       = local.host_ports.kube_proxy_metrics
         targetPort = local.host_ports.kube_proxy_metrics
         selector = {
-          app = "kube-proxy"
+          app = local.endpoints.kube_proxy.name
         }
       }
     }
@@ -36,10 +36,10 @@ module "prometheus" {
       enabled = true
       service = {
         enabled    = true
-        port       = local.service_ports.metrics
-        targetPort = local.service_ports.metrics
+        port       = local.service_ports.coredns_metrics
+        targetPort = local.service_ports.coredns_metrics
         selector = {
-          k8s-app = "coredns"
+          app = local.endpoints.kube_dns.name
         }
       }
     }
@@ -50,7 +50,7 @@ module "prometheus" {
         port       = local.host_ports.etcd_metrics
         targetPort = local.host_ports.etcd_metrics
         selector = {
-          k8s-app = "etcd"
+          k8s-app = local.endpoints.etcd.name
         }
       }
     }
@@ -112,15 +112,12 @@ module "registry" {
   images = {
     registry = local.container_images_digest.registry
   }
-  ports = {
-    registry = local.service_ports.registry
-    metrics  = local.service_ports.metrics
-  }
   ca_issuer_name      = local.kubernetes.cert_issuers.ca_internal
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_user          = minio_iam_user.user["registry"]
+  service_port        = local.service_ports.registry
   service_hostname    = local.endpoints.registry.service
   service_ip          = local.services.registry.ip
 }
@@ -160,7 +157,6 @@ module "device-plugin" {
   images = {
     device_plugin = local.container_images_digest.device_plugin
   }
-  metrics_port = local.service_ports.metrics
   args = [
     "--device",
     yamlencode({
@@ -415,7 +411,9 @@ locals {
               ]
               metrics = {
                 enable = true
-                port   = local.service_ports.metrics
+                serviceMonitor = {
+                  enabled = true
+                }
               }
             }
           }
@@ -496,6 +494,9 @@ locals {
                 annotations = {
                   "kube-vip.io/loadbalancerIPs" = local.services.k8s_gateway.ip
                 }
+                labels = {
+                  app = "k8s-gateway"
+                }
               }
               affinity = {
                 podAntiAffinity = {
@@ -530,7 +531,7 @@ locals {
                 },
                 {
                   name       = "prometheus"
-                  parameters = "0.0.0.0:9153" # not configurable
+                  parameters = "0.0.0.0:${local.service_ports.coredns_metrics}"
                 },
                 {
                   name = "hosts"
@@ -559,6 +560,29 @@ locals {
                 }
               ])
             }
+          }
+        },
+
+        # monitoring
+        {
+          apiVersion = "monitoring.coreos.com/v1"
+          kind       = "ServiceMonitor"
+          metadata = {
+            name      = "k8s-gateway"
+            namespace = "kube-system"
+          }
+          spec = {
+            selector = {
+              matchLabels = {
+                app = "k8s-gateway"
+              }
+            }
+            endpoints = [
+              {
+                path       = "/metrics"
+                targetPort = local.service_ports.coredns_metrics
+              },
+            ]
           }
         },
       ] :
@@ -836,7 +860,6 @@ locals {
       yamlencode(m)
     ]
 
-    /*
     kured = [
       for _, m in [
         {
@@ -892,10 +915,9 @@ locals {
               configuration = {
                 prometheusUrl     = "https://${local.endpoints.prometheus.ingress}"
                 period            = "2m"
-                metricsPort       = local.service_ports.metrics
                 forceReboot       = true
                 drainTimeout      = "6m"
-                alertFilterRegexp = "^Watchdog$|^PrometheusNotConnectedToAlertmanagers$"
+                alertFilterRegexp = "^Watchdog$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
                 ]
@@ -913,12 +935,12 @@ locals {
                 }
               }
               priorityClassName = "system-node-critical"
+              metrics = {
+                create    = true
+                namespace = "monitoring"
+              }
               service = {
                 create = true
-                annotations = {
-                  "prometheus.io/scrape" = "true"
-                  "prometheus.io/port"   = tostring(local.service_ports.metrics)
-                }
               }
               volumeMounts = [
                 {
@@ -942,7 +964,6 @@ locals {
       ] :
       yamlencode(m)
     ]
-    */
 
     juicefs-csi-driver = [
       for _, m in [

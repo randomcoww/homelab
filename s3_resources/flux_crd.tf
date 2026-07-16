@@ -212,6 +212,9 @@ locals {
               }
               prometheus = {
                 enabled = true
+                servicemonitor = {
+                  enabled = true
+                }
               }
               webhook = {
                 replicaCount = 2
@@ -303,7 +306,9 @@ locals {
             values = {
               metrics = {
                 enabled = true
-                port    = local.service_ports.metrics
+                podmonitor = {
+                  enabled = true
+                }
               }
             }
           }

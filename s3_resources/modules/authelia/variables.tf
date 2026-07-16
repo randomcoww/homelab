@@ -42,10 +42,6 @@ variable "images" {
   })
 }
 
-variable "metrics_port" {
-  type = number
-}
-
 variable "gateway_ref" {
   type = object({
     name      = string

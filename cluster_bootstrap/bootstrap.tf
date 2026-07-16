@@ -172,8 +172,8 @@ resource "helm_release" "prometheus-operator-crds" {
 
 module "kube-proxy" {
   source    = "./modules/kube_proxy_release"
-  name      = "kube-proxy"
-  namespace = "kube-system"
+  name      = local.endpoints.kube_proxy.name
+  namespace = local.endpoints.kube_proxy.namespace
   images = {
     kube_proxy = local.container_images_digest.kube_proxy
   }
@@ -215,8 +215,8 @@ module "flannel" {
 }
 
 resource "helm_release" "kube-dns" {
-  name             = "kube-dns"
-  namespace        = "kube-system"
+  name             = local.endpoints.kube_dns.name
+  namespace        = local.endpoints.kube_dns.namespace
   repository       = "https://coredns.github.io/helm"
   chart            = "coredns"
   create_namespace = true
@@ -238,7 +238,13 @@ resource "helm_release" "kube-dns" {
       prometheus = {
         service = {
           enabled = true
+          monitor = {
+            enabled = false # create in prometheus chart
+          }
         }
+      }
+      customLabels = {
+        app = local.endpoints.kube_dns.name
       }
       service = {
         clusterIP = local.services.cluster_dns.ip
@@ -292,7 +298,7 @@ resource "helm_release" "kube-dns" {
             },
             {
               name       = "prometheus"
-              parameters = "0.0.0.0:${local.service_ports.metrics}"
+              parameters = "0.0.0.0:${local.service_ports.coredns_metrics}"
             },
             {
               name        = "kubernetes"

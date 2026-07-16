@@ -127,7 +127,6 @@ module "authelia" {
       tag        = regex(local.container_image_regex, local.container_images.authelia).tag
     }
   }
-  metrics_port   = local.service_ports.metrics
   ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
   ldap_endpoint  = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
   redis_sentinel_endpoint = {
