@@ -54,6 +54,8 @@ output "manifests" {
           }
         }
       },
+
+      # monitoring
       {
         apiVersion = "monitoring.coreos.com/v1"
         kind       = "PodMonitor"
@@ -71,6 +73,40 @@ output "manifests" {
             {
               path       = "/metrics"
               portNumber = var.ports.kea_metrics
+            },
+          ]
+        }
+      },
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "PrometheusRule"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          groups = [
+            {
+              name = var.name
+              rules = [
+                {
+                  alert = "KeaDHCP4PoolUsageHigh"
+                  expr  = <<-EOF
+                  max by (subnet_id) (
+                    kea_dhcp4_pool_addresses_assigned_total{job="${var.name}"} /
+                    (kea_dhcp4_pool_addresses_total{job="${var.name}"} + 1)
+                  ) > 0.90
+                  EOF
+                  for   = "10m"
+                  labels = {
+                    severity = "warning"
+                  }
+                  annotations = {
+                    summary     = "Kea DHCPv4 pool usage high"
+                    description = "DHCPv4 pool {{ $labels.subnet }} is at {{ $value | humanize }}% utilization."
+                  }
+                }
+              ]
             },
           ]
         }

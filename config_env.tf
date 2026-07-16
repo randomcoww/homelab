@@ -262,18 +262,6 @@ locals {
       apiserver = {
         name = "kubernetes"
       }
-      etcd = {
-        name      = "etcd"
-        namespace = "kube-system"
-      }
-      kube_dns = {
-        name      = "kube-dns"
-        namespace = "kube-system"
-      }
-      k8s_gateway = {
-        name      = "k8s-gateway"
-        namespace = "kube-system"
-      }
       kubernetes_mcp = {
         name = "kubernetes-mcp"
       }
@@ -281,20 +269,12 @@ locals {
         name      = "s3-csi"
         namespace = "s3-csi"
       }
-      kea = {
-        name      = "kea"
-        namespace = "netboot"
-      }
       minio = {
         name      = "minio"
         namespace = "minio"
       }
       prometheus = {
         name      = "prometheus"
-        namespace = "monitoring"
-      }
-      kured = {
-        name      = "kured"
         namespace = "monitoring"
       }
       searxng = {

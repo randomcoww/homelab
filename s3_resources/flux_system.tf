@@ -92,246 +92,6 @@ module "prometheus" {
       ]
     },
   ]
-  extra_rules_map = {
-    minio = {
-      groups = [
-        {
-          name = "minio"
-          rules = [
-            /*
-            {
-              alert = "ErasureSetNearingQuorumLoss"
-              expr = <<-EOF
-              minio_cluster_erasure_set_write_tolerance{job="${local.endpoints.minio.name}"} <= 1
-              EOF
-              for = "1m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary = "Erasure set {{ $labels.pool_id }}/{{ $labels.set_id }} operating at minimum capacity"
-              }
-            },
-            {
-              alert = "ErasureSetQuorumLossImminent"
-              expr = <<-EOF
-              minio_cluster_erasure_set_write_tolerance{job="${local.endpoints.minio.name}"} <=
-              floor(minio_cluster_erasure_set_write_quorum{job="${local.endpoints.minio.name}"}/2)
-              EOF
-              for = "5m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary = "Erasure set {{ $labels.pool_id }}/{{ $labels.set_id }} at 1/2 write availability"
-              }
-            },
-            */
-            {
-              alert = "HighServerErrorRate"
-              expr  = <<-EOF
-              rate(minio_api_requests_5xx_errors_total{job="${local.endpoints.minio.name}"}[5m]) > 1
-              EOF
-              for   = "2m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary = "High 5xx error rate on {{ $labels.server }}: {{ $value | humanize }} errors/sec"
-              }
-            },
-            {
-              alert = "StorageCapacityDecreasing"
-              expr  = <<-EOF
-              deriv(minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"}[1h]) / (1024 * 1024 * 1024) < -1
-              EOF
-              for   = "30m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Cluster storage decreasing rapidly (>1GB/hour)"
-              }
-            },
-            {
-              alert = "StorageFreeSpaceIncreasing"
-              expr  = <<-EOF
-              deriv(minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"}[1h]) / (1024 * 1024 * 1024) > 1
-              EOF
-              for   = "30m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Cluster free space increasing rapidly (>1GB/hour)"
-              }
-            },
-            {
-              alert = "StorageCapacityCritical"
-              expr  = <<-EOF
-              (minio_cluster_health_capacity_usable_free_bytes{job="${local.endpoints.minio.name}"} /
-              minio_cluster_health_capacity_usable_total_bytes{job="${local.endpoints.minio.name}"}) < 0.30
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Cluster storage {{ $value | humanizePercentage }} free (below 30%)"
-              }
-            },
-            {
-              alert = "GoroutineCountHigh"
-              expr  = <<-EOF
-              minio_system_process_go_routine_total{job="${local.endpoints.minio.name}"} > 10000
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Node {{ $labels.server }} has {{ $value }} goroutines (threshold: 10000)"
-              }
-            },
-            {
-              alert = "GoroutineCountRapidlyIncreasing"
-              expr  = <<-EOF
-              deriv(minio_system_process_go_routine_total{job="${local.endpoints.minio.name}"}[5m]) > 10
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Goroutine count on {{ $labels.server }} increasing at {{ $value | humanize }}/sec"
-              }
-            },
-            {
-              alert = "HighClientErrorRate"
-              expr  = <<-EOF
-              rate(minio_api_requests_4xx_errors_total{job="${local.endpoints.minio.name}"}[5m]) > 1
-              EOF
-              for   = "2m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "High 4xx error rate on {{ $labels.server }}: {{ $value | humanize }} errors/sec"
-              }
-            },
-            {
-              alert = "ErasureSetDegraded"
-              expr  = <<-EOF
-              minio_cluster_erasure_set_health{job="${local.endpoints.minio.name}"} == 0
-              EOF
-              for   = "15m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Erasure set {{ $labels.pool_id }}/{{ $labels.set_id }} is degraded"
-              }
-            },
-            {
-              alert = "DriveOffline"
-              expr  = <<-EOF
-              minio_system_drive_health{job="${local.endpoints.minio.name}"} == 0
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary = "Drive {{ $labels.drive }} at index {{ $labels.drive_index }} in server {{$labels.server}} is offline."
-              }
-            },
-            {
-              alert = "MemoryUsageHigh"
-              expr  = <<-EOF
-              minio_system_memory_used_perc{job="${local.endpoints.minio.name}"} > 90
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary = "Memory usage on {{ $labels.server }} at {{ $value }}%"
-              }
-            },
-            {
-              alert = "MemoryUsageIncreasing"
-              expr  = <<-EOF
-              deriv(minio_system_memory_used_perc{job="${local.endpoints.minio.name}"}[15m]) > 1.25 and
-              minio_system_memory_used_perc{job="${local.endpoints.minio.name}"} > 50
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Memory usage on {{ $labels.server }} increasing rapidly ({{ $value }}%/15min)"
-              }
-            },
-            {
-              alert = "ScannerStalled"
-              expr  = <<-EOF
-              minio_scanner_last_activity_seconds{job="${local.endpoints.minio.name}"} > 172800
-              EOF
-              for   = "2m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "Scanner inactive on {{ $labels.server }} for {{ $value | humanizeDuration }}"
-              }
-            },
-            {
-              alert = "FileDescriptorExhaustion"
-              expr  = <<-EOF
-              (minio_system_process_file_descriptor_open_total{job="${local.endpoints.minio.name}"} /
-              minio_system_process_file_descriptor_limit_total{job="${local.endpoints.minio.name}"}) > 0.90
-              EOF
-              for   = "2m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary = "MinIO process on {{ $labels.server }} using {{ $value | printf \"%.2f\" }}% of available file descriptors"
-              }
-            },
-          ]
-        }
-      ]
-    }
-    kea = {
-      groups = [
-        {
-          name = "kea"
-          rules = [
-            {
-              alert = "KeaDHCP4PoolUsageHigh"
-              expr  = <<-EOF
-              max by (subnet_id) (
-                kea_dhcp4_pool_addresses_assigned_total{job="${local.endpoints.kea.name}"} /
-                (kea_dhcp4_pool_addresses_total{job="${local.endpoints.kea.name}"} + 1)
-              ) > 0.90
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "Kea DHCPv4 pool usage high"
-                description = <<-EOF
-                DHCPv4 pool {{ $labels.subnet }} is at {{ $value | humanize }}% utilization.
-                EOF
-              }
-            },
-          ]
-        },
-      ]
-    }
-  }
   ingress_hostname = local.endpoints.prometheus.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -527,8 +287,8 @@ module "device-plugin" {
 
 module "kea" {
   source    = "./modules/kea"
-  name      = local.endpoints.kea.name
-  namespace = local.endpoints.kea.namespace
+  name      = "kea"
+  namespace = "netboot"
   images = {
     kea  = local.container_images_digest.kea
     ipxe = local.container_images_digest.ipxe
@@ -670,8 +430,8 @@ locals {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = local.endpoints.k8s_gateway.name
-            namespace = local.endpoints.k8s_gateway.namespace
+            name      = "k8s-gateway"
+            namespace = "kube-system"
           }
           spec = {
             interval = "15m"
@@ -682,8 +442,8 @@ locals {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.endpoints.k8s_gateway.name
-            namespace = local.endpoints.k8s_gateway.namespace
+            name      = "k8s-gateway"
+            namespace = "kube-system"
           }
           spec = {
             interval = "15m"
@@ -694,12 +454,12 @@ locals {
                 version = "3.7.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = local.endpoints.k8s_gateway.name
+                  name = "k8s-gateway"
                 }
                 interval = "5m"
               }
             }
-            releaseName = local.endpoints.k8s_gateway.name
+            releaseName = "k8s-gateway"
             install = {
               remediation = {
                 retries = -1
@@ -737,9 +497,6 @@ locals {
                   "kube-vip.io/loadbalancerIPs" = local.services.k8s_gateway.ip
                 }
               }
-              customLabels = {
-                app = local.endpoints.k8s_gateway.name
-              }
               affinity = {
                 podAntiAffinity = {
                   requiredDuringSchedulingIgnoredDuringExecution = [
@@ -750,7 +507,7 @@ locals {
                             key      = "app"
                             operator = "In"
                             values = [
-                              local.endpoints.k8s_gateway.name,
+                              "k8s-gateway",
                             ]
                           },
                         ]
@@ -1079,14 +836,15 @@ locals {
       yamlencode(m)
     ]
 
+    /*
     kured = [
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = local.endpoints.kured.name
-            namespace = local.endpoints.kured.namespace
+            name      = "kured"
+            namespace = "monitoring"
           }
           spec = {
             interval = "15m"
@@ -1097,8 +855,8 @@ locals {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.endpoints.kured.name
-            namespace = local.endpoints.prometheus.namespace
+            name      = "kured"
+            namespace = "monitoring"
           }
           spec = {
             interval = "15m"
@@ -1109,12 +867,12 @@ locals {
                 version = "6.1.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = local.endpoints.kured.name
+                  name = "kured"
                 }
                 interval = "5m"
               }
             }
-            releaseName = local.endpoints.kured.name
+            releaseName = "kured"
             install = {
               remediation = {
                 retries = -1
@@ -1184,6 +942,7 @@ locals {
       ] :
       yamlencode(m)
     ]
+    */
 
     juicefs-csi-driver = [
       for _, m in [

@@ -215,8 +215,8 @@ module "flannel" {
 }
 
 resource "helm_release" "kube-dns" {
-  name             = local.endpoints.kube_dns.name
-  namespace        = local.endpoints.kube_dns.namespace
+  name             = "kube-dns"
+  namespace        = "kube-system"
   repository       = "https://coredns.github.io/helm"
   chart            = "coredns"
   create_namespace = true
@@ -243,9 +243,6 @@ resource "helm_release" "kube-dns" {
       service = {
         clusterIP = local.services.cluster_dns.ip
       }
-      customLabels = {
-        app = local.endpoints.kube_dns.name
-      }
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
@@ -256,7 +253,7 @@ resource "helm_release" "kube-dns" {
                     key      = "app"
                     operator = "In"
                     values = [
-                      local.endpoints.kube_dns.name,
+                      "kube-dns",
                     ]
                   },
                 ]
