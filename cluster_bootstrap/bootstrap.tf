@@ -237,10 +237,10 @@ resource "helm_release" "kube-dns" {
       }
       prometheus = {
         service = {
-          enabled = true
-          monitor = {
-            enabled = false # create in prometheus chart
-          }
+          enabled = false
+        }
+        monitor = {
+          enabled = false # create in prometheus chart
         }
       }
       customLabels = {
