@@ -218,7 +218,8 @@ module "statefulset" {
   affinity  = var.affinity
   replicas  = length(local.members)
   annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/secret"                     = sha256(module.secret.manifest)
+    "secret.reloader.stakater.com/reload" = "${var.name}-tls"
   }
   spec = {
     minReadySeconds = 30
@@ -385,21 +386,8 @@ module "statefulset" {
       },
       {
         name = "tls"
-        csi = {
-          driver   = "csi.cert-manager.io"
-          readOnly = true
-          volumeAttributes = {
-            "csi.cert-manager.io/issuer-name"   = var.name
-            "csi.cert-manager.io/common-name"   = "$${POD_NAME}"
-            "csi.cert-manager.io/issuer-kind"   = "Issuer"
-            "csi.cert-manager.io/key-algorithm" = "ECDSA"
-            "csi.cert-manager.io/key-size"      = "521"
-            "csi.cert-manager.io/key-encoding"  = "PKCS8"
-            "csi.cert-manager.io/key-usages" = join(",", [
-              "digital signature",
-              "key encipherment",
-            ])
-          }
+        secret = {
+          secretName = "${var.name}-tls"
         }
       },
     ]
