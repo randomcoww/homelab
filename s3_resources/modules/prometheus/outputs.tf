@@ -100,6 +100,34 @@ output "manifests" {
           }
         }
       },
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+          ]
+          dnsNames = concat([
+            var.name,
+          ], local.members)
+          issuerRef = {
+            name = var.name
+            kind = "Issuer"
+          }
+        }
+      },
     ] :
     yamlencode(m)
   ]

@@ -50,9 +50,6 @@ locals {
         app     = var.name
         release = "0.1.0"
       }
-      annotations = {
-        "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-      }
     }
     spec = {
       schedule          = "0 * * * *"
@@ -171,6 +168,10 @@ locals {
     }
     prometheus = {
       enabled = true
+      annotations = {
+        "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
+        "secret.reloader.stakater.com/reload" = "${var.name}-tls"
+      }
       thanosService = {
         enabled = true
         port    = local.ports.thanos_sidecar
@@ -451,22 +452,8 @@ locals {
           },
           {
             name = "tls"
-            csi = {
-              driver   = "csi.cert-manager.io"
-              readOnly = true
-              volumeAttributes = {
-                "csi.cert-manager.io/issuer-name" = var.name
-                "csi.cert-manager.io/issuer-kind" = "Issuer"
-                "csi.cert-manager.io/dns-names" = join(",", [
-                  "$${POD_NAME}.${local.headless_service}.$${POD_NAMESPACE}",
-                ])
-                "csi.cert-manager.io/key-algorithm" = "ECDSA"
-                "csi.cert-manager.io/key-size"      = "521"
-                "csi.cert-manager.io/key-usages" = join(",", [
-                  "digital signature",
-                  "key encipherment",
-                ])
-              }
+            secret = {
+              secretName = "${var.name}-tls"
             }
           },
         ]
