@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.7@sha256:f90b69bc851107660de618258cf8ced0c29979e4f8b1f2776118abf850551d2e"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.2.1@sha256:49b77655f9f109bedc5eb25723bb0e4c57d8513ba33cc69c31be3f243eb2386d"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:8230f06574280781ea6ad45e27962db60175b18e4a43dd54c19012feb5438174"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:a9e67e425679e9a1f88da3fcc6d0b2d9f914603a2a1260a905f4353af2b4052b"
     # tier 2
     kea               = "reg.cluster.internal/randomcoww/kea:v3.2.0.1783952895@sha256:498082564413e134b861c7c5d11dbc144bfe045227047401352c8c67b46195fe"
     ipxe              = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1783953619@sha256:fda7c4b07b146645dd3238f6cb7e4f790cae91b108a415265f48720a805f4afa"
@@ -136,7 +136,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1783951442@sha256:fce09abfce73ff49c185aad197491bf20aefc290a0bc185b9811262f65a01f60"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-13.1783951243@sha256:d7f61e9b3e33939d519957332ab41b4f667fece867a3d626ea50f677d49bc244"
     litestream       = "docker.io/litestream/litestream:0.5.14@sha256:ef0ac5958cf81725b7a85fb76f82ef71ace030db9429086eeefc59ee6ca53941"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:252cfb5b348809167f5519970ca3457711e723afc76179a662b1c720cbbc1dd3"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:800a5e3757df04f59e6bd6c622f15de2edbfa47f5591c5b82d4a8ff3b938a845"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.10.2@sha256:9fcea9c6e32ab60b0498f3986c6cdf651ddbe61db48d2213a3d28048ddd673d4"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
