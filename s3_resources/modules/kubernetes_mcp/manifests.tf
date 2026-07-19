@@ -30,6 +30,9 @@ module "deployment" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
+  annotations = merge({
+    "secret.reloader.stakater.com/reload" = "${var.name}-tls"
+  })
   template_spec = {
     serviceAccountName = var.name
     resources = {
