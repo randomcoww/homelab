@@ -457,10 +457,11 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default  = "qwen-3-6-27b"
-      provider = "custom"
-      base_url = "$${OPENAI_BASE_URL}"
-      api_key  = "$${OPENAI_API_KEY}"
+      default        = "qwen-3-6-27b"
+      provider       = "custom"
+      base_url       = "$${OPENAI_BASE_URL}"
+      api_key        = "$${OPENAI_API_KEY}"
+      context_length = 262144
     }
     web = {
       search_backend  = "searxng"

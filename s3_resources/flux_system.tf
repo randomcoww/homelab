@@ -1028,6 +1028,7 @@ locals {
                       "atime-mode=noatime",
                       "backup-meta=0",
                       "no-usage-report=true",
+                      "writeback",
                     ]
                   },
                   {
