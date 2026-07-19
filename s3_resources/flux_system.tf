@@ -1028,8 +1028,14 @@ locals {
                       "atime-mode=noatime",
                       "backup-meta=0",
                       "no-usage-report=true",
-                      "writeback",
+                      # FUSE
+                      "writeback_cache",
                     ]
+                  },
+                  {
+                    annotations = {
+                      juicefs-delete-delay = "1m"
+                    }
                   },
                   {
                     ceMountImage = local.container_images_digest.juicefs

@@ -466,7 +466,6 @@ module "hermes-agent" {
     web = {
       search_backend  = "searxng"
       extract_backend = "camofox"
-      searxng_url     = "https://${local.endpoints.searxng.ingress}"
     }
     browser = {
       camofox_url = "$${CAMOFOX_URL}"
