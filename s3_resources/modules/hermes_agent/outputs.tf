@@ -1,6 +1,6 @@
 output "manifests" {
   value = concat([
-    module.deployment.manifest,
+    module.statefulset.manifest,
     module.secret.manifest,
     module.juicefs-secret.manifest,
     module.service.manifest,
@@ -67,6 +67,9 @@ output "manifests" {
         metadata = {
           name      = "${var.name}-pg"
           namespace = var.namespace
+          labels = {
+            "cnpg.io/reload" = "true"
+          }
         }
         spec = {
           instances = 3
@@ -109,7 +112,6 @@ output "manifests" {
           usages = [
             "key encipherment",
             "digital signature",
-            "client auth",
           ]
           issuerRef = {
             name = var.ca_issuer_name

@@ -39,6 +39,20 @@ locals {
       claims_policy = "stump_policy"
       consent_mode  = "implicit"
     }
+    hermes-dashboard = {
+      client_name = "hermes-dashboard"
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+      ]
+      require_pkce          = false
+      pkce_challenge_method = ""
+      redirect_uris = [
+        "https://${local.endpoints.hermes_agent.ingress}/auth/callback",
+      ]
+      consent_mode = "implicit"
+    }
   }
 
   authelia_oidc_clients = {
@@ -438,17 +452,15 @@ module "hermes-agent" {
       tool_use_enforcement = true
       reasoning_effort     = "xhigh"
     }
-    timezone = local.timezone
     stt = {
       enabled  = true
       provider = "groq"
     }
     model = {
-      default        = "qwen-3-6-27b"
-      provider       = "custom"
-      base_url       = "https://${local.endpoints.llama_cpp.ingress}/v1"
-      api_key        = random_password.llama-cpp-auth-token.result
-      context_length = 262144
+      default  = "qwen-3-6-27b"
+      provider = "custom"
+      base_url = "$${OPENAI_BASE_URL}"
+      api_key  = "$${OPENAI_API_KEY}"
     }
     web = {
       search_backend  = "searxng"
@@ -456,14 +468,14 @@ module "hermes-agent" {
       searxng_url     = "https://${local.endpoints.searxng.ingress}"
     }
     browser = {
-      camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
+      camofox_url = "$${CAMOFOX_URL}"
     }
     mcp_servers = {
       kubernetes = {
         url = "https://${local.endpoints.kubernetes_mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
         client_cert = [
-          "~/.certs/mcp-client.crt",
-          "~/.certs/mcp-client.key",
+          "$${INTERNAL_CLIENT_CERT_PATH}",
+          "$${INTERNAL_CLIENT_KEY_PATH}",
         ]
         timeout         = 30
         connect_timeout = 30
@@ -471,7 +483,7 @@ module "hermes-agent" {
       github = {
         url = "https://api.githubcopilot.com/mcp"
         headers = {
-          Authorization = "Bearer ${var.github_token}"
+          Authorization = "Bearer $${GITHUB_TOKEN}"
         }
         timeout         = 30
         connect_timeout = 30
@@ -482,8 +494,8 @@ module "hermes-agent" {
           "alpaca-mcp-server",
         ]
         env = {
-          ALPACA_API_KEY     = var.alpaca_api_key
-          ALPACA_SECRET_KEY  = var.alpaca_secret_key
+          ALPACA_API_KEY     = "$${ALPACA_API_KEY}"
+          ALPACA_SECRET_KEY  = "$${ALPACA_SECRET_KEY}"
           ALPACA_PAPER_TRADE = "true"
           ALPACA_TOOLSETS = join(",", [
             "account",
@@ -506,9 +518,6 @@ module "hermes-agent" {
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
     memory = {
       provider = "mnemosyne"
-      mnemosyne = {
-        shared_surface_path = "mnemosyne.db"
-      }
     }
     plugins = {
       enabled = [
@@ -517,8 +526,7 @@ module "hermes-agent" {
     }
     auxiliary = {
       vision = {
-        timeout  = 1800
-        provider = "auto"
+        timeout = 1800
       }
     }
     group_sessions_per_user = false
@@ -537,11 +545,20 @@ module "hermes-agent" {
     }
   }
   extra_envs = {
+    "TZ" = local.timezone
+  }
+  hermes_envs = {
+    OPENAI_BASE_URL             = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    OPENAI_API_KEY              = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                 = "https://${local.endpoints.searxng.ingress}"
     CAMOFOX_URL                 = "https://${local.endpoints.camofox_browser.ingress}"
     CAMOFOX_API_KEY             = random_password.camofox-browser-auth-token.result
+    AUXILIARY_VISION_PROVIDER   = "auto"
     HERMES_STREAM_READ_TIMEOUT  = 1800
     HERMES_STREAM_STALE_TIMEOUT = 1800
+    HERMES_CRON_TIMEOUT         = 1800
+    HERMES_TIMEZONE             = local.timezone
+    GITHUB_TOKEN                = var.github_token
     API_SERVER_ENABLED          = true
     API_SERVER_MODEL_NAME       = local.endpoints.hermes_agent.name
     API_SERVER_KEY              = random_password.hermes-agent-auth-token.result
@@ -551,11 +568,19 @@ module "hermes-agent" {
     SLACK_ALLOWED_USERS         = var.slack_allowed_users
     SLACK_HOME_CHANNEL          = var.slack_home_channel
     SLACK_HOME_CHANNEL_NAME     = "bot"
-    MNEMOSYNE_HOST_LLM_ENABLED  = true
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    STT_GROQ_MODEL = "whisper-large-v3-turbo"
-    GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
+    GROQ_BASE_URL                       = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
+    GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
+    HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
+    HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
+    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.ingress}"
+    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes_agent.ingress}"
+    # mnemosyne vars #
+    MNEMOSYNE_HOST_LLM_ENABLED = true
+    # custom vars #
+    ALPACA_API_KEY    = var.alpaca_api_key
+    ALPACA_SECRET_KEY = var.alpaca_secret_key
   }
   ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes_agent.ingress

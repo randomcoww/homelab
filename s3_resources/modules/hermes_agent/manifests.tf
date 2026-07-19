@@ -1,23 +1,32 @@
 locals {
-  extra_envs = merge(var.extra_envs, {
+  hermes_envs = merge(var.hermes_envs, {
     HERMES_HOME     = "/opt/data"
     API_SERVER_HOST = "0.0.0.0"
     API_SERVER_PORT = 8642
+    # custom vars #
+    INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
+    INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
   })
+  envs = merge({
+    HERMES_DASHBOARD      = true
+    HERMES_DASHBOARD_PORT = 9119
+    HERMES_DASHBOARD_HOST = "0.0.0.0"
+    SSL_CERT_FILE         = "/etc/ssl/certs/ca-certificates.crt"
+  }, var.extra_envs)
+
   tmp_path = "/opt/data-tmp"
   uid      = 10000
   gid      = 10000
 
-  files = merge({
+  files = {
     "config.yaml" = yamlencode(var.extra_configs)
     ".env"        = <<-EOF
-%{~for k, v in local.extra_envs~}
+%{~for k, v in local.hermes_envs~}
 ${k}=${v}
 
 %{~endfor~}
     EOF
-  }, var.extra_files)
-
+  }
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_user     = "juicefs"
 }
@@ -71,10 +80,16 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = var.name
-        port       = local.extra_envs.API_SERVER_PORT
+        name       = "dahsboard"
+        port       = local.envs.HERMES_DASHBOARD_PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.API_SERVER_PORT
+        targetPort = local.envs.HERMES_DASHBOARD_PORT
+      },
+      {
+        name       = "apiserver"
+        port       = local.hermes_envs.API_SERVER_PORT
+        protocol   = "TCP"
+        targetPort = local.hermes_envs.API_SERVER_PORT
       },
     ]
   }
@@ -108,7 +123,23 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_envs.API_SERVER_PORT
+            port = local.envs.HERMES_DASHBOARD_PORT
+          },
+        ]
+      },
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/v1"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.hermes_envs.API_SERVER_PORT
           },
         ]
       },
@@ -116,8 +147,8 @@ module "httproute" {
   }
 }
 
-module "deployment" {
-  source = "../../../modules/deployment"
+module "statefulset" {
+  source = "../../../modules/statefulset"
 
   name      = var.name
   namespace = var.namespace
@@ -126,15 +157,12 @@ module "deployment" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = merge({
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    "checksum/secret"                     = sha256(module.secret.manifest)
+    "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
+    "checksum/juicefs-secret"             = sha256(module.juicefs-secret.manifest)
+    "secret.reloader.stakater.com/reload" = "${var.name}-client-tls"
   })
-
   template_spec = {
-    securityContext = {
-      # uid/gid of hermes
-      fsGroup = local.gid
-    }
     resources = {
       requests = {
         memory = "4Gi"
@@ -150,36 +178,53 @@ module "deployment" {
           <<-EOF
           set -xe
 
-          cp -rfL ${local.tmp_path}/. \
-            ${local.extra_envs.HERMES_HOME}
+          rm -f \
+            ${local.hermes_envs.HERMES_HOME}/config.yaml.bak-* \
+            ${local.hermes_envs.HERMES_HOME}/.env.bak-*
 
-          exec /init /opt/hermes/docker/main-wrapper.sh gateway run
+          cp -afL ${local.tmp_path}/. \
+            ${local.hermes_envs.HERMES_HOME}
+
+          chown ${local.uid}:${local.gid} \
+            %{~for f, _ in local.files~}
+            ${local.hermes_envs.HERMES_HOME}/${f} \
+            %{~endfor~}
+            ${local.hermes_envs.HERMES_HOME}
+
+          exec /init /opt/hermes/docker/main-wrapper.sh \
+            gateway run
           EOF
         ]
-        env = [
+        env = concat([
+          for k, v in local.envs :
           {
-            name  = "TZ"
-            value = lookup(var.extra_configs, "timezone", "UTC")
+            name  = tostring(k)
+            value = tostring(v)
+          }
+          ], [
+          {
+            name  = "SSL_CERT_DIR"
+            value = dirname(local.envs.SSL_CERT_FILE)
           },
-        ]
+        ])
         volumeMounts = concat([
           {
             name      = "data"
-            mountPath = local.extra_envs.HERMES_HOME
+            mountPath = local.hermes_envs.HERMES_HOME
           },
           {
             name      = "ca-trust-bundle"
-            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            mountPath = local.envs.SSL_CERT_FILE
             readOnly  = true
           },
           {
-            name      = "mcp-client-tls"
-            mountPath = "${local.tmp_path}/.certs/mcp-client.crt"
+            name      = "client-tls"
+            mountPath = local.hermes_envs.INTERNAL_CLIENT_CERT_PATH
             subPath   = "tls.crt"
           },
           {
-            name      = "mcp-client-tls"
-            mountPath = "${local.tmp_path}/.certs/mcp-client.key"
+            name      = "client-tls"
+            mountPath = local.hermes_envs.INTERNAL_CLIENT_KEY_PATH
             subPath   = "tls.key"
           },
           ], [
@@ -192,13 +237,16 @@ module "deployment" {
         ])
         ports = [
           {
-            containerPort = local.extra_envs.API_SERVER_PORT
+            containerPort = local.envs.HERMES_DASHBOARD_PORT
+          },
+          {
+            containerPort = local.hermes_envs.API_SERVER_PORT
           },
         ]
         startupProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.extra_envs.API_SERVER_PORT
+            port   = local.envs.HERMES_DASHBOARD_PORT
             path   = "/health"
           }
           failureThreshold = 6
@@ -206,7 +254,7 @@ module "deployment" {
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.extra_envs.API_SERVER_PORT
+            port   = local.envs.HERMES_DASHBOARD_PORT
             path   = "/health"
           }
           initialDelaySeconds = 10
@@ -215,7 +263,7 @@ module "deployment" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.extra_envs.API_SERVER_PORT
+            port   = local.envs.HERMES_DASHBOARD_PORT
             path   = "/health"
           }
         }
@@ -243,7 +291,7 @@ module "deployment" {
         }
       },
       {
-        name = "mcp-client-tls"
+        name = "client-tls"
         secret = {
           secretName = "${var.name}-client-tls"
         }

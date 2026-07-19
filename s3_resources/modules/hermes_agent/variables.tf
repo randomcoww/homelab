@@ -34,17 +34,12 @@ variable "extra_configs" {
 }
 
 variable "extra_envs" {
-  type    = map(string)
+  type    = map(any)
   default = {}
 }
 
-variable "extra_dbs" {
-  type    = list(string)
-  default = []
-}
-
-variable "extra_files" {
-  type    = map(string)
+variable "hermes_envs" {
+  type    = map(any)
   default = {}
 }
 
