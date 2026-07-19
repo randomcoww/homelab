@@ -1,8 +1,9 @@
 locals {
   hermes_envs = merge(var.hermes_envs, {
-    HERMES_HOME     = "/opt/data"
-    API_SERVER_HOST = "0.0.0.0"
-    API_SERVER_PORT = 8642
+    HERMES_HOME        = "/opt/data"
+    API_SERVER_ENABLED = true
+    API_SERVER_HOST    = "0.0.0.0"
+    API_SERVER_PORT    = 8642
     # custom vars #
     INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
     INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
@@ -156,21 +157,21 @@ module "statefulset" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
-  annotations = merge({
+  annotations = {
     "checksum/secret"                     = sha256(module.secret.manifest)
     "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
     "checksum/juicefs-secret"             = sha256(module.juicefs-secret.manifest)
     "secret.reloader.stakater.com/reload" = "${var.name}-client-tls"
-  })
+  }
   template_spec = {
     resources = {
       requests = {
         memory = "4Gi"
       }
     }
-    containers = [
+    initContainers = [
       {
-        name  = var.name
+        name  = "${var.name}-config"
         image = var.images.hermes_agent
         command = [
           "bash",
@@ -190,10 +191,30 @@ module "statefulset" {
             ${local.hermes_envs.HERMES_HOME}/${f} \
             %{~endfor~}
             ${local.hermes_envs.HERMES_HOME}
-
-          exec /init /opt/hermes/docker/main-wrapper.sh \
-            gateway run
           EOF
+        ]
+        volumeMounts = concat([
+          {
+            name      = "data"
+            mountPath = local.hermes_envs.HERMES_HOME
+          },
+          ], [
+          for f, _ in local.files :
+          {
+            name      = "config"
+            mountPath = "${local.tmp_path}/${f}"
+            subPath   = f
+          }
+        ])
+      }
+    ]
+    containers = [
+      {
+        name  = var.name
+        image = var.images.hermes_agent
+        args = [
+          "gateway",
+          "run",
         ]
         env = concat([
           for k, v in local.envs :
@@ -207,7 +228,7 @@ module "statefulset" {
             value = dirname(local.envs.SSL_CERT_FILE)
           },
         ])
-        volumeMounts = concat([
+        volumeMounts = [
           {
             name      = "data"
             mountPath = local.hermes_envs.HERMES_HOME
@@ -227,14 +248,17 @@ module "statefulset" {
             mountPath = local.hermes_envs.INTERNAL_CLIENT_KEY_PATH
             subPath   = "tls.key"
           },
-          ], [
-          for f, _ in local.files :
           {
-            name      = "config"
-            mountPath = "${local.tmp_path}/${f}"
-            subPath   = f
-          }
-        ])
+            name      = "tmp"
+            mountPath = "${local.hermes_envs.HERMES_HOME}/workspace"
+            subPath   = "workspace"
+          },
+          {
+            name      = "tmp"
+            mountPath = "${local.hermes_envs.HERMES_HOME}/logs"
+            subPath   = "logs"
+          },
+        ]
         ports = [
           {
             containerPort = local.envs.HERMES_DASHBOARD_PORT
@@ -246,7 +270,7 @@ module "statefulset" {
         startupProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.envs.HERMES_DASHBOARD_PORT
+            port   = local.hermes_envs.API_SERVER_PORT
             path   = "/health"
           }
           failureThreshold = 6
@@ -254,7 +278,7 @@ module "statefulset" {
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.envs.HERMES_DASHBOARD_PORT
+            port   = local.hermes_envs.API_SERVER_PORT
             path   = "/health"
           }
           initialDelaySeconds = 10
@@ -263,7 +287,7 @@ module "statefulset" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.envs.HERMES_DASHBOARD_PORT
+            port   = local.hermes_envs.API_SERVER_PORT
             path   = "/health"
           }
         }
@@ -294,6 +318,12 @@ module "statefulset" {
         name = "client-tls"
         secret = {
           secretName = "${var.name}-client-tls"
+        }
+      },
+      {
+        name = "tmp"
+        emptyDir = {
+          medium = "Memory"
         }
       },
     ]

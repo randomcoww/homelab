@@ -559,7 +559,6 @@ module "hermes-agent" {
     HERMES_CRON_TIMEOUT         = 1800
     HERMES_TIMEZONE             = local.timezone
     GITHUB_TOKEN                = var.github_token
-    API_SERVER_ENABLED          = true
     API_SERVER_MODEL_NAME       = local.endpoints.hermes_agent.name
     API_SERVER_KEY              = random_password.hermes-agent-auth-token.result
     GATEWAY_ALLOW_ALL_USERS     = true
