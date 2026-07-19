@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.7@sha256:f90b69bc851107660de618258cf8ced0c29979e4f8b1f2776118abf850551d2e"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.2.1@sha256:49b77655f9f109bedc5eb25723bb0e4c57d8513ba33cc69c31be3f243eb2386d"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:a9e67e425679e9a1f88da3fcc6d0b2d9f914603a2a1260a905f4353af2b4052b"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:f767919bd003062ac69713cdce920eb922c9fa3388efe96264e78b763342ca1a"
     # tier 2
     kea               = "reg.cluster.internal/randomcoww/kea:v3.2.0.1783952895@sha256:498082564413e134b861c7c5d11dbc144bfe045227047401352c8c67b46195fe"
     ipxe              = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1783953619@sha256:fda7c4b07b146645dd3238f6cb7e4f790cae91b108a415265f48720a805f4afa"
@@ -142,7 +142,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.2@sha256:4f6655284ab3d252b7f28fedb19fe6c8fc82ee5b1295c20ac74d475e5398a52d"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.65@sha256:5df586e2c7ced2a3125f6e78923388d80b69de0a2ad1470325b05318f12725bd"
-    camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.11.2@sha256:826da04c4ec75b3eb450bc7cf2513176ba408f92b862b89f768ca30563171137"
+    camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.12.0@sha256:aea61cc2f8add693760ffa917e35e08939db8781d2f63815704a0de9625df577"
     navidrome        = "ghcr.io/navidrome/navidrome:0.63.2@sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:c9b77919daeba2c02ad954d0c844cc4e7142069d177b89c5fd771f405daf9e02"
     thanos           = "quay.io/thanos/thanos:v0.42.2@sha256:6249f7aaadd3695df637fb2eb4cb9a9955611eee691c3970892fe9c0dc3f2db6"
