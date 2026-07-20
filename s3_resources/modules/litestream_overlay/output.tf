@@ -19,30 +19,19 @@ output "template_spec" {
           local.config_file,
           db.path,
         ]
+        envFrom = [
+          {
+            secretRef = {
+              name = var.s3_access_secret
+            }
+          },
+        ]
         env = [
           {
             name = "POD_NAME"
             valueFrom = {
               fieldRef = {
                 fieldPath = "metadata.name"
-              }
-            }
-          },
-          {
-            name = "AWS_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.s3_access_secret
-                key  = "AWS_ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "AWS_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.s3_access_secret
-                key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
           },
@@ -74,30 +63,19 @@ output "template_spec" {
           "-config",
           local.config_file,
         ]
+        envFrom = [
+          {
+            secretRef = {
+              name = var.s3_access_secret
+            }
+          },
+        ]
         env = [
           {
             name = "POD_NAME"
             valueFrom = {
               fieldRef = {
                 fieldPath = "metadata.name"
-              }
-            }
-          },
-          {
-            name = "AWS_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.s3_access_secret
-                key  = "AWS_ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "AWS_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.s3_access_secret
-                key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
           },

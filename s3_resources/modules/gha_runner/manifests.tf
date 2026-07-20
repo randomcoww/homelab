@@ -127,6 +127,13 @@ module "workflow-config" {
                 "devic.es/fuse" = 1
               }
             }
+            envFrom = [
+              {
+                secretRef = {
+                  name = module.user-secret.name
+                }
+              },
+            ]
             env = [
               {
                 name = "INTERNAL_CA_CERT" # add to image for pulling rootfs and ignition
@@ -140,24 +147,6 @@ module "workflow-config" {
               {
                 name  = "RCLONE_S3_ENDPOINT"
                 value = var.minio_endpoint
-              },
-              {
-                name = "AWS_ACCESS_KEY_ID"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.user-secret.name
-                    key  = "AWS_ACCESS_KEY_ID"
-                  }
-                }
-              },
-              {
-                name = "AWS_SECRET_ACCESS_KEY"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.user-secret.name
-                    key  = "AWS_SECRET_ACCESS_KEY"
-                  }
-                }
               },
             ]
             volumeMounts = [

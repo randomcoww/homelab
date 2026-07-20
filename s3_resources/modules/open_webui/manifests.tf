@@ -121,18 +121,14 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.open_webui
-        env = concat([
-          for k, v in local.extra_envs :
+        envFrom = [
           {
-            name = tostring(k)
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = tostring(k)
-              }
+            secretRef = {
+              name = module.secret.name
             }
-          }
-          ], [
+          },
+        ]
+        env = [
           {
             name = "S3_ACCESS_KEY_ID"
             valueFrom = {
@@ -160,7 +156,7 @@ module "deployment" {
               }
             }
           },
-        ])
+        ]
         ports = [
           {
             containerPort = local.extra_envs.PORT

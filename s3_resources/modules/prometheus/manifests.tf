@@ -77,23 +77,10 @@ locals {
                     --objstore.config=${yamlencode(local.thanos_object_config)}
                     EOF
                   ]
-                  env = [
+                  envFrom = [
                     {
-                      name = "AWS_ACCESS_KEY_ID"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_ACCESS_KEY_ID"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_SECRET_ACCESS_KEY"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_SECRET_ACCESS_KEY"
-                        }
+                      secretRef = {
+                        name = module.minio-user-secret.name
                       }
                     },
                   ]
@@ -348,30 +335,19 @@ locals {
               --objstore.config=${yamlencode(local.thanos_object_config)}
               EOF
             ]
+            envFrom = [
+              {
+                secretRef = {
+                  name = module.minio-user-secret.name
+                }
+              },
+            ]
             env = [
               {
                 name = "POD_NAME"
                 valueFrom = {
                   fieldRef = {
                     fieldPath = "metadata.name"
-                  }
-                }
-              },
-              {
-                name = "AWS_ACCESS_KEY_ID"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.minio-user-secret.name
-                    key  = "AWS_ACCESS_KEY_ID"
-                  }
-                }
-              },
-              {
-                name = "AWS_SECRET_ACCESS_KEY"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.minio-user-secret.name
-                    key  = "AWS_SECRET_ACCESS_KEY"
                   }
                 }
               },

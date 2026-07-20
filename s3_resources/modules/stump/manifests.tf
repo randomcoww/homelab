@@ -166,18 +166,13 @@ module "litestream-overlay" {
             containerPort = local.extra_envs.STUMP_PORT
           },
         ]
-        env = concat([
-          for k, v in local.extra_envs :
+        envFrom = [
           {
-            name = tostring(k)
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = tostring(k)
-              }
+            secretRef = {
+              name = module.secret.name
             }
-          }
-        ])
+          },
+        ]
         volumeMounts = [
           {
             name      = "data"
