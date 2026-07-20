@@ -15,15 +15,16 @@ locals {
     SSL_CERT_FILE    = "/etc/ssl/certs/ca-certificates.crt"
   }, var.extra_agent_envs)
   webui_envs = merge({
-    WANTED_UID                    = local.agent_envs.HERMES_UID
-    WANTED_GID                    = local.agent_envs.HERMES_GID
-    HERMES_WEBUI_SKIP_ONBOARDING  = 1
-    HERMES_WEBUI_HOST             = "0.0.0.0"
-    HERMES_WEBUI_PORT             = 8787
-    HERMES_WEBUI_STATE_DIR        = "${local.config_envs.HERMES_HOME}/webui"
-    HERMES_WEBUI_AGENT_DIR        = "/opt/hermes"
-    HERMES_WEBUI_GATEWAY_BASE_URL = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
-    HERMES_WEBUI_GATEWAY_API_KEY  = local.config_envs.API_SERVER_KEY
+    WANTED_UID                     = local.agent_envs.HERMES_UID
+    WANTED_GID                     = local.agent_envs.HERMES_GID
+    HERMES_WEBUI_SKIP_ONBOARDING   = 1
+    HERMES_WEBUI_HOST              = "0.0.0.0"
+    HERMES_WEBUI_PORT              = 8787
+    HERMES_WEBUI_STATE_DIR         = "${local.config_envs.HERMES_HOME}/webui"
+    HERMES_WEBUI_DEFAULT_WORKSPACE = "${local.config_envs.HERMES_HOME}/workspace"
+    HERMES_WEBUI_AGENT_DIR         = "/opt/hermes"
+    HERMES_WEBUI_GATEWAY_BASE_URL  = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
+    HERMES_WEBUI_GATEWAY_API_KEY   = local.config_envs.API_SERVER_KEY
   }, var.extra_webui_envs)
 
   files = {
@@ -330,7 +331,7 @@ module "statefulset" {
           },
           {
             name      = "tmp"
-            mountPath = "/workspace"
+            mountPath = local.webui_envs.HERMES_WEBUI_DEFAULT_WORKSPACE
             subPath   = "workspace"
           },
           {
