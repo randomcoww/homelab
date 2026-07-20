@@ -195,16 +195,16 @@ module "statefulset" {
             subPathExpr = "valkey-$(POD_NAME).conf"
           },
           {
-            name        = "tls"
-            mountPath   = "${local.base_path}/valkey.crt"
-            subPathExpr = "tls.crt"
-            readOnly    = true
+            name      = "tls"
+            mountPath = "${local.base_path}/valkey.crt"
+            subPath   = "tls.crt"
+            readOnly  = true
           },
           {
-            name        = "tls"
-            mountPath   = "${local.base_path}/valkey.key"
-            subPathExpr = "tls.key"
-            readOnly    = true
+            name      = "tls"
+            mountPath = "${local.base_path}/valkey.key"
+            subPath   = "tls.key"
+            readOnly  = true
           },
           {
             name      = "tls"
