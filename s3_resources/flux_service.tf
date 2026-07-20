@@ -789,43 +789,6 @@ module "gha-runner" {
   minio_user        = minio_iam_user.user["arc"]
 }
 
-# Tailscale remote access
-
-module "tailscale" {
-  source    = "./modules/tailscale"
-  name      = "tailscale"
-  namespace = "tailscale"
-  replicas  = 2
-  images = {
-    tailscale = local.container_images_digest.tailscale
-  }
-  tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
-  extra_envs = [
-    {
-      name  = "TS_ACCEPT_DNS"
-      value = false
-    },
-    {
-      name  = "TS_DEBUG_FIREWALL_MODE"
-      value = "nftables"
-    },
-    {
-      name = "TS_EXTRA_ARGS"
-      value = join(",", [
-        "--advertise-exit-node",
-      ])
-    },
-    {
-      name = "TS_ROUTES"
-      value = join(",", distinct([
-        local.networks[local.services.apiserver.network.name].prefix,
-        local.networks.service.prefix,
-        local.networks.kubernetes_service.prefix,
-      ]))
-    },
-  ]
-}
-
 locals {
   flux_service = {
 
@@ -928,6 +891,30 @@ locals {
       yamlencode(m)
     ]
 
+    tailscale-connector = [
+      for _, m in [
+        {
+          apiVersion = "tailscale.com/v1alpha1"
+          kind       = "Connector"
+          metadata = {
+            name = "ts-${local.kubernetes.cluster_name}"
+          }
+          spec = {
+            replicas       = 2
+            hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
+            subnetRouter = {
+              advertiseRoutes = [
+                local.networks[local.services.apiserver.network.name].prefix,
+                local.networks.service.prefix,
+                local.networks.kubernetes_service.prefix,
+              ]
+            }
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
+
     gha-runner      = module.gha-runner.manifests
     llama-cpp       = module.llama-cpp.manifests
     camofox-browser = module.camofox-browser.manifests
@@ -937,7 +924,6 @@ locals {
     hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
-    tailscale       = module.tailscale.manifests
     stump           = module.stump.manifests
     navidrome       = module.navidrome.manifests
   }

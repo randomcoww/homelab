@@ -460,5 +460,66 @@ locals {
       ] :
       yamlencode(m)
     ]
+
+    tailscale-operator = [
+      for _, m in [
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "tailscale-operator"
+            namespace = "tailscale"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://pkgs.tailscale.com/helmcharts"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "tailscale-operator"
+            namespace = "tailscale"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "tailscale-operator"
+                version = "1.98.9" # renovate: datasource=helm depName=tailscale-operator registryUrl=https://pkgs.tailscale.com/helmcharts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "tailscale-operator"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "tailscale-operator"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              oauth = {
+                clientId     = data.terraform_remote_state.sr.outputs.tailscale_oauth_client.id
+                clientSecret = data.terraform_remote_state.sr.outputs.tailscale_oauth_client.key
+              }
+            }
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
   }
 }

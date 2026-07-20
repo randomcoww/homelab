@@ -1,16 +1,29 @@
+# https://tailscale.com/docs/kubernetes-operator/quickstart
 resource "tailscale_acl" "cluster" {
   acl = jsonencode({
     tagOwners = {
-      "tag:terraform" = [
-        "autogroup:member",
-      ]
+      "tag:terraform"    = ["autogroup:member"]
+      "tag:k8s-operator" = ["autogroup:admin"]
+      "tag:k8s"          = ["tag:k8s-operator"]
+    },
+    autoApprovers = {
+      services = {
+        "tag:k8s" = ["tag:k8s"]
+      },
     },
     acls = [
       {
         action = "accept"
-        users  = ["*"]
-        ports  = ["*:*"]
+        src    = ["*"]
+        dst    = ["*:*"]
       },
+    ],
+    grants = [
+      {
+        src = ["*"]
+        dst = ["tag:k8s-operator"]
+        ip  = ["tcp:443"]
+      }
     ],
     nodeAttrs = [
       {
@@ -52,13 +65,17 @@ resource "tailscale_dns_configuration" "cluster" {
   magic_dns          = false
 }
 
-resource "tailscale_tailnet_key" "auth" {
-  reusable            = true
-  ephemeral           = false
-  preauthorized       = true
-  recreate_if_invalid = "always"
-  expiry              = 7776000
-  tags = [
-    "tag:terraform",
+# operator oauth client
+resource "tailscale_oauth_client" "k8s-operator" {
+  description = "k8s-operator"
+  scopes = [
+    "devices:core",
+    "auth_keys",
+    "services",
+  ]
+  tags = ["tag:k8s-operator"]
+
+  depends_on = [
+    tailscale_acl.cluster,
   ]
 }

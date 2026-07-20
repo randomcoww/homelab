@@ -34,17 +34,18 @@ output "cloudflare_tunnel" {
   sensitive = true
 }
 
-# Tailscale
-
-output "tailscale_auth_key" {
-  value     = tailscale_tailnet_key.auth.key
-  sensitive = true
-}
-
 output "letsencrypt" {
   value = {
     private_key_pem = tls_private_key.letsencrypt-prod.private_key_pem
     username        = var.letsencrypt_username
+  }
+  sensitive = true
+}
+
+output "tailscale_oauth_client" {
+  value = {
+    id  = tailscale_oauth_client.k8s-operator.id
+    key = tailscale_oauth_client.k8s-operator.key
   }
   sensitive = true
 }

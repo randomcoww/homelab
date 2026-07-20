@@ -29,11 +29,14 @@ GitHub PAT permissions:
 
 Tailscale auth scopes:
 
-* auth_keys
-* devices:core:read
-* devices:posture_attributes
 * dns
 * policy_file
+* auth_keys
+* devices:core
+* auth_keys
+* services
+
+It should include `dns`, `policy_file`, and scopes needed by the Tailscale operator.
 
 ### Generate secrets files
 
