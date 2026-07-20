@@ -9,21 +9,6 @@ locals {
   }
 
   authelia_oidc_clients_base = {
-    open-webui = {
-      client_name = "Open WebUI"
-      scopes = [
-        "openid",
-        "email",
-        "profile",
-        "groups",
-      ]
-      require_pkce          = false
-      pkce_challenge_method = ""
-      redirect_uris = [
-        "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
-      ]
-      consent_mode = "implicit"
-    }
     stump = {
       client_name = "Stump"
       scopes = [
@@ -598,101 +583,6 @@ module "hermes-agent" {
   minio_user     = minio_iam_user.user["hermes_agent"]
 }
 
-module "open-webui" {
-  source    = "./modules/open_webui"
-  name      = local.endpoints.open_webui.name
-  namespace = local.endpoints.open_webui.namespace
-  replicas  = 1
-  images = {
-    open_webui = local.container_images_digest.open_webui
-    litestream = local.container_images_digest.litestream
-  }
-  extra_configs = {
-    WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
-    ENABLE_VERSION_UPDATE_CHECK    = false
-    ENABLE_OPENAI_API              = true
-    OPENAI_API_BASE_URL            = "https://${local.endpoints.hermes_agent.ingress}/v1"
-    OPENAI_API_KEY                 = random_password.hermes-agent-auth-token.result
-    DEFAULT_MODELS                 = local.endpoints.hermes_agent.name
-    ENABLE_WEB_SEARCH              = false
-    WEB_SEARCH_ENGINE              = "searxng"
-    WEB_SEARCH_RESULT_COUNT        = 4
-    SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
-    ENABLE_CODE_INTERPRETER        = false
-    ENABLE_CODE_EXECUTION          = false
-    ENABLE_FOLLOW_UP_GENERATION    = false
-    ENABLE_EVALUATION_ARENA_MODELS = false
-    ENABLE_MESSAGE_RATING          = false
-    SHOW_ADMIN_DETAILS             = false
-    BYPASS_MODEL_ACCESS_CONTROL    = true
-    ENABLE_OLLAMA_API              = false
-    ENABLE_COMMUNITY_SHARING       = false
-    ENABLE_RAG_HYBRID_SEARCH       = true
-    AUDIO_STT_ENGINE               = "openai"
-    AUDIO_STT_MODEL                = "whisper-large-v3-turbo"
-    AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    AUDIO_STT_OPENAI_API_KEY       = random_password.llama-cpp-auth-token.result
-    RAG_TOP_K                      = 5
-    RAG_EMBEDDING_ENGINE           = "openai"
-    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
-    RAG_EMBEDDING_MODEL            = "jina-embeddings-v5-omni"
-    RAG_TOP_K_RERANKER             = 5
-    RAG_RERANKING_ENGINE           = "external"
-    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
-    RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
-    RAG_RERANKING_MODEL            = "jina-reranker-m0"
-    TOOL_SERVER_CONNECTIONS = jsonencode([
-      /*
-      {
-        type      = "mcp"
-        url       = "https://api.githubcopilot.com/mcp"
-        auth_type = "bearer"
-        config = {
-          enable                    = true
-          function_name_filter_list = ""
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = var.github_token
-        info = {
-          id          = "github"
-          name        = "github"
-          description = "Query GitHub resources"
-        }
-      },
-      */
-    ])
-    # OIDC
-    ENABLE_PERSISTENT_CONFIG            = false # persist mcp oauth registration
-    ENABLE_SIGNUP                       = false
-    ENABLE_LOGIN_FORM                   = false
-    ENABLE_OAUTH_SIGNUP                 = true
-    ENABLE_OAUTH_PERSISTENT_CONFIG      = false
-    ENABLE_OAUTH_ID_TOKEN_COOKIE        = false
-    OAUTH_MERGE_ACCOUNTS_BY_EMAIL       = true
-    OAUTH_CLIENT_ID                     = local.authelia_oidc_clients.open-webui.client_id
-    OAUTH_CLIENT_SECRET                 = local.authelia_oidc_clients.open-webui.client_secret
-    OPENID_PROVIDER_URL                 = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
-    OAUTH_PROVIDER_NAME                 = "Authelia"
-    OAUTH_SCOPES                        = join(" ", local.authelia_oidc_clients.open-webui.scopes)
-    ENABLE_OAUTH_ROLE_MANAGEMENT        = true
-    OAUTH_ALLOWED_ROLES                 = "openwebui,openwebui-admin"
-    OAUTH_ADMIN_ROLES                   = "openwebui-admin"
-    OAUTH_ROLES_CLAIM                   = "groups"
-    CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES = 60
-  }
-  ingress_hostname = local.endpoints.open_webui.ingress
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-  minio_endpoint = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket   = "open-webui"
-  minio_user     = minio_iam_user.user["open_webui"]
-}
-
 # Wifi AP
 
 resource "random_password" "hostapd-ssid" {
@@ -1050,6 +940,5 @@ locals {
     tailscale       = module.tailscale.manifests
     stump           = module.stump.manifests
     navidrome       = module.navidrome.manifests
-    # open-webui      = module.open-webui.manifests
   }
 }

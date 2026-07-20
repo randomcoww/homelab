@@ -137,7 +137,6 @@ locals {
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-13.1783951243@sha256:d7f61e9b3e33939d519957332ab41b4f667fece867a3d626ea50f677d49bc244"
     litestream       = "docker.io/litestream/litestream:0.5.14@sha256:ef0ac5958cf81725b7a85fb76f82ef71ace030db9429086eeefc59ee6ca53941"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:800a5e3757df04f59e6bd6c622f15de2edbfa47f5591c5b82d4a8ff3b938a845"
-    open_webui       = "ghcr.io/open-webui/open-webui:v0.10.2@sha256:9fcea9c6e32ab60b0498f3986c6cdf651ddbe61db48d2213a3d28048ddd673d4"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.2@sha256:4f6655284ab3d252b7f28fedb19fe6c8fc82ee5b1295c20ac74d475e5398a52d"
@@ -301,10 +300,6 @@ locals {
       }
       llama_cpp = {
         name = "llama-cpp"
-      }
-      open_webui = {
-        name    = "open-webui"
-        ingress = "owui.${local.domains.public}"
       }
       lldap = {
         name      = "lldap"

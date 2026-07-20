@@ -51,27 +51,6 @@ locals {
         ]
       }
 
-      # open-webui + litestream sqlite
-      open_webui = {
-        name      = local.endpoints.open_webui.name
-        namespace = local.endpoints.open_webui.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "open-webui",
-            ]
-          },
-        ]
-      }
-
       # stump mount-s3 access for ebooks and metadata
       stump = {
         name      = local.endpoints.stump.name
