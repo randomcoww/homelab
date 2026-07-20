@@ -182,11 +182,10 @@ module "statefulset" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = {
-    "checksum/secret"                     = sha256(module.secret.manifest)
-    "checksum/env-secret"                 = sha256(module.env-secret.manifest)
-    "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
-    "checksum/juicefs-secret"             = sha256(module.juicefs-secret.manifest)
-    "secret.reloader.stakater.com/reload" = "${var.name}-client-tls"
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/env-secret"        = sha256(module.env-secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
   }
   template_spec = {
     resources = {
@@ -264,14 +263,16 @@ module "statefulset" {
             readOnly  = true
           },
           {
-            name      = "client-tls"
+            name      = "internal-client-tls"
             mountPath = local.config_envs.INTERNAL_CLIENT_CERT_PATH
             subPath   = "tls.crt"
+            readOnly  = true
           },
           {
-            name      = "client-tls"
+            name      = "internal-client-tls"
             mountPath = local.config_envs.INTERNAL_CLIENT_KEY_PATH
             subPath   = "tls.key"
+            readOnly  = true
           },
           {
             name      = "tmp"
@@ -405,6 +406,23 @@ module "statefulset" {
         name = "agent"
         image = {
           reference = var.images.hermes_agent
+        }
+      },
+      {
+        name = "internal-client-tls"
+        csi = {
+          driver   = "csi.cert-manager.io"
+          readOnly = true
+          volumeAttributes = {
+            "csi.cert-manager.io/issuer-name"   = var.ca_issuer_name
+            "csi.cert-manager.io/issuer-kind"   = "ClusterIssuer"
+            "csi.cert-manager.io/key-algorithm" = "ECDSA"
+            "csi.cert-manager.io/key-size"      = "521"
+            "csi.cert-manager.io/key-usages" = join(",", [
+              "digital signature",
+              "key encipherment",
+            ])
+          }
         }
       },
     ]
