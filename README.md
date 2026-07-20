@@ -31,12 +31,12 @@ Tailscale auth scopes:
 
 * dns
 * policy_file
-* auth_keys
+* oauth_keys
 * devices:core
 * auth_keys
 * services
 
-It should include `dns`, `policy_file`, and scopes needed by the Tailscale operator.
+It should include `dns`, `policy_file`, `oauth_keys`, and scopes needed by the Tailscale operator.
 
 ### Generate secrets files
 
