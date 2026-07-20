@@ -36,6 +36,37 @@ ${k}=${v}
 %{~endfor~}
     EOF
   }
+
+  # mounts for both agent and webui
+  common_volume_mounts = [
+    {
+      name      = "data"
+      mountPath = local.config_envs.HERMES_HOME
+    },
+    {
+      name      = "ca-trust-bundle"
+      mountPath = local.agent_envs.SSL_CERT_FILE
+      readOnly  = true
+    },
+    {
+      name      = "internal-client-tls"
+      mountPath = local.config_envs.INTERNAL_CLIENT_CERT_PATH
+      subPath   = "tls.crt"
+      readOnly  = true
+    },
+    {
+      name      = "internal-client-tls"
+      mountPath = local.config_envs.INTERNAL_CLIENT_KEY_PATH
+      subPath   = "tls.key"
+      readOnly  = true
+    },
+    {
+      name      = "tmp"
+      mountPath = "${local.config_envs.HERMES_HOME}/logs"
+      subPath   = "logs"
+    },
+  ]
+
   tmp_path                  = "/tmp/hermes-config"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_user     = "juicefs"
@@ -52,10 +83,7 @@ module "secret" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  data = merge(local.files, {
-    for k, v in merge(local.webui_envs, local.config_envs) :
-    tostring(k) => tostring(v)
-  })
+  data      = local.files
 }
 
 module "env-secret" {
@@ -65,7 +93,7 @@ module "env-secret" {
   app       = var.name
   release   = var.release
   data = {
-    for k, v in merge(local.webui_envs, local.config_envs) :
+    for k, v in merge(local.webui_envs, local.config_envs, local.agent_envs) :
     tostring(k) => tostring(v)
   }
 }
@@ -240,46 +268,15 @@ module "statefulset" {
           "gateway",
           "run",
         ]
-        env = concat([
+        env = [
           for k, v in local.agent_envs :
           {
             name  = tostring(k)
             value = tostring(v)
           }
-          ], [
-          {
-            name  = "SSL_CERT_DIR"
-            value = dirname(local.agent_envs.SSL_CERT_FILE)
-          },
-        ])
-        volumeMounts = [
-          {
-            name      = "data"
-            mountPath = local.config_envs.HERMES_HOME
-          },
-          {
-            name      = "ca-trust-bundle"
-            mountPath = local.agent_envs.SSL_CERT_FILE
-            readOnly  = true
-          },
-          {
-            name      = "internal-client-tls"
-            mountPath = local.config_envs.INTERNAL_CLIENT_CERT_PATH
-            subPath   = "tls.crt"
-            readOnly  = true
-          },
-          {
-            name      = "internal-client-tls"
-            mountPath = local.config_envs.INTERNAL_CLIENT_KEY_PATH
-            subPath   = "tls.key"
-            readOnly  = true
-          },
-          {
-            name      = "tmp"
-            mountPath = "${local.config_envs.HERMES_HOME}/logs"
-            subPath   = "logs"
-          },
         ]
+        volumeMounts = concat(local.common_volume_mounts, [
+        ])
         ports = [
           {
             containerPort = local.config_envs.API_SERVER_PORT
@@ -320,22 +317,13 @@ module "statefulset" {
             }
           },
         ]
-        volumeMounts = [
-          {
-            name      = "data"
-            mountPath = local.config_envs.HERMES_HOME
-          },
-          {
-            name      = "tmp"
-            mountPath = "${local.config_envs.HERMES_HOME}/logs"
-            subPath   = "logs"
-          },
+        volumeMounts = concat(local.common_volume_mounts, [
           {
             name      = "agent"
             mountPath = local.webui_envs.HERMES_WEBUI_AGENT_DIR
             subPath   = "opt/hermes"
           },
-        ]
+        ])
         ports = [
           {
             containerPort = local.webui_envs.HERMES_WEBUI_PORT
@@ -406,6 +394,7 @@ module "statefulset" {
               "digital signature",
               "key encipherment",
             ])
+            "csi.cert-manager.io/fs-group" : tostring(local.agent_envs.HERMES_GID)
           }
         }
       },
