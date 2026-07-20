@@ -276,11 +276,6 @@ module "statefulset" {
           },
           {
             name      = "tmp"
-            mountPath = "${local.config_envs.HERMES_HOME}/workspace"
-            subPath   = "workspace"
-          },
-          {
-            name      = "tmp"
             mountPath = "${local.config_envs.HERMES_HOME}/logs"
             subPath   = "logs"
           },
@@ -329,11 +324,6 @@ module "statefulset" {
           {
             name      = "data"
             mountPath = local.config_envs.HERMES_HOME
-          },
-          {
-            name      = "tmp"
-            mountPath = local.webui_envs.HERMES_WEBUI_DEFAULT_WORKSPACE
-            subPath   = "workspace"
           },
           {
             name      = "tmp"
@@ -388,12 +378,6 @@ module "statefulset" {
         secret = {
           secretName  = module.secret.name
           defaultMode = 493
-        }
-      },
-      {
-        name = "client-tls"
-        secret = {
-          secretName = "${var.name}-client-tls"
         }
       },
       {
