@@ -128,7 +128,7 @@ locals {
     ipxe              = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1784556701@sha256:c379e96ab3e875ad9b35907d304c8fc4cd9c2fabe6905a271c3804ed26836581"
     registry          = "ghcr.io/distribution/distribution:3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8"
     device_plugin     = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
-    gha_runner        = "ghcr.io/actions/actions-runner:2.335.1@sha256:08c30b0a7105f64bddfc485d2487a22aa03932a791402393352fdf674bda2c29"
+    gha_runner        = "ghcr.io/actions/actions-runner:2.336.0@sha256:0cfdcc701ce933c6d243c6b0b2da767366dc9f2e99961d4c3754b0b78084cdda"
     mountpoint_s3_csi = "reg.cluster.internal/randomcoww/mountpoint-s3-csi:v2.7.0.1784555222@sha256:2cea71465d557f45b9ecd28d73dbf1b8a3a7a42861250d527338be2716112b51"
     # tier 3
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1784555602@sha256:798ac8339499ffbcb09e8f0776f88e73a5c963eecbfedbfb836192bbfb6b80cc"
@@ -140,13 +140,13 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.2@sha256:4f6655284ab3d252b7f28fedb19fe6c8fc82ee5b1295c20ac74d475e5398a52d"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.65@sha256:5df586e2c7ced2a3125f6e78923388d80b69de0a2ad1470325b05318f12725bd"
-    camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.12.1@sha256:9ffe6b87112de3088631fdbc2ec81a5c292a25cc23157c350d202110c2d4bb53"
+    camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.13.0@sha256:64b30ffdbbc4ae0e28200a66dfbd6f55ac4188229eb34ef769afcf7be40faa6e"
     navidrome        = "ghcr.io/navidrome/navidrome:0.63.2@sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:c9b77919daeba2c02ad954d0c844cc4e7142069d177b89c5fd771f405daf9e02"
     thanos           = "quay.io/thanos/thanos:v0.42.2@sha256:6249f7aaadd3695df637fb2eb4cb9a9955611eee691c3970892fe9c0dc3f2db6"
     stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
-    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.7.1784555200@sha256:f56ea0b0860e6285cfdf5283b1803ecae69e18c00cd7ab54141368ae92d6aedc"
-    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.127@sha256:5118dc81c567f7e8f0e080761de814c75851a4c056dfcd9eb842e212e982cede"
+    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.20.1784591297@sha256:ce3d08064776a6ca7cc96ae9f093b4588728cba2ab8f56ead07f513c06448eeb"
+    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.130@sha256:fee263b03dcc6f9421686a5baf11595d1aeaf2879854626c1484c273f20875e5"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:ce-v1.4.0.1784556524@sha256:96a5b2b03f1858bc03177a011305075dba3ead2c9ac4eb913eff69edddbb30f6"
 
     # models (model_file)
