@@ -36,6 +36,9 @@ output "manifests" {
             "container-builds",
             "etcd-wrapper",
           ]
+          "kaniko-high-memory" = [
+            "container-builds",
+          ]
           "cosa" = [
             "fedora-coreos-config-custom",
           ]
