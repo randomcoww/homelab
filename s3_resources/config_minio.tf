@@ -51,7 +51,7 @@ locals {
         ]
       }
 
-      # stump mount-s3 access for ebooks and metadata
+      # stump juicefs and litestream
       stump = {
         name      = local.endpoints.stump.name
         namespace = local.endpoints.stump.namespace
@@ -72,7 +72,7 @@ locals {
         ]
       }
 
-      # navidrome mount-s3 access for music and metadata
+      # navidrome litestream
       navidrome = {
         name      = local.endpoints.navidrome.name
         namespace = local.endpoints.navidrome.namespace
@@ -114,7 +114,7 @@ locals {
         ]
       }
 
-      # fluxcd
+      # fluxcd bucket ops
       fluxcd = {
         name      = "fluxcd"
         namespace = "flux-system"
@@ -135,7 +135,7 @@ locals {
         ]
       }
 
-      # hermes agent
+      # hermes-agent juicefs
       hermes_agent = {
         name      = local.endpoints.hermes_agent.name
         namespace = local.endpoints.hermes_agent.namespace
@@ -161,19 +161,6 @@ locals {
         name      = local.endpoints.mountpoint_s3_csi.name
         namespace = local.endpoints.mountpoint_s3_csi.namespace
         policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "stump",
-            ]
-          },
           {
             Effect = "Allow"
             Action = [
