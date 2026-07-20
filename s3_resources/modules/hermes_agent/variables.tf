@@ -25,6 +25,7 @@ variable "affinity" {
 variable "images" {
   type = object({
     hermes_agent = string
+    hermes_webui = string
   })
 }
 
@@ -33,12 +34,17 @@ variable "extra_configs" {
   default = {}
 }
 
-variable "extra_envs" {
+variable "extra_config_envs" {
   type    = map(any)
   default = {}
 }
 
-variable "hermes_envs" {
+variable "extra_agent_envs" {
+  type    = map(any)
+  default = {}
+}
+
+variable "extra_webui_envs" {
   type    = map(any)
   default = {}
 }

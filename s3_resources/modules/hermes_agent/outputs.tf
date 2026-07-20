@@ -3,6 +3,7 @@ output "manifests" {
     module.statefulset.manifest,
     module.secret.manifest,
     module.juicefs-secret.manifest,
+    module.env-secret.manifest,
     module.service.manifest,
     module.httproute.manifest,
     module.minio-user-secret.manifest,

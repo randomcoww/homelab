@@ -1,5 +1,5 @@
 locals {
-  hermes_envs = merge(var.hermes_envs, {
+  config_envs = merge(var.extra_config_envs, {
     HERMES_HOME        = "/opt/data"
     API_SERVER_ENABLED = true
     API_SERVER_HOST    = "0.0.0.0"
@@ -8,26 +8,34 @@ locals {
     INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
     INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
   })
-  envs = merge({
-    HERMES_DASHBOARD      = true
-    HERMES_DASHBOARD_PORT = 9119
-    HERMES_DASHBOARD_HOST = "0.0.0.0"
-    SSL_CERT_FILE         = "/etc/ssl/certs/ca-certificates.crt"
-  }, var.extra_envs)
-
-  tmp_path = "/opt/data-tmp"
-  uid      = 10000
-  gid      = 10000
+  agent_envs = merge({
+    HERMES_UID       = 10000
+    HERMES_GID       = 10000
+    HERMES_DASHBOARD = false
+    SSL_CERT_FILE    = "/etc/ssl/certs/ca-certificates.crt"
+  }, var.extra_agent_envs)
+  webui_envs = merge({
+    WANTED_UID                    = local.agent_envs.HERMES_UID
+    WANTED_GID                    = local.agent_envs.HERMES_GID
+    HERMES_WEBUI_SKIP_ONBOARDING  = 1
+    HERMES_WEBUI_HOST             = "0.0.0.0"
+    HERMES_WEBUI_PORT             = 8787
+    HERMES_WEBUI_STATE_DIR        = "${local.config_envs.HERMES_HOME}/webui"
+    HERMES_WEBUI_AGENT_DIR        = "/opt/hermes"
+    HERMES_WEBUI_GATEWAY_BASE_URL = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
+    HERMES_WEBUI_GATEWAY_API_KEY  = local.config_envs.API_SERVER_KEY
+  }, var.extra_webui_envs)
 
   files = {
     "config.yaml" = yamlencode(var.extra_configs)
     ".env"        = <<-EOF
-%{~for k, v in local.hermes_envs~}
+%{~for k, v in local.config_envs~}
 ${k}=${v}
 
 %{~endfor~}
     EOF
   }
+  tmp_path                  = "/tmp/hermes-config"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_user     = "juicefs"
 }
@@ -43,7 +51,22 @@ module "secret" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  data      = local.files
+  data = merge(local.files, {
+    for k, v in merge(local.webui_envs, local.config_envs) :
+    tostring(k) => tostring(v)
+  })
+}
+
+module "env-secret" {
+  source    = "../../../modules/secret"
+  name      = "${var.name}-env"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    for k, v in merge(local.webui_envs, local.config_envs) :
+    tostring(k) => tostring(v)
+  }
 }
 
 module "juicefs-secret" {
@@ -81,16 +104,16 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "dahsboard"
-        port       = local.envs.HERMES_DASHBOARD_PORT
+        name       = "webui"
+        port       = local.webui_envs.HERMES_WEBUI_PORT
         protocol   = "TCP"
-        targetPort = local.envs.HERMES_DASHBOARD_PORT
+        targetPort = local.webui_envs.HERMES_WEBUI_PORT
       },
       {
         name       = "apiserver"
-        port       = local.hermes_envs.API_SERVER_PORT
+        port       = local.config_envs.API_SERVER_PORT
         protocol   = "TCP"
-        targetPort = local.hermes_envs.API_SERVER_PORT
+        targetPort = local.config_envs.API_SERVER_PORT
       },
     ]
   }
@@ -124,7 +147,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.envs.HERMES_DASHBOARD_PORT
+            port = local.webui_envs.HERMES_WEBUI_PORT
           },
         ]
       },
@@ -140,7 +163,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.hermes_envs.API_SERVER_PORT
+            port = local.config_envs.API_SERVER_PORT
           },
         ]
       },
@@ -159,6 +182,7 @@ module "statefulset" {
   replicas  = var.replicas
   annotations = {
     "checksum/secret"                     = sha256(module.secret.manifest)
+    "checksum/env-secret"                 = sha256(module.env-secret.manifest)
     "checksum/minio-user-secret"          = sha256(module.minio-user-secret.manifest)
     "checksum/juicefs-secret"             = sha256(module.juicefs-secret.manifest)
     "secret.reloader.stakater.com/reload" = "${var.name}-client-tls"
@@ -180,23 +204,23 @@ module "statefulset" {
           set -xe
 
           rm -f \
-            ${local.hermes_envs.HERMES_HOME}/config.yaml.bak-* \
-            ${local.hermes_envs.HERMES_HOME}/.env.bak-*
+            ${local.config_envs.HERMES_HOME}/config.yaml.bak-* \
+            ${local.config_envs.HERMES_HOME}/.env.bak-*
 
           cp -afL ${local.tmp_path}/. \
-            ${local.hermes_envs.HERMES_HOME}
+            ${local.config_envs.HERMES_HOME}
 
-          chown ${local.uid}:${local.gid} \
+          chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
             %{~for f, _ in local.files~}
-            ${local.hermes_envs.HERMES_HOME}/${f} \
+            ${local.config_envs.HERMES_HOME}/${f} \
             %{~endfor~}
-            ${local.hermes_envs.HERMES_HOME}
+            ${local.config_envs.HERMES_HOME}
           EOF
         ]
         volumeMounts = concat([
           {
             name      = "data"
-            mountPath = local.hermes_envs.HERMES_HOME
+            mountPath = local.config_envs.HERMES_HOME
           },
           ], [
           for f, _ in local.files :
@@ -217,7 +241,7 @@ module "statefulset" {
           "run",
         ]
         env = concat([
-          for k, v in local.envs :
+          for k, v in local.agent_envs :
           {
             name  = tostring(k)
             value = tostring(v)
@@ -225,52 +249,49 @@ module "statefulset" {
           ], [
           {
             name  = "SSL_CERT_DIR"
-            value = dirname(local.envs.SSL_CERT_FILE)
+            value = dirname(local.agent_envs.SSL_CERT_FILE)
           },
         ])
         volumeMounts = [
           {
             name      = "data"
-            mountPath = local.hermes_envs.HERMES_HOME
+            mountPath = local.config_envs.HERMES_HOME
           },
           {
             name      = "ca-trust-bundle"
-            mountPath = local.envs.SSL_CERT_FILE
+            mountPath = local.agent_envs.SSL_CERT_FILE
             readOnly  = true
           },
           {
             name      = "client-tls"
-            mountPath = local.hermes_envs.INTERNAL_CLIENT_CERT_PATH
+            mountPath = local.config_envs.INTERNAL_CLIENT_CERT_PATH
             subPath   = "tls.crt"
           },
           {
             name      = "client-tls"
-            mountPath = local.hermes_envs.INTERNAL_CLIENT_KEY_PATH
+            mountPath = local.config_envs.INTERNAL_CLIENT_KEY_PATH
             subPath   = "tls.key"
           },
           {
             name      = "tmp"
-            mountPath = "${local.hermes_envs.HERMES_HOME}/workspace"
+            mountPath = "${local.config_envs.HERMES_HOME}/workspace"
             subPath   = "workspace"
           },
           {
             name      = "tmp"
-            mountPath = "${local.hermes_envs.HERMES_HOME}/logs"
+            mountPath = "${local.config_envs.HERMES_HOME}/logs"
             subPath   = "logs"
           },
         ]
         ports = [
           {
-            containerPort = local.envs.HERMES_DASHBOARD_PORT
-          },
-          {
-            containerPort = local.hermes_envs.API_SERVER_PORT
+            containerPort = local.config_envs.API_SERVER_PORT
           },
         ]
         startupProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.hermes_envs.API_SERVER_PORT
+            port   = local.config_envs.API_SERVER_PORT
             path   = "/health"
           }
           failureThreshold = 6
@@ -278,7 +299,7 @@ module "statefulset" {
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.hermes_envs.API_SERVER_PORT
+            port   = local.config_envs.API_SERVER_PORT
             path   = "/health"
           }
           initialDelaySeconds = 10
@@ -287,7 +308,60 @@ module "statefulset" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.hermes_envs.API_SERVER_PORT
+            port   = local.config_envs.API_SERVER_PORT
+            path   = "/health"
+          }
+        }
+      },
+      {
+        name  = "${var.name}-webui"
+        image = var.images.hermes_webui
+        envFrom = [
+          {
+            secretRef = {
+              name = module.env-secret.name
+            }
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "data"
+            mountPath = local.config_envs.HERMES_HOME
+          },
+          {
+            name      = "tmp"
+            mountPath = "/workspace"
+            subPath   = "workspace"
+          },
+          {
+            name      = "tmp"
+            mountPath = "${local.config_envs.HERMES_HOME}/logs"
+            subPath   = "logs"
+          },
+          {
+            name      = "agent"
+            mountPath = local.webui_envs.HERMES_WEBUI_AGENT_DIR
+            subPath   = "opt/hermes"
+          },
+        ]
+        ports = [
+          {
+            containerPort = local.webui_envs.HERMES_WEBUI_PORT
+          },
+        ]
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.webui_envs.HERMES_WEBUI_PORT
+            path   = "/health"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.webui_envs.HERMES_WEBUI_PORT
             path   = "/health"
           }
         }
@@ -324,6 +398,12 @@ module "statefulset" {
         name = "tmp"
         emptyDir = {
           medium = "Memory"
+        }
+      },
+      {
+        name = "agent"
+        image = {
+          reference = var.images.hermes_agent
         }
       },
     ]

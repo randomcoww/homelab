@@ -445,6 +445,7 @@ module "hermes-agent" {
   namespace = local.endpoints.hermes_agent.namespace
   images = {
     hermes_agent = local.container_images_digest.hermes_agent
+    hermes_webui = local.container_images_digest.hermes_webui
   }
   # TODO: investigate apptainer and podman for agent terminal
   extra_configs = {
@@ -544,10 +545,7 @@ module "hermes-agent" {
       strict_mention  = true
     }
   }
-  extra_envs = {
-    "TZ" = local.timezone
-  }
-  hermes_envs = {
+  extra_config_envs = {
     OPENAI_BASE_URL             = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY              = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                 = "https://${local.endpoints.searxng.ingress}"
@@ -568,18 +566,26 @@ module "hermes-agent" {
     SLACK_HOME_CHANNEL          = var.slack_home_channel
     SLACK_HOME_CHANNEL_NAME     = "bot"
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL                       = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
-    GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
-    HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
-    HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
-    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.ingress}"
-    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes_agent.ingress}"
+    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    STT_GROQ_MODEL = "whisper-large-v3-turbo"
+    GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
     # mnemosyne vars #
     MNEMOSYNE_HOST_LLM_ENABLED = true
     # custom vars #
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
+  }
+  extra_agent_envs = {
+    "TZ" = local.timezone
+  }
+  extra_webui_envs = {
+    # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164
+    # HERMES_WEBUI_OIDC_CLIENT_ID               = local.authelia_oidc_clients.hermes-dashboard.client_id
+    # HERMES_WEBUI_OIDC_CLIENT_SECRET           = local.authelia_oidc_clients.hermes-dashboard.client_secret
+    # HERMES_WEBUI_OIDC_ISSUER                  = "https://${local.endpoints.authelia.ingress}"
+    # HERMES_WEBUI_OIDC_ALLOW_CLAIM             = "email"
+    # HERMES_WEBUI_OIDC_ALLOW_VALUES            = var.smtp_username
+    # HERMES_WEBUI_OIDC_ALLOW_PRIVATE_ENDPOINTS = true
   }
   ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes_agent.ingress
