@@ -192,7 +192,6 @@ locals {
     flannel_healthz    = 58084
     bgp                = 179 # not configurable
     kube_vip_metrics   = 58089
-    kube_vip_health    = 58088
     crio_metrics       = 58091
   }
 
