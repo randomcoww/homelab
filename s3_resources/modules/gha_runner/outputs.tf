@@ -84,7 +84,7 @@ output "manifests" {
             githubConfigSecret = {
               github_token = var.github_credentials.token
             }
-            maxRunners = 3
+            maxRunners = 2
             containerMode = {
               type = "kubernetes"
               kubernetesModeWorkVolumeClaim = {
