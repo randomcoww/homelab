@@ -345,42 +345,97 @@ resource "helm_release" "kube-dns" {
 
 # LoadBalancer
 
-module "kube-vip" {
-  source    = "./modules/kube_vip_release"
-  name      = "kube-vip"
-  namespace = "kube-system"
-  images = {
-    kube_vip = local.container_images_digest.kube_vip
-  }
-  ports = {
-    apiserver        = local.host_ports.apiserver,
-    kube_vip_metrics = local.host_ports.kube_vip_metrics,
-    kube_vip_health  = local.host_ports.kube_vip_health,
-  }
-  bgp_as     = local.ha.bgp_as
-  bgp_peeras = local.ha.bgp_as
-  bgp_neighbor_ips = [
-    for _, host in local.members.gateway :
-    cidrhost(local.networks.service.prefix, host.netnum)
-  ]
-  apiserver_ip      = local.services.apiserver.ip
-  service_interface = "phy-service"
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
+resource "helm_release" "kube-vip" {
+  name             = "kube-vip"
+  namespace        = "kube-system"
+  repository       = "https://kube-vip.github.io/helm-charts"
+  chart            = "kube-vip"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "0.9.9"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      image = {
+        repository = regex(local.container_image_regex, local.container_images.kube_vip).depName
+        tag        = regex(local.container_image_regex, local.container_images.kube_vip).tag
+      }
+      extraArgs = {
+        serviceInterface  = "phy-service"
+        cleanRoutingTable = true
+      }
+      config = {
+        address = local.services.apiserver.ip
+      }
+      env = {
+        for k, v in {
+          vip_arp             = false
+          port                = local.host_ports.apiserver
+          prometheus_server   = ":${local.host_ports.kube_vip_metrics}"
+          vip_interface       = "lo"
+          dns_mode            = "first"
+          cp_enable           = true
+          svc_enable          = true
+          lb_enable           = false
+          lb_port             = local.host_ports.apiserver
+          svc_leasename       = "plndr-svcs-lock"
+          vip_routingtable    = false
+          bgp_enable          = true
+          bgp_as              = local.ha.bgp_as
+          address             = local.services.apiserver.ip
+          egress_withnftables = true
+          bgp_peers = join(",", [
+            for _, host in local.members.gateway :
+            "${cidrhost(local.networks.service.prefix, host.netnum)}:${local.ha.bgp_as}::false"
+          ])
+        } :
+        k => tostring(v)
+      }
+      envValueFrom = {
+        vip_nodename = {
+          fieldRef = {
+            fieldPath = "spec.nodeName"
+          }
+        }
+        bgp_routerid = {
+          fieldRef = {
+            fieldPath = "status.podIP"
+          }
+        }
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
               {
-                key      = "node-role.kubernetes.io/control-plane"
-                operator = "Exists"
+                matchExpressions = [
+                  {
+                    key      = "node-role.kubernetes.io/control-plane"
+                    operator = "Exists"
+                  },
+                ]
               },
             ]
-          },
-        ]
+          }
+        }
       }
-    }
-  }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
+      }
+      priorityClassName = "system-cluster-critical"
+      podMonitor = {
+        enabled = true
+      }
+    })
+  ]
+
   depends_on = [
     kubernetes_labels.labels,
     helm_release.prometheus-operator-crds,
