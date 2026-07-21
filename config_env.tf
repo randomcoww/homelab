@@ -146,7 +146,7 @@ locals {
     thanos           = "quay.io/thanos/thanos:v0.42.2@sha256:6249f7aaadd3695df637fb2eb4cb9a9955611eee691c3970892fe9c0dc3f2db6"
     stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.20.1784591297@sha256:ce3d08064776a6ca7cc96ae9f093b4588728cba2ab8f56ead07f513c06448eeb"
-    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.130@sha256:fee263b03dcc6f9421686a5baf11595d1aeaf2879854626c1484c273f20875e5"
+    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.136@sha256:49f9d97ce7d8f509f6d38b27173fe8ecd4f3f21318b0d5b00b503fb756c12df6"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:ce-v1.4.0.1784556524@sha256:96a5b2b03f1858bc03177a011305075dba3ead2c9ac4eb913eff69edddbb30f6"
 
     # models (model_file)
