@@ -463,7 +463,7 @@ module "hermes-agent" {
           "$${INTERNAL_CLIENT_CERT_PATH}",
           "$${INTERNAL_CLIENT_KEY_PATH}",
         ]
-        timeout         = 30
+        timeout         = 300
         connect_timeout = 30
       }
       github = {
@@ -471,7 +471,7 @@ module "hermes-agent" {
         headers = {
           Authorization = "Bearer $${GITHUB_TOKEN}"
         }
-        timeout         = 30
+        timeout         = 300
         connect_timeout = 30
       }
       alpaca = {
@@ -497,7 +497,7 @@ module "hermes-agent" {
             "index-data",
           ])
         }
-        timeout         = 30
+        timeout         = 300
         connect_timeout = 30
       }
     }
