@@ -204,7 +204,7 @@ locals {
                 "certmanager.k8s.io/disable-validation" = "true"
               }
               crds = {
-                enabled = true
+                enabled = false # CRDs created in cluster_bootstrap
               }
               enableCertificateOwnerRef = true
               config = {
