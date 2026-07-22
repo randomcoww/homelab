@@ -41,6 +41,7 @@ output "manifests" {
           }
           mountOptions = [
             "endpoint-url ${var.minio_endpoint}",
+            "force-path-style",
             "maximum-throughput-gbps 1",
             "metadata-ttl 300",
           ]

@@ -13,7 +13,6 @@ resource "tls_cert_request" "minio" {
   ip_addresses = [
     "127.0.0.1",
     var.service_ip,
-    var.cluster_service_ip,
   ]
   dns_names = concat([
     "localhost",

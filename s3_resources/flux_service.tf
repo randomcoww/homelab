@@ -564,7 +564,7 @@ module "hermes-agent" {
     "TZ" = local.timezone
   }
   extra_webui_envs = {
-    # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164
+    # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
     # HERMES_WEBUI_OIDC_CLIENT_ID               = local.authelia_oidc_clients.hermes-dashboard.client_id
     # HERMES_WEBUI_OIDC_CLIENT_SECRET           = local.authelia_oidc_clients.hermes-dashboard.client_secret
     # HERMES_WEBUI_OIDC_ISSUER                  = "https://${local.endpoints.authelia.ingress}"
@@ -578,7 +578,7 @@ module "hermes-agent" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_bucket   = "hermes-agent"
   minio_user     = minio_iam_user.user["hermes_agent"]
 }
@@ -729,7 +729,7 @@ module "stump" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_data_bucket = "ebooks"
   minio_bucket      = "stump"
   minio_user        = minio_iam_user.user["stump"]
@@ -763,7 +763,7 @@ module "navidrome" {
     name      = "forwardauth-authelia"
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_data_bucket = "music"
   minio_bucket      = "navidrome"
   minio_user        = minio_iam_user.user["navidrome"]
@@ -785,7 +785,7 @@ module "gha-runner" {
   }
   ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
   registry_endpoint = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  minio_endpoint    = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint    = "${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_user        = minio_iam_user.user["arc"]
 }
 

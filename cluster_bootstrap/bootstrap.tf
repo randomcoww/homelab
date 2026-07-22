@@ -154,6 +154,49 @@ resource "helm_release" "bootstrap" {
   ]
 }
 
+resource "helm_release" "local-path-provisioner" {
+  chart            = "local-path-provisioner"
+  name             = "local-path-provisioner"
+  namespace        = "kube-system"
+  repository       = "https://charts.containeroo.ch"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "0.0.37"
+  max_history      = 2
+  values = [
+    yamlencode({
+      replicaCount = 2
+      storageClass = {
+        create            = true
+        name              = "local-path"
+        provisionerName   = "rancher.io/local-path"
+        defaultClass      = true
+        defaultVolumeType = "local"
+      }
+      nodePathMap = [
+        {
+          node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+          paths = [
+            "${local.kubernetes.containers_path}/local_path_provisioner",
+          ]
+        },
+      ]
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
+      }
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
+}
+
 data "http" "cert-manager-crds-yaml" {
   url = "https://github.com/cert-manager/cert-manager/releases/download/v${local.cert_manager_version}/cert-manager.crds.yaml"
   request_headers = {
@@ -193,52 +236,109 @@ resource "helm_release" "prometheus-operator-crds" {
     yamlencode({
     }),
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
-}
-
-module "kube-proxy" {
-  source    = "./modules/kube_proxy_release"
-  name      = local.endpoints.kube_proxy.name
-  namespace = local.endpoints.kube_proxy.namespace
-  images = {
-    kube_proxy = local.container_images_digest.kube_proxy
-  }
-  ports = {
-    kube_proxy         = local.host_ports.kube_proxy
-    kube_proxy_metrics = local.host_ports.kube_proxy_metrics
-    kube_apiserver     = local.host_ports.apiserver
-  }
-  kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
-  kube_apiserver_ip     = local.services.apiserver.ip
-
-  depends_on = [
-    kubernetes_labels.labels,
-    helm_release.prometheus-operator-crds,
-  ]
 }
 
 # CNI
 
-module "flannel" {
-  source    = "./modules/flannel_release"
-  name      = "flannel"
-  namespace = "kube-system"
-  images = {
-    flannel            = local.container_images_digest.flannel
-    flannel_cni_plugin = local.container_images_digest.flannel_cni_plugin
-  }
-  metrics_port              = local.host_ports.flannel_healthz
-  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  cni_version               = "0.3.1"
-  cni_bin_path              = local.kubernetes.cni_bin_path
-  cni_config_path           = local.kubernetes.cni_config_path
-
+resource "helm_release" "cilium" {
+  name             = "cilium"
+  namespace        = "kube-system"
+  repository       = "https://helm.cilium.io"
+  chart            = "cilium"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "1.20.0-rc.1"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      routingMode          = "native"
+      autoDirectNodeRoutes = true
+      cni = {
+        binPath  = local.kubernetes.cni_bin_path
+        confPath = local.kubernetes.cni_config_path
+      }
+      gatewayAPI = {
+        enabled = true
+      }
+      bgpControlPlane = {
+        enabled = true
+      }
+      hubble = {
+        enabled = false
+      }
+      ipMasqAgent = {
+        enabled = true
+      }
+      ipv4 = {
+        enabled = true
+      }
+      bpf = {
+        masquerade = true
+      }
+      ipv4NativeRoutingCIDR = local.networks.kubernetes_pod.prefix
+      enableIPv4Masquerade  = true
+      ## L2
+      l2announcements = {
+        enabled = true
+      }
+      kubeProxyReplacement = true
+      k8sServiceHost       = local.services.apiserver.ip
+      k8sServicePort       = local.host_ports.apiserver
+      ##
+      ipam = {
+        mode = "kubernetes"
+        operator = {
+          clusterPoolIPv4PodCIDRList = [
+            local.networks.kubernetes_pod.prefix,
+          ]
+        }
+      }
+      priorityClassName = "system-node-critical"
+    })
+  ]
   depends_on = [
     kubernetes_labels.labels,
-    helm_release.prometheus-operator-crds,
+    helm_release.cert-manager-crds,
+  ]
+}
+
+resource "helm_release" "cilium-crs" {
+  chart            = "../helm-wrapper"
+  name             = "cilium-crs"
+  namespace        = "kube-system"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = [
+        for _, m in [
+          {
+            apiVersion = "cilium.io/v2"
+            kind       = "CiliumLoadBalancerIPPool"
+            metadata = {
+              name : "svc-pool"
+            }
+            spec = {
+              blocks = [
+                {
+                  start = cidrhost(local.networks.service.prefix, 1)
+                  stop  = cidrhost(local.networks.service.prefix, -2)
+                },
+              ]
+            }
+          },
+        ] :
+        yamlencode(m)
+      ]
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+    helm_release.cilium,
   ]
 }
 
@@ -470,50 +570,6 @@ resource "helm_release" "kube-vip" {
   ]
 }
 
-resource "helm_release" "local-path-provisioner" {
-  chart            = "local-path-provisioner"
-  name             = "local-path-provisioner"
-  namespace        = "kube-system"
-  repository       = "https://charts.containeroo.ch"
-  create_namespace = true
-  wait             = true
-  wait_for_jobs    = false
-  version          = "0.0.37"
-  max_history      = 2
-  values = [
-    yamlencode({
-      replicaCount = 2
-      storageClass = {
-        create            = true
-        name              = "local-path"
-        provisionerName   = "rancher.io/local-path"
-        defaultClass      = true
-        defaultVolumeType = "local"
-      }
-      nodePathMap = [
-        {
-          node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = [
-            "${local.kubernetes.containers_path}/local_path_provisioner",
-          ]
-        },
-      ]
-      resources = {
-        requests = {
-          memory = "128Mi"
-        }
-        limits = {
-          memory = "128Mi"
-        }
-      }
-    }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
-    helm_release.prometheus-operator-crds,
-  ]
-}
-
 # Internal S3
 
 resource "random_password" "minio-access-key-id" {
@@ -542,15 +598,16 @@ module "minio" {
     id     = random_password.minio-access-key-id.result
     secret = random_password.minio-secret-access-key.result
   }
-  cluster_domain     = local.domains.kubernetes
-  ca                 = data.terraform_remote_state.host.outputs.internal_ca
-  service_hostname   = local.endpoints.minio.service
-  service_ip         = local.services.minio.ip
-  cluster_service_ip = local.services.cluster_minio.ip
+  cluster_domain   = local.domains.kubernetes
+  ca               = data.terraform_remote_state.host.outputs.internal_ca
+  service_hostname = local.endpoints.minio.service
+  service_ip       = local.services.minio.ip
 
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.local-path-provisioner,
     helm_release.prometheus-operator-crds,
+    helm_release.cilium-crs,
   ]
 }
 

@@ -315,10 +315,9 @@ resource "helm_release" "minio" {
       service = {
         type              = "LoadBalancer"
         port              = var.service_port
-        clusterIP         = var.cluster_service_ip
-        loadBalancerClass = "kube-vip.io/kube-vip-class"
+        loadBalancerClass = "io.cilium/l2-announcer"
         annotations = {
-          "kube-vip.io/loadbalancerIPs" = var.service_ip
+          "lbipam.cilium.io/ips" = var.service_ip
         }
       }
       certsPath = "/opt/minio/certs"

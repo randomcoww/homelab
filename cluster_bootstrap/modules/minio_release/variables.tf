@@ -60,7 +60,3 @@ variable "service_hostname" {
 variable "service_ip" {
   type = string
 }
-
-variable "cluster_service_ip" {
-  type = string
-}

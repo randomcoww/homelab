@@ -97,7 +97,7 @@ module "prometheus" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint = "${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_bucket   = "prometheus"
   minio_user     = minio_iam_user.user["prometheus"]
 }
@@ -113,7 +113,7 @@ module "registry" {
     registry = local.container_images_digest.registry
   }
   ca_issuer_name      = local.kubernetes.cert_issuers.ca_internal
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint      = "${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_user          = minio_iam_user.user["registry"]
@@ -325,10 +325,6 @@ module "kea" {
       ]
       mtu = lookup(local.networks.lan, "mtu", 1500)
     },
-    {
-      prefix = local.networks.service.prefix
-      mtu    = lookup(local.networks.service, "mtu", 1500)
-    },
   ]
   timezone = local.timezone
 }
@@ -490,9 +486,9 @@ locals {
               }
               service = {
                 type              = "LoadBalancer"
-                loadBalancerClass = "kube-vip.io/kube-vip-class"
+                loadBalancerClass = "io.cilium/l2-announcer"
                 annotations = {
-                  "kube-vip.io/loadbalancerIPs" = local.services.k8s_gateway.ip
+                  "lbipam.cilium.io/ips" = local.services.k8s_gateway.ip
                 }
                 labels = {
                   app = "k8s-gateway"

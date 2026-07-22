@@ -49,10 +49,9 @@ locals {
       enable_netnum = true
       netnums = {
         apiserver   = 2
-        k8s_gateway = 31
-        minio       = 34
+        k8s_gateway = 31 # external DNS
+        minio       = 34 # pre-DNS bootstrap
         registry    = 35 # used by hosts without access to cluster DNS
-        gateway_api = 36
       }
     }
     # Conntrack sync
@@ -93,7 +92,6 @@ locals {
         cluster_dns           = 10
         cluster_kea_primary   = 12
         cluster_kea_secondary = 13
-        cluster_minio         = 14
       }
     }
     kubernetes_pod = {
@@ -118,11 +116,8 @@ locals {
     etcd                    = "registry.k8s.io/etcd:v3.7.0@sha256:6ecefbe2510c4a30573a62a4d6dd175acf881ca67003fcd91849a16df7a724d5"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.36.2@sha256:620a27c742eb5ebf5be8613b7458b7ce7cd31e2804b61b98f6516e328002c4cc"
-    flannel            = "ghcr.io/flannel-io/flannel:v0.28.7@sha256:f90b69bc851107660de618258cf8ced0c29979e4f8b1f2776118abf850551d2e"
-    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
-    kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.2.1@sha256:49b77655f9f109bedc5eb25723bb0e4c57d8513ba33cc69c31be3f243eb2386d"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:f767919bd003062ac69713cdce920eb922c9fa3388efe96264e78b763342ca1a"
+    kube_vip = "ghcr.io/kube-vip/kube-vip:v1.2.1@sha256:49b77655f9f109bedc5eb25723bb0e4c57d8513ba33cc69c31be3f243eb2386d"
+    minio    = "cgr.dev/chainguard/minio:latest@sha256:f767919bd003062ac69713cdce920eb922c9fa3388efe96264e78b763342ca1a"
     # tier 2
     kea               = "reg.cluster.internal/randomcoww/kea:v3.2.0.1784556033@sha256:5ba20e2ae2eb90e006cd70a808cc1cf3376e41538dc5d6ecd3d644f2e0faf8a1"
     ipxe              = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1784556701@sha256:c379e96ab3e875ad9b35907d304c8fc4cd9c2fabe6905a271c3804ed26836581"

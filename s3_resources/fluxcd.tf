@@ -29,7 +29,7 @@ resource "helm_release" "fluxcd-bucket" {
             spec = {
               interval = "10s"
               provider = "generic"
-              endpoint = data.terraform_remote_state.bootstrap.outputs.minio.endpoint
+              endpoint = "${local.endpoints.minio.service}:${local.service_ports.minio}"
               secretRef = {
                 name = module.minio-user-secret-fluxcd.name
               }
