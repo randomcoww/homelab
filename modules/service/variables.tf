@@ -30,6 +30,11 @@ variable "affinity" {
   default = {}
 }
 
+variable "selector" {
+  type    = any
+  default = {}
+}
+
 variable "tolerations" {
   type    = any
   default = {}
