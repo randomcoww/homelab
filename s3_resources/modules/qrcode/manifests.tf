@@ -115,16 +115,6 @@ module "httproute" {
             port = local.qrcode_port
           },
         ]
-        filters = [
-          {
-            type = "ExtensionRef"
-            extensionRef = {
-              group = "traefik.io"
-              kind  = "Middleware"
-              name  = var.name
-            }
-          },
-        ]
       },
     ]
   }

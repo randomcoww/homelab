@@ -74,16 +74,6 @@ module "httproute" {
             port = local.extra_envs.ND_PORT
           },
         ]
-        filters = [
-          {
-            type = "ExtensionRef"
-            extensionRef = {
-              group = "traefik.io"
-              kind  = "Middleware"
-              name  = var.name
-            }
-          },
-        ]
       },
     ]
   }

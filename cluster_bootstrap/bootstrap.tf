@@ -241,14 +241,14 @@ resource "helm_release" "prometheus-operator-crds" {
 # CNI
 
 resource "helm_release" "cilium" {
-  name             = "cilium"
-  namespace        = "kube-system"
+  name             = local.endpoints.cilium.name
+  namespace        = local.endpoints.cilium.namespace
   repository       = "https://helm.cilium.io"
   chart            = "cilium"
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "1.20.0-rc.1"
+  version          = "1.20.0-rc.1" # TODO: move to release version
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
@@ -260,7 +260,8 @@ resource "helm_release" "cilium" {
         confPath = local.kubernetes.cni_config_path
       }
       gatewayAPI = {
-        enabled = true
+        enabled    = true
+        enableAlpn = true
       }
       bgpControlPlane = {
         enabled = true
@@ -279,13 +280,36 @@ resource "helm_release" "cilium" {
       }
       ipv4NativeRoutingCIDR = local.networks.kubernetes_pod.prefix
       enableIPv4Masquerade  = true
+      envoy = {
+        prometheus = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      operator = {
+        prometheus = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      prometheus = {
+        enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
+      }
       ## L2
       l2announcements = {
         enabled = true
       }
-      kubeProxyReplacement = true
-      k8sServiceHost       = local.services.apiserver.ip
-      k8sServicePort       = local.host_ports.apiserver
+      kubeProxyReplacement                = true
+      k8sServiceHost                      = local.services.apiserver.ip
+      k8sServicePort                      = local.host_ports.apiserver
+      kubeProxyReplacementHealthzBindAddr = "0.0.0.0:${local.host_ports.kube_proxy_healthz}"
       ##
       ipam = {
         mode = "kubernetes"
@@ -306,8 +330,8 @@ resource "helm_release" "cilium" {
 
 resource "helm_release" "cilium-crs" {
   chart            = "../helm-wrapper"
-  name             = "cilium-crs"
-  namespace        = "kube-system"
+  name             = "${local.endpoints.cilium.name}-crs"
+  namespace        = local.endpoints.cilium.namespace
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
@@ -325,8 +349,54 @@ resource "helm_release" "cilium-crs" {
             spec = {
               blocks = [
                 {
-                  start = cidrhost(local.networks.service.prefix, 1)
+                  cidr  = local.networks.service.prefix
+                  start = cidrhost(cidrsubnet(local.networks.service.prefix, 1, 1), 0)
                   stop  = cidrhost(local.networks.service.prefix, -2)
+                },
+              ]
+            }
+          },
+          {
+            apiVersion = "gateway.networking.k8s.io/v1"
+            kind       = "Gateway"
+            metadata = {
+              name = local.endpoints.cilium.name
+              annotations = {
+                "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+              }
+            }
+            spec = {
+              gatewayClassName = "cilium"
+              listeners = [
+                {
+                  allowedRoutes = {
+                    namespaces = {
+                      from = "Same"
+                    }
+                  }
+                  name     = "web"
+                  port     = 80
+                  protocol = "HTTP"
+                },
+                {
+                  allowedRoutes = {
+                    namespaces = {
+                      from = "All"
+                    }
+                  }
+                  hostname = "*.${local.domains.public}"
+                  name     = "websecure"
+                  port     = 443
+                  protocol = "HTTPS"
+                  tls = {
+                    mode = "Terminate"
+                    certificateRefs = [
+                      {
+                        group = "core"
+                        name  = "${local.domains.public}-tls"
+                      },
+                    ]
+                  }
                 },
               ]
             }

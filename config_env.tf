@@ -179,12 +179,10 @@ locals {
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 10250 # prometheus operator assumes this port and is not configurable
-    kube_proxy         = 50254
-    kube_proxy_metrics = 50255
+    kube_proxy_healthz = 10256 # cilium kubeproxy health
     etcd_client        = 58082
     etcd_peer          = 58083
     etcd_metrics       = 58086
-    flannel_healthz    = 58084
     bgp                = 179 # not configurable
     kube_vip_metrics   = 58089
     crio_metrics       = 58091
@@ -248,9 +246,10 @@ locals {
 
   endpoints = {
     for name, e in {
-      kube_proxy = {
-        name      = "kube-proxy"
+      cilium = {
+        name      = "cilium"
         namespace = "kube-system"
+        service   = "cilium-gateway-cilium.kube-system"
       }
       etcd = {
         name      = "etcd"
@@ -259,10 +258,6 @@ locals {
       kube_dns = {
         name      = "kube-dns"
         namespace = "kube-system"
-      }
-      traefik = {
-        name      = "traefik"
-        namespace = "traefik"
       }
       kubernetes_mcp = {
         name = "kubernetes-mcp"

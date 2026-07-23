@@ -98,8 +98,8 @@ module "lldap" {
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -148,8 +148,8 @@ module "authelia" {
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -340,8 +340,8 @@ module "llama-cpp" {
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -376,8 +376,8 @@ module "searxng" {
   }
   ingress_hostname = local.endpoints.searxng.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -402,8 +402,8 @@ module "camofox-browser" {
   }
   ingress_hostname = local.endpoints.camofox_browser.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -575,8 +575,8 @@ module "hermes-agent" {
   ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes_agent.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
   minio_endpoint = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_bucket   = "hermes-agent"
@@ -700,12 +700,8 @@ module "qrcode-hostapd" {
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
   ingress_hostname = local.endpoints.qrcode_hostapd.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-  middleware_ref = {
-    name      = "forwardauth-authelia"
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
 }
 
@@ -726,8 +722,8 @@ module "stump" {
   }
   ingress_hostname = local.endpoints.stump.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
   minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_data_bucket = "ebooks"
@@ -756,12 +752,8 @@ module "navidrome" {
   }
   ingress_hostname = local.endpoints.navidrome.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-  middleware_ref = {
-    name      = "forwardauth-authelia"
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
   minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_data_bucket = "music"
@@ -792,6 +784,7 @@ module "gha-runner" {
 locals {
   flux_service = {
 
+    /*
     cloudflare-tunnel = [
       for _, m in [
         {
@@ -855,7 +848,7 @@ locals {
                   for _, e in local.endpoints :
                   {
                     hostname = e.ingress
-                    service  = "https://${local.endpoints.traefik.service}"
+                    service  = "https://${local.endpoints.cilium.service}"
                   } if lookup(e, "tunnel", false)
                 ]
               }
@@ -864,32 +857,13 @@ locals {
                   memory = "128Mi"
                 }
               }
-              affinity = {
-                nodeAffinity = {
-                  preferredDuringSchedulingIgnoredDuringExecution = [
-                    {
-                      weight = 100
-                      preference = {
-                        matchExpressions = [
-                          {
-                            key      = "beta.amd.com/gpu.cu-count"
-                            operator = "Lt"
-                            values = [
-                              "16",
-                            ]
-                          },
-                        ]
-                      }
-                    },
-                  ]
-                }
-              }
             }
           }
         },
       ] :
       yamlencode(m)
     ]
+    */
 
     tailscale-connector = [
       for _, m in [
@@ -925,6 +899,5 @@ locals {
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     stump           = module.stump.manifests
-    navidrome       = module.navidrome.manifests
   }
 }

@@ -22,15 +22,7 @@ module "prometheus" {
       enabled = false
     }
     kubeProxy = {
-      enabled = true
-      service = {
-        enabled    = true
-        port       = local.host_ports.kube_proxy_metrics
-        targetPort = local.host_ports.kube_proxy_metrics
-        selector = {
-          app = local.endpoints.kube_proxy.name
-        }
-      }
+      enabled = false # using cilium
     }
     coreDns = {
       enabled = true
@@ -94,8 +86,8 @@ module "prometheus" {
   ]
   ingress_hostname = local.endpoints.prometheus.ingress
   gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
+    name      = local.endpoints.cilium.name
+    namespace = local.endpoints.cilium.namespace
   }
   minio_endpoint = "${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_bucket   = "prometheus"
@@ -579,32 +571,6 @@ locals {
                 targetPort = local.service_ports.coredns_metrics
               },
             ]
-          }
-        },
-      ] :
-      yamlencode(m)
-    ]
-
-    traefik-crs = [
-      for _, m in [
-        {
-          apiVersion = "traefik.io/v1alpha1"
-          kind       = "Middleware"
-          metadata = {
-            name      = "forwardauth-authelia"
-            namespace = local.endpoints.traefik.namespace
-          }
-          spec = {
-            forwardAuth = {
-              address            = "http://${local.endpoints.authelia.service_fqdn}/api/authz/forward-auth"
-              trustForwardHeader = true
-              authResponseHeaders = [
-                "Remote-User",
-                "Remote-Groups",
-                "Remote-Email",
-                "Remote-Name",
-              ]
-            }
           }
         },
       ] :

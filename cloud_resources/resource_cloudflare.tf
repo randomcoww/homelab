@@ -157,7 +157,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
       for _, e in local.endpoints :
       {
         hostname = e.ingress
-        service  = "https://${local.endpoints.traefik.service}"
+        service  = "https://${local.endpoints.cilium.service}"
         path     = "/"
         # need to remove default params from terrafrom
         origin_request = {
