@@ -50,7 +50,7 @@ module "kubernetes-master" {
     bgp                = local.host_ports.bgp
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
-  cluster_apiserver_endpoint = "kubernetes.default.svc.${local.domains.kubernetes}"
+  cluster_apiserver_endpoint = local.endpoints.apiserver.service_fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   node_ips = compact([
@@ -58,8 +58,8 @@ module "kubernetes-master" {
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
   apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
-  apiserver_ip             = local.services.apiserver.ip
-  cluster_apiserver_ip     = local.services.cluster_apiserver.ip
+  apiserver_ip             = local.vips.apiserver.ip
+  cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates
   bird_path                = local.ha.bird_config_path
@@ -93,11 +93,11 @@ module "kubernetes-worker" {
   }
   host_netnum               = each.value.netnum
   cluster_domain            = local.domains.kubernetes
-  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
+  apiserver_endpoint        = "https://${local.vips.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
   node_prefix               = each.value.networks.service.prefix
-  cluster_dns_ip            = local.services.cluster_dns.ip
+  cluster_dns_ip            = local.endpoints.kube_dns.cluster_ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path
   feature_gates             = local.kubernetes.feature_gates
@@ -113,7 +113,7 @@ module "kubernetes-worker" {
   internal_registries = [
     {
       prefix   = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
-      location = local.service_ports.registry == 443 ? local.services.registry.ip : "${local.services.registry.ip}:${local.service_ports.registry}"
+      location = local.service_ports.registry == 443 ? local.endpoints.registry.service_ip : "${local.endpoints.registry.service_ip}:${local.service_ports.registry}"
     },
   ]
 }

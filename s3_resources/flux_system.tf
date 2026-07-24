@@ -111,7 +111,7 @@ module "registry" {
   minio_user          = minio_iam_user.user["registry"]
   service_port        = local.service_ports.registry
   service_hostname    = local.endpoints.registry.service
-  service_ip          = local.services.registry.ip
+  service_ip          = local.endpoints.registry.service_ip
 }
 
 # cert-manager
@@ -282,8 +282,8 @@ module "kea" {
     ipxe = local.container_images_digest.ipxe
   }
   service_ips = [
-    local.services.cluster_kea_primary.ip,
-    local.services.cluster_kea_secondary.ip,
+    local.endpoints.kea_primary.cluster_ip,
+    local.endpoints.kea_secondary.cluster_ip,
   ]
   ports = {
     kea_peer    = local.host_ports.kea_peer
@@ -292,15 +292,15 @@ module "kea" {
     ipxe_tftp   = local.host_ports.ipxe_tftp
   }
   ipxe_boot_file_name  = "ipxe.efi"
-  ipxe_script_base_url = "https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ipxe-"
+  ipxe_script_base_url = "https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ipxe-"
   networks = [
     {
       prefix = local.networks.lan.prefix
       routers = [
-        local.services.gateway.ip,
+        local.vips.gateway.ip,
       ]
       domain_name_servers = [
-        local.services.k8s_gateway.ip,
+        local.endpoints.k8s_gateway.service_ip,
       ]
       domain_search = [
         local.domains.kubernetes,
@@ -309,11 +309,11 @@ module "kea" {
       classless_static_route = [
         # allow local access to these from clients that set default route over VPN
         for _, prefix in distinct([
-          local.networks[local.services.apiserver.network.name].prefix,
+          local.networks[local.vips.apiserver.network.name].prefix,
           local.networks.service.prefix,
           local.networks.kubernetes_service.prefix,
         ]) :
-        "${prefix} - ${local.services.gateway.ip}"
+        "${prefix} - ${local.vips.gateway.ip}"
       ]
       mtu = lookup(local.networks.lan, "mtu", 1500)
     },
@@ -416,8 +416,8 @@ locals {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = "k8s-gateway"
-            namespace = "kube-system"
+            name      = local.endpoints.k8s_gateway.name
+            namespace = local.endpoints.k8s_gateway.namespace
           }
           spec = {
             interval = "15m"
@@ -428,8 +428,8 @@ locals {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = "k8s-gateway"
-            namespace = "kube-system"
+            name      = local.endpoints.k8s_gateway.name
+            namespace = local.endpoints.k8s_gateway.namespace
           }
           spec = {
             interval = "15m"
@@ -440,12 +440,12 @@ locals {
                 version = "3.7.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = "k8s-gateway"
+                  name = local.endpoints.k8s_gateway.name
                 }
                 interval = "5m"
               }
             }
-            releaseName = "k8s-gateway"
+            releaseName = local.endpoints.k8s_gateway.name
             install = {
               remediation = {
                 retries = -1
@@ -479,11 +479,11 @@ locals {
               service = {
                 type              = "LoadBalancer"
                 loadBalancerClass = "io.cilium/l2-announcer"
-                annotations = {
-                  "lbipam.cilium.io/ips" = local.services.k8s_gateway.ip
-                }
                 labels = {
-                  app = "k8s-gateway"
+                  app = local.endpoints.k8s_gateway.name
+                }
+                annotations = {
+                  "lbipam.cilium.io/ips" = local.endpoints.k8s_gateway.service_ip
                 }
               }
               affinity = {
@@ -496,7 +496,7 @@ locals {
                             key      = "app"
                             operator = "In"
                             values = [
-                              "k8s-gateway",
+                              local.endpoints.k8s_gateway.name,
                             ]
                           },
                         ]

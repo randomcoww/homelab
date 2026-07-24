@@ -8,13 +8,13 @@ locals {
       "ignition.platform.id=metal",
       "coreos.no_persist_ip",
       "initrd=${host.host_image.initrd}",
-      "ignition.config.url=https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ignition-$${mac:hexhyp}",
-      "coreos.live.rootfs_url=https://${local.services.minio.ip}:${local.service_ports.minio}/boot/${host.host_image.rootfs}",
+      "ignition.config.url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ignition-$${mac:hexhyp}",
+      "coreos.live.rootfs_url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/${host.host_image.rootfs}",
       "rd.driver.blacklist=nouveau,nova_core",
       "modprobe.blacklist=nouveau,nova_core",
       "selinux=0",
-      "amd_iommu=off",                                                                                     # memory performance for LLM
-      "ipxe.url=https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ipxe-$${mac:hexhyp}", # for custom update check
+      "amd_iommu=off",                                                                                              # memory performance for LLM
+      "ipxe.url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ipxe-$${mac:hexhyp}", # for custom update check
     ], host.boot_args))
   }
   netboot_config = {
@@ -69,8 +69,8 @@ resource "minio_s3_object" "ipxe" {
   content_type = "text/plain"
   content      = <<-EOF
   #!ipxe
-  kernel https://${local.services.minio.ip}:${local.service_ports.minio}/boot/${each.value.kernel} ${join(" ", each.value.netboot_args)}
-  initrd https://${local.services.minio.ip}:${local.service_ports.minio}/boot/${each.value.initrd}
+  kernel https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/${each.value.kernel} ${join(" ", each.value.netboot_args)}
+  initrd https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/${each.value.initrd}
   boot
   EOF
 

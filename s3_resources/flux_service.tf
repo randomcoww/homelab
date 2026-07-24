@@ -877,11 +877,11 @@ locals {
             replicas       = 2
             hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
             subnetRouter = {
-              advertiseRoutes = [
-                local.networks[local.services.apiserver.network.name].prefix,
+              advertiseRoutes = distinct([
+                local.networks[local.vips.apiserver.network.name].prefix,
                 local.networks.service.prefix,
                 local.networks.kubernetes_service.prefix,
-              ]
+              ])
             }
           }
         },

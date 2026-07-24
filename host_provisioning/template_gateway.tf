@@ -23,7 +23,7 @@ module "gateway" {
   sync_prefix         = each.value.networks.sync.prefix
   sync_interface_name = each.value.networks.sync.interface
   conntrackd_ignore_ipv4 = concat([
-    local.services.gateway.ip,
+    local.vips.gateway.ip,
     local.networks.kubernetes_pod.prefix,
     local.networks.kubernetes_service.prefix,
     ], flatten([
@@ -36,7 +36,7 @@ module "gateway" {
   ]))
   keepalived_router_id      = 13
   keepalived_path           = local.ha.keepalived_config_path
-  keepalived_interface_name = each.value.networks[local.services.gateway.network.name].interface
+  keepalived_interface_name = each.value.networks[local.vips.gateway.network.name].interface
   # Use VIP with network netmask to intentionally create a prefix route on main table
-  keepalived_vip = "${local.services.gateway.ip}/${each.value.networks[local.services.gateway.network.name].cidr}"
+  keepalived_vip = "${local.vips.gateway.ip}/${each.value.networks[local.vips.gateway.network.name].cidr}"
 }

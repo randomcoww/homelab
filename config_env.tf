@@ -28,8 +28,6 @@ locals {
       enable_netnum  = true
       netnums = {
         gateway = 2
-        glkvm   = 126
-        switch  = 127
       }
     }
     # BGP
@@ -48,10 +46,7 @@ locals {
       mtu           = 1500
       enable_netnum = true
       netnums = {
-        apiserver   = 2
-        k8s_gateway = 31 # external DNS
-        minio       = 34 # pre-DNS bootstrap
-        registry    = 35 # used by hosts without access to cluster DNS
+        apiserver = 2
       }
     }
     # Conntrack sync
@@ -87,12 +82,6 @@ locals {
     kubernetes_service = {
       network = "10.96.0.0"
       cidr    = 12
-      netnums = {
-        cluster_apiserver     = 1
-        cluster_dns           = 10
-        cluster_kea_primary   = 12
-        cluster_kea_secondary = 13
-      }
     }
     kubernetes_pod = {
       network = "10.244.0.0"
@@ -246,49 +235,70 @@ locals {
 
   endpoints = {
     for name, e in {
-      cilium = {
-        name      = "cilium"
-        namespace = "kube-system"
-        service   = "cilium-gateway-cilium.kube-system"
+
+      ## system
+      apiserver = {
+        name           = "kubernetes"
+        namespace      = "default"
+        cluster_netnum = 1
       }
       etcd = {
         name      = "etcd"
         namespace = "kube-system"
       }
-      kube_dns = {
-        name      = "kube-dns"
+      cilium = {
+        name      = "cilium"
         namespace = "kube-system"
+        service   = "cilium-gateway-cilium.kube-system"
       }
-      kubernetes_mcp = {
-        name = "kubernetes-mcp"
+      kube_dns = {
+        name           = "kube-dns"
+        namespace      = "kube-system"
+        cluster_netnum = 10
       }
-      mountpoint_s3_csi = {
-        name      = "s3-csi"
-        namespace = "s3-csi"
+      k8s_gateway = {
+        name           = "k8s-gateway"
+        namespace      = "kube-system"
+        service_netnum = 33
       }
+
+      ## infra
       minio = {
-        name      = "minio"
-        namespace = "minio"
+        name           = "minio"
+        namespace      = "minio"
+        service_netnum = 34
+      }
+      fluxcd = {
+        name      = "fluxcd"
+        namespace = "flux-system"
+      }
+      cert_manager = {
+        name      = "cert-manager"
+        namespace = "cert-manager"
+      }
+      registry = {
+        name           = "registry"
+        namespace      = "registry"
+        service        = "reg.${local.domains.kubernetes}"
+        service_netnum = 35
+      }
+      # - kea needs a known IP for each peer -
+      kea_primary = {
+        cluster_netnum = 12
+      }
+      kea_secondary = {
+        cluster_netnum = 13
       }
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
       }
-      searxng = {
-        name = "searxng"
+      mountpoint_s3_csi = {
+        name      = "s3-csi"
+        namespace = "s3-csi"
       }
-      registry = {
-        name      = "registry"
-        namespace = "registry"
-        service   = "reg.${local.domains.kubernetes}"
-      }
-      qrcode_hostapd = {
-        name    = "qrcode-hostapd"
-        ingress = "hostapd.${local.domains.public}"
-      }
-      llama_cpp = {
-        name = "llama-cpp"
-      }
+
+      ## auth stack
       lldap = {
         name      = "lldap"
         namespace = "auth"
@@ -304,20 +314,27 @@ locals {
         ingress   = "auth.${local.domains.public}"
         tunnel    = true
       }
+
+      ## client services
+      kubernetes_mcp = {
+        name = "kubernetes-mcp"
+      }
+      searxng = {
+        name = "searxng"
+      }
+      qrcode_hostapd = {
+        name    = "qrcode-hostapd"
+        ingress = "hostapd.${local.domains.public}"
+      }
+      llama_cpp = {
+        name = "llama-cpp"
+      }
       navidrome = {
         name = "navidrome"
       }
       stump = {
         name   = "stump"
         tunnel = true
-      }
-      fluxcd = {
-        name      = "fluxcd"
-        namespace = "flux-system"
-      }
-      cert_manager = {
-        name      = "cert-manager"
-        namespace = "cert-manager"
       }
       camofox_browser = {
         name = "camofox"
@@ -326,12 +343,16 @@ locals {
         name = "hermes-agent"
       }
     } :
-    name => merge(e, {
+    name => merge(e, contains(keys(e), "name") ? {
       namespace    = lookup(e, "namespace", "default")
       service      = "${lookup(e, "service", "${e.name}.${lookup(e, "namespace", "default")}")}"
       service_fqdn = "${e.name}.${lookup(e, "namespace", "default")}.svc.${local.domains.kubernetes}"
       ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
-    })
+      } : {}, contains(keys(e), "service_netnum") ? {
+      service_ip = cidrhost(local.networks.service.prefix, e.service_netnum)
+      } : {}, contains(keys(e), "cluster_netnum") ? {
+      cluster_ip = cidrhost(local.networks.kubernetes_service.prefix, e.cluster_netnum)
+    } : {})
   }
 
   # finalized local vars #
@@ -344,7 +365,7 @@ locals {
     }, {}))
   })
 
-  services = merge([
+  vips = merge([
     for network_name, network in local.networks :
     try({
       for service, netnum in network.netnums :
