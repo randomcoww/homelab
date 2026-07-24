@@ -224,7 +224,6 @@ output "manifests" {
           usages = [
             "key encipherment",
             "digital signature",
-            "client auth",
           ]
           issuerRef = {
             name = var.ca_issuer_name

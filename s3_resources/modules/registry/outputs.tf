@@ -114,7 +114,6 @@ output "manifests" {
           usages = [
             "key encipherment",
             "digital signature",
-            "server auth",
           ]
           ipAddresses = [
             "127.0.0.1",
