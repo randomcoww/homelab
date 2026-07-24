@@ -338,6 +338,73 @@ module "mountpoint-s3-csi" {
 locals {
   flux_system = {
 
+    cilium-crs = [
+      for _, m in [
+        {
+          apiVersion = "cilium.io/v2"
+          kind       = "CiliumLoadBalancerIPPool"
+          metadata = {
+            name = "service"
+          }
+          spec = {
+            blocks = [
+              {
+                start = cidrhost(cidrsubnet(local.networks.service.prefix, 2, 1), 1)
+                stop  = cidrhost(local.networks.service.prefix, -2)
+              },
+            ]
+          }
+        },
+        {
+          apiVersion = "gateway.networking.k8s.io/v1"
+          kind       = "Gateway"
+          metadata = {
+            name      = local.endpoints.cilium.name
+            namespace = local.endpoints.cilium.namespace
+            annotations = {
+              "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+            }
+          }
+          spec = {
+            gatewayClassName = "cilium"
+            listeners = [
+              {
+                allowedRoutes = {
+                  namespaces = {
+                    from = "Same"
+                  }
+                }
+                name     = "web"
+                port     = 80
+                protocol = "HTTP"
+              },
+              {
+                allowedRoutes = {
+                  namespaces = {
+                    from = "All"
+                  }
+                }
+                hostname = "*.${local.domains.public}"
+                name     = "websecure"
+                port     = 443
+                protocol = "HTTPS"
+                tls = {
+                  mode = "Terminate"
+                  certificateRefs = [
+                    {
+                      group = ""
+                      name  = "${local.domains.public}-tls"
+                    },
+                  ]
+                }
+              },
+            ]
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
+
     kubelet-csr-approver = [
       for _, m in [
         {
@@ -477,8 +544,7 @@ locals {
                 }
               }
               service = {
-                type              = "LoadBalancer"
-                loadBalancerClass = "io.cilium/l2-announcer"
+                type = "LoadBalancer"
                 labels = {
                   app = local.endpoints.k8s_gateway.name
                 }
@@ -571,6 +637,28 @@ locals {
                 targetPort = local.service_ports.coredns_metrics
               },
             ]
+          }
+        },
+
+        # static service IP
+        {
+          apiVersion = "cilium.io/v2"
+          kind       = "CiliumLoadBalancerIPPool"
+          metadata = {
+            name = "${local.endpoints.k8s_gateway.namespace}-${local.endpoints.k8s_gateway.name}"
+          }
+          spec = {
+            blocks = [
+              {
+                cidr = "${local.endpoints.k8s_gateway.service_ip}/32"
+              },
+            ]
+            serviceSelector = {
+              matchLabels = {
+                "io.kubernetes.service.namespace" = local.endpoints.k8s_gateway.namespace
+                "io.kubernetes.service.name"      = local.endpoints.k8s_gateway.name
+              }
+            }
           }
         },
       ] :

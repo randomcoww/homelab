@@ -223,11 +223,10 @@ module "service" {
   release   = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-    "kube-vip.io/loadbalancerIPs"               = var.service_ip
+    "lbipam.cilium.io/ips"                      = var.service_ip
   }
   spec = {
-    type              = "LoadBalancer"
-    loadBalancerClass = "kube-vip.io/kube-vip-class"
+    type = "LoadBalancer"
     ports = [
       {
         name       = var.name

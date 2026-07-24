@@ -153,6 +153,28 @@ output "manifests" {
           ]
         }
       },
+
+      # static service IP
+      {
+        apiVersion = "cilium.io/v2"
+        kind       = "CiliumLoadBalancerIPPool"
+        metadata = {
+          name = "${var.namespace}-${var.name}"
+        }
+        spec = {
+          blocks = [
+            {
+              cidr = "${var.service_ip}/32"
+            },
+          ]
+          serviceSelector = {
+            matchLabels = {
+              "io.kubernetes.service.namespace" = var.namespace
+              "io.kubernetes.service.name"      = var.name
+            }
+          }
+        }
+      },
     ] :
     yamlencode(m)
     ], [
