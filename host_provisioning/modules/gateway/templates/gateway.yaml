@@ -65,6 +65,9 @@ storage:
             virtual_ipaddress {
               ${keepalived_vip} dev ${keepalived_interface_name} use_vmac
             }
+            virtual_rules {
+              to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
+            }
             virtual_routes {
               default dev ${keepalived_interface_name} table ${slave_default_route.table_id}
             }
@@ -138,6 +141,7 @@ storage:
           [DHCPv4]
           RequestBroadcast=true
           ClientIdentifier=mac
+          RouteTable=${master_default_route.table_id}
           UseTimezone=false
     %{~ endfor ~}
     - path: /etc/conntrackd/conntrackd.conf

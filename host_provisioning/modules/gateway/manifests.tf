@@ -23,6 +23,10 @@ locals {
       keepalived_vip            = var.keepalived_vip
       keepalived_router_id      = var.keepalived_router_id
 
+      master_default_route = {
+        table_id       = 250
+        table_priority = 32770
+      }
       slave_default_route = {
         table_id       = 240
         table_priority = 32780
