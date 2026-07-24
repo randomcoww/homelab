@@ -80,7 +80,7 @@ output "manifests" {
           bootstrap = {
             initdb = {
               database = local.juicefs_postgres_database
-              owner    = local.juicefs_postgres_user
+              owner    = local.juicefs_postgres_username
               secret = {
                 name = module.juicefs-secret.name
               }

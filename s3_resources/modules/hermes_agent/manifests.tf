@@ -69,7 +69,7 @@ ${k}=${v}
 
   tmp_path                  = "/tmp/hermes-config"
   juicefs_postgres_database = "juicefs"
-  juicefs_postgres_user     = "juicefs"
+  juicefs_postgres_username = "juicefs"
 }
 
 resource "random_password" "juicefs-postgres-password" {
@@ -107,7 +107,7 @@ module "juicefs-secret" {
   data = {
     # juicefs params
     name       = var.name
-    metaurl    = "postgres://${local.juicefs_postgres_user}:${random_password.juicefs-postgres-password.result}@${var.name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
+    metaurl    = "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${var.name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
     storage    = "minio"
     bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
     access-key = var.minio_user.id
@@ -118,7 +118,7 @@ module "juicefs-secret" {
     ])
 
     # cngp params
-    username = local.juicefs_postgres_user
+    username = local.juicefs_postgres_username
     password = random_password.juicefs-postgres-password.result
   }
 }
