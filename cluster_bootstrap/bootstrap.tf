@@ -381,9 +381,7 @@ resource "helm_release" "cilium-crs" {
             }
             spec = {
               nodeSelector = {
-                matchLabels = {
-                  "node-role.kubernetes.io/control-plane" = "true"
-                }
+                matchLabels = {}
               }
               bgpInstances = [
                 {
