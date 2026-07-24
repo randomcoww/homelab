@@ -14,6 +14,7 @@ module "gateway" {
   bird_cache_table_name = local.ha.bird_cache_table_name
   bgp_port              = local.host_ports.bgp
   bgp_as                = local.ha.bgp_as
+  bgp_as_peer           = local.ha.bgp_as_cluster
   bgp_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key

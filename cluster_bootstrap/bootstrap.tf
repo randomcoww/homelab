@@ -253,15 +253,18 @@ resource "helm_release" "cilium" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      routingMode          = "native"
-      autoDirectNodeRoutes = true
+      routingMode                  = "native"
+      autoDirectNodeRoutes         = true
+      directRoutingSkipUnreachable = true
+      bpf = {
+        masquerade = true
+      }
       cni = {
         binPath  = local.kubernetes.cni_bin_path
         confPath = local.kubernetes.cni_config_path
       }
       gatewayAPI = {
-        enabled    = true
-        enableAlpn = true
+        enabled = true
       }
       bgpControlPlane = {
         enabled = true
@@ -274,9 +277,6 @@ resource "helm_release" "cilium" {
       }
       ipv4 = {
         enabled = true
-      }
-      bpf = {
-        masquerade = true
       }
       ipv4NativeRoutingCIDR = local.networks.kubernetes_pod.prefix
       enableIPv4Masquerade  = true
@@ -302,12 +302,19 @@ resource "helm_release" "cilium" {
           enabled = true
         }
       }
-      ## L2
-      l2announcements = {
-        enabled = true
+      extraConfig = {
+        enable-remote-node-masquerade = "true" # enable BPF masquerade to outside
       }
+      devices = join(",", [
+        "phy-service", # direct
+        "phy-node",    # pod to router (cp nodes)
+        "phy-wan",     # pod to internet (gw nodes)
+        "phy-backup",  # pod to internet backup (gw nodes)
+        "phy-lan",     # pod to boot client
+        "vrrp.+",      # pod to user client
+      ])
       kubeProxyReplacement                = true
-      k8sServiceHost                      = local.services.apiserver.ip
+      k8sServiceHost                      = local.vips.apiserver.ip
       k8sServicePort                      = local.host_ports.apiserver
       kubeProxyReplacementHealthzBindAddr = "0.0.0.0:${local.host_ports.kube_proxy_healthz}"
       ##
@@ -342,60 +349,80 @@ resource "helm_release" "cilium-crs" {
         for _, m in [
           {
             apiVersion = "cilium.io/v2"
-            kind       = "CiliumLoadBalancerIPPool"
+            kind       = "CiliumBGPPeerConfig"
             metadata = {
-              name : "svc-pool"
+              name = "cilium-peer"
             }
             spec = {
-              blocks = [
+              ebgpMultihop = 4
+              gracefulRestart = {
+                enabled = true
+              }
+              transport = {
+                peerPort = local.host_ports.bgp
+              }
+              families = [
                 {
-                  cidr  = local.networks.service.prefix
-                  start = cidrhost(cidrsubnet(local.networks.service.prefix, 1, 1), 0)
-                  stop  = cidrhost(local.networks.service.prefix, -2)
+                  afi  = "ipv4"
+                  safi = "unicast"
+                  advertisements = {
+                    matchLabels = {
+                    }
+                  }
                 },
               ]
             }
           },
           {
-            apiVersion = "gateway.networking.k8s.io/v1"
-            kind       = "Gateway"
+            apiVersion = "cilium.io/v2"
+            kind       = "CiliumBGPClusterConfig"
             metadata = {
-              name = local.endpoints.cilium.name
-              annotations = {
-                "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-              }
+              name = "cilium-bgp"
             }
             spec = {
-              gatewayClassName = "cilium"
-              listeners = [
+              nodeSelector = {
+                matchLabels = {
+                  "node-role.kubernetes.io/control-plane" = "true"
+                }
+              }
+              bgpInstances = [
                 {
-                  allowedRoutes = {
-                    namespaces = {
-                      from = "Same"
+                  name     = "instance-${local.ha.bgp_as}"
+                  localASN = local.ha.bgp_as_cluster
+                  peers = [
+                    for k, host in local.members.gateway :
+                    {
+                      name        = "peer-${k}"
+                      peerASN     = local.ha.bgp_as
+                      peerAddress = cidrhost(local.networks.service.prefix, host.netnum)
+                      peerConfigRef = {
+                        name = "cilium-peer"
+                      }
                     }
-                  }
-                  name     = "web"
-                  port     = 80
-                  protocol = "HTTP"
+                  ]
                 },
+              ]
+            }
+          },
+          {
+            apiVersion = "cilium.io/v2"
+            kind       = "CiliumBGPAdvertisement"
+            metadata = {
+              name = "bgp-advertisements"
+            }
+            spec = {
+              advertisements = [
                 {
-                  allowedRoutes = {
-                    namespaces = {
-                      from = "All"
-                    }
-                  }
-                  hostname = "*.${local.domains.public}"
-                  name     = "websecure"
-                  port     = 443
-                  protocol = "HTTPS"
-                  tls = {
-                    mode = "Terminate"
-                    certificateRefs = [
-                      {
-                        group = "core"
-                        name  = "${local.domains.public}-tls"
-                      },
+                  advertisementType = "Service"
+                  service = {
+                    addresses = [
+                      "ExternalIP",
+                      "LoadBalancerIP",
                     ]
+                  }
+                  selector = {
+                    matchLabels = {
+                    }
                   }
                 },
               ]
@@ -445,7 +472,7 @@ resource "helm_release" "kube-dns" {
         app = local.endpoints.kube_dns.name
       }
       service = {
-        clusterIP = local.services.cluster_dns.ip
+        clusterIP = local.endpoints.kube_dns.cluster_ip
       }
       affinity = {
         podAntiAffinity = {
@@ -508,11 +535,11 @@ resource "helm_release" "kube-dns" {
             },
             {
               name       = "forward"
-              parameters = "${local.domains.public} ${local.services.k8s_gateway.ip}"
+              parameters = "${local.domains.public} ${local.endpoints.k8s_gateway.service_ip}"
             },
             {
               name       = "forward"
-              parameters = "${local.domains.kubernetes} ${local.services.k8s_gateway.ip}"
+              parameters = "${local.domains.kubernetes} ${local.endpoints.k8s_gateway.service_ip}"
             },
             ], [
             for tlshostname, ips in merge({
@@ -535,105 +562,6 @@ resource "helm_release" "kube-dns" {
       ]
     }),
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-    helm_release.prometheus-operator-crds,
-  ]
-}
-
-# LoadBalancer
-
-resource "helm_release" "kube-vip" {
-  name             = "kube-vip"
-  namespace        = "kube-system"
-  repository       = "https://kube-vip.github.io/helm-charts"
-  chart            = "kube-vip"
-  create_namespace = true
-  wait             = true
-  wait_for_jobs    = false
-  version          = "0.9.9"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      image = {
-        repository = regex(local.container_image_regex, local.container_images.kube_vip).depName
-        tag        = regex(local.container_image_regex, local.container_images.kube_vip).tag
-      }
-      extraArgs = {
-        serviceInterface  = "phy-service"
-        cleanRoutingTable = true
-      }
-      config = {
-        address = local.services.apiserver.ip
-      }
-      env = {
-        for k, v in {
-          vip_arp             = false
-          port                = local.host_ports.apiserver
-          prometheus_server   = ":${local.host_ports.kube_vip_metrics}"
-          vip_interface       = "lo"
-          dns_mode            = "first"
-          cp_enable           = true
-          svc_enable          = true
-          lb_enable           = false
-          lb_port             = local.host_ports.apiserver
-          svc_leasename       = "plndr-svcs-lock"
-          vip_routingtable    = false
-          bgp_enable          = true
-          bgp_as              = local.ha.bgp_as
-          address             = local.services.apiserver.ip
-          egress_withnftables = true
-          bgp_peers = join(",", [
-            for _, host in local.members.gateway :
-            "${cidrhost(local.networks.service.prefix, host.netnum)}:${local.ha.bgp_as}::false"
-          ])
-        } :
-        k => tostring(v)
-      }
-      envValueFrom = {
-        vip_nodename = {
-          fieldRef = {
-            fieldPath = "spec.nodeName"
-          }
-        }
-        bgp_routerid = {
-          fieldRef = {
-            fieldPath = "status.podIP"
-          }
-        }
-      }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "node-role.kubernetes.io/control-plane"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
-      resources = {
-        requests = {
-          memory = "128Mi"
-        }
-        limits = {
-          memory = "128Mi"
-        }
-      }
-      priorityClassName = "system-cluster-critical"
-      podMonitor = {
-        enabled = true
-      }
-    })
-  ]
-
   depends_on = [
     kubernetes_labels.labels,
     helm_release.prometheus-operator-crds,
@@ -671,13 +599,12 @@ module "minio" {
   cluster_domain   = local.domains.kubernetes
   ca               = data.terraform_remote_state.host.outputs.internal_ca
   service_hostname = local.endpoints.minio.service
-  service_ip       = local.services.minio.ip
+  service_ip       = local.endpoints.minio.service_ip
 
   depends_on = [
     kubernetes_labels.labels,
     helm_release.local-path-provisioner,
     helm_release.prometheus-operator-crds,
-    helm_release.cilium-crs,
   ]
 }
 

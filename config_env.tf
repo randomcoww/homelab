@@ -191,7 +191,8 @@ locals {
     haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
-    bgp_as                 = 65005
+    bgp_as                 = 65005 # host bird
+    bgp_as_cluster         = 65006 # cilium
   }
 
   domain_regex = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"

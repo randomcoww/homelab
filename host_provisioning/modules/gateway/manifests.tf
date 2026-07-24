@@ -10,6 +10,7 @@ locals {
       bird_cache_table_name     = var.bird_cache_table_name
       bgp_as                    = var.bgp_as
       bgp_as_members            = 65500
+      bgp_as_peer               = var.bgp_as_peer
       bgp_port                  = var.bgp_port
       bgp_neighbor_netnums      = var.bgp_neighbor_netnums
       node_prefix               = var.node_prefix
@@ -22,10 +23,6 @@ locals {
       keepalived_vip            = var.keepalived_vip
       keepalived_router_id      = var.keepalived_router_id
 
-      master_default_route = {
-        table_id       = 250
-        table_priority = 32770
-      }
       slave_default_route = {
         table_id       = 240
         table_priority = 32780

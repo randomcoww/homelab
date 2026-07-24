@@ -26,6 +26,10 @@ variable "bgp_as" {
   type = number
 }
 
+variable "bgp_as_peer" {
+  type = number
+}
+
 variable "bgp_port" {
   type = number
 }

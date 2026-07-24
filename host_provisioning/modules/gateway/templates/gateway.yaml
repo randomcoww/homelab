@@ -65,9 +65,6 @@ storage:
             virtual_ipaddress {
               ${keepalived_vip} dev ${keepalived_interface_name} use_vmac
             }
-            virtual_rules {
-              to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
-            }
             virtual_routes {
               default dev ${keepalived_interface_name} table ${slave_default_route.table_id}
             }
@@ -92,6 +89,7 @@ storage:
             source address ${cidrhost(node_prefix, host_netnum)};
             local port ${bgp_port} as ${bgp_as_members};
             neighbor ${cidrhost(node_prefix, netnum)} port ${bgp_port} internal;
+            graceful restart;
             direct;
             bfd {
             };
@@ -107,6 +105,7 @@ storage:
             source address ${cidrhost(node_prefix, host_netnum)};
             local port ${bgp_port} as ${bgp_as};
             neighbor range ${node_prefix} port ${bgp_port} internal;
+            graceful restart;
             direct;
             bfd {
             };
@@ -120,7 +119,8 @@ storage:
             debug all;
             source address ${cidrhost(service_prefix, host_netnum)};
             local port ${bgp_port} as ${bgp_as};
-            neighbor range ${service_prefix} port ${bgp_port} internal;
+            neighbor range ${service_prefix} port ${bgp_port} as ${bgp_as_peer};
+            graceful restart;
             direct;
             bfd {
             };
@@ -129,7 +129,7 @@ storage:
               export all;
             };
           }
-    # Create fallback route so backup node can access the internet through the wan interface
+    # DHCP options for WAN
     %{~ for _, interface in wan_interface_names ~}
     - path: /etc/systemd/network/20-${interface}.network.d/20-master-default-route.conf
       mode: 0644
@@ -138,7 +138,6 @@ storage:
           [DHCPv4]
           RequestBroadcast=true
           ClientIdentifier=mac
-          RouteTable=${master_default_route.table_id}
           UseTimezone=false
     %{~ endfor ~}
     - path: /etc/conntrackd/conntrackd.conf

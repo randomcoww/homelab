@@ -47,7 +47,7 @@ storage:
           ipv4 table ${bird_cache_table_name};
 
           protocol kernel {
-            merge paths;
+            merge paths yes;
             ipv4 {
               export all;
             };
