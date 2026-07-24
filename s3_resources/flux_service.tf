@@ -784,7 +784,6 @@ module "gha-runner" {
 locals {
   flux_service = {
 
-    /*
     cloudflare-tunnel = [
       for _, m in [
         {
@@ -848,7 +847,7 @@ locals {
                   for _, e in local.endpoints :
                   {
                     hostname = e.ingress
-                    service  = "https://${local.endpoints.cilium.service}"
+                    service  = "https://${e.ingress}"
                   } if lookup(e, "tunnel", false)
                 ]
               }
@@ -863,7 +862,6 @@ locals {
       ] :
       yamlencode(m)
     ]
-    */
 
     tailscale-connector = [
       for _, m in [
