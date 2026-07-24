@@ -250,7 +250,6 @@ locals {
       cilium = {
         name      = "cilium"
         namespace = "kube-system"
-        service   = "cilium-gateway-cilium.kube-system"
       }
       kube_dns = {
         name           = "kube-dns"
