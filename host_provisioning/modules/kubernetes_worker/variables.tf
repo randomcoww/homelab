@@ -41,10 +41,6 @@ variable "host_netnum" {
   type = number
 }
 
-variable "cni_bridge_interface_name" {
-  type = string
-}
-
 variable "cluster_domain" {
   type = string
 }
