@@ -27,6 +27,7 @@ resource "helm_release" "bootstrap" {
   wait             = false
   wait_for_jobs    = false
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({ manifests = [
       for _, m in [
@@ -164,6 +165,7 @@ resource "helm_release" "local-path-provisioner" {
   wait_for_jobs    = false
   version          = "0.0.37"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 2
@@ -212,6 +214,7 @@ resource "helm_release" "cert-manager-crds" {
   wait             = true
   wait_for_jobs    = false
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
@@ -584,24 +587,21 @@ module "minio" {
   namespace = local.endpoints.minio.namespace
   timeout   = local.kubernetes.helm_release_timeout
   images = {
-    minio = {
-      repository = regex(local.container_image_regex, local.container_images.minio).depName
-      tag        = regex(local.container_image_regex, local.container_images.minio).tag
-    }
+    minio = local.container_images_digest.minio
   }
   service_port = local.service_ports.minio
   root_user = {
     id     = random_password.minio-access-key-id.result
     secret = random_password.minio-secret-access-key.result
   }
-  cluster_domain   = local.domains.kubernetes
-  ca               = data.terraform_remote_state.host.outputs.internal_ca
+  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   service_hostname = local.endpoints.minio.service
   service_ip       = local.endpoints.minio.service_ip
 
   depends_on = [
     kubernetes_labels.labels,
     helm_release.local-path-provisioner,
+    helm_release.cert-manager-crds,
     helm_release.prometheus-operator-crds,
   ]
 }

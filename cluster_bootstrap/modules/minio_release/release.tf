@@ -1,4 +1,8 @@
 locals {
+  tls_path         = "/opt/minio/certs"
+  mount_path       = "/export"
+  headless_service = "${var.name}-svc"
+
   manifests = concat([
     for _, m in [
       {
@@ -9,6 +13,11 @@ locals {
           namespace = var.namespace
         }
         spec = {
+          namespaceSelector = {
+            matchNames = [
+              var.namespace,
+            ]
+          }
           selector = {
             matchLabels = {
               app        = var.name
@@ -17,17 +26,12 @@ locals {
           }
           endpoints = [
             {
-              path       = "/minio/metrics/v3"
-              targetPort = var.service_port
-              scheme     = "https"
+              path   = "/minio/metrics/v3"
+              port   = "https"
+              scheme = "https"
               tlsConfig = {
-                ca = {
-                  secret = {
-                    key  = "tls.crt"
-                    name = module.tls.name
-                  }
-                }
-                serverName = var.name
+                serverName         = var.service_hostname
+                insecureSkipVerify = false
               }
             },
           ]
@@ -276,118 +280,286 @@ locals {
     ] :
     yamlencode(m)
     ], [
-    module.tls.manifest,
+    module.secret.manifest,
+    module.service.manifest,
+    module.service-headless.manifest,
+    module.statefulset.manifest,
   ])
+}
+
+module "secret" {
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    rootUser     = var.root_user.id
+    rootPassword = var.root_user.secret
+  }
+}
+
+module "service" {
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  annotations = {
+    "lbipam.cilium.io/ips" = var.service_ip
+  }
+  labels = {
+    monitoring = "true"
+  }
+  spec = {
+    type = "LoadBalancer"
+    ports = [
+      {
+        name       = "https"
+        port       = var.service_port
+        protocol   = "TCP"
+        targetPort = var.service_port
+      },
+    ]
+  }
+}
+
+module "service-headless" {
+  source    = "../../../modules/service"
+  name      = local.headless_service
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  spec = {
+    type                     = "ClusterIP"
+    clusterIP                = "None"
+    publishNotReadyAddresses = true
+    ports = [
+      {
+        name       = "https"
+        port       = var.service_port
+        protocol   = "TCP"
+        targetPort = var.service_port
+      },
+    ]
+  }
+}
+
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
+  spec = {
+    serviceName         = local.headless_service
+    podManagementPolicy = "Parallel"
+    volumeClaimTemplates = [
+      {
+        apiVersion = "v1"
+        kind       = "PersistentVolumeClaim"
+        metadata = {
+          name = "export"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "500Gi"
+            }
+          }
+          storageClassName = "local-path"
+          volumeMode       = "Filesystem"
+        }
+      },
+    ]
+  }
+  template_spec = {
+    resources = merge({
+      requests = {
+        memory = "4Gi"
+      }
+      limits = {
+        memory = "4Gi"
+      }
+    }, var.resources)
+    priorityClassName = "system-node-critical"
+    securityContext = {
+      fsGroup             = 1000
+      fsGroupChangePolicy = "OnRootMismatch"
+      runAsGroup          = 1000
+      runAsUser           = 1000
+    }
+    containers = [
+      {
+        name  = var.name
+        image = var.images.minio
+        command = [
+          "sh",
+          "-ce",
+          <<-EOF
+          docker-entrypoint.sh \
+            minio server https://${var.name}-{0...${var.replicas - 1}}.${local.headless_service}.${var.namespace}${local.mount_path} \
+            -S ${local.tls_path} --address :${var.service_port}
+          EOF
+        ]
+        env = [
+          {
+            name = "MINIO_ROOT_USER"
+            valueFrom = {
+              secretKeyRef = {
+                key  = "rootUser"
+                name = module.secret.name
+              }
+            }
+          },
+          {
+            name = "MINIO_ROOT_PASSWORD"
+            valueFrom = {
+              secretKeyRef = {
+                key  = "rootPassword"
+                name = module.secret.name
+              }
+            }
+          },
+          {
+            name  = "MINIO_PROMETHEUS_AUTH_TYPE"
+            value = "public"
+          },
+          {
+            name  = "MINIO_API_REQUESTS_DEADLINE"
+            value = "2m"
+          },
+          {
+            name  = "MINIO_STORAGE_CLASS_RRS"
+            value = "EC:2"
+          },
+          {
+            name  = "MINIO_STORAGE_CLASS_STANDARD"
+            value = "EC:2"
+          },
+        ]
+        port = [
+          {
+            containerPort = var.service_port
+            name          = "https"
+            protocol      = "TCP"
+          },
+        ]
+        volumeMounts = [
+          {
+            mountPath = local.mount_path
+            name      = "export"
+          },
+          {
+            mountPath = "${local.tls_path}/public.crt"
+            name      = "cert-secret-volume"
+            subPath   = "tls.crt"
+          },
+          {
+            mountPath = "${local.tls_path}/private.key"
+            name      = "cert-secret-volume"
+            subPath   = "tls.key"
+          },
+          {
+            mountPath = "${local.tls_path}/CAs/ca.crt"
+            name      = "cert-secret-volume"
+            subPath   = "ca.crt"
+          },
+        ]
+        startupProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            port   = var.service_port
+            path   = "/minio/health/live"
+          }
+          failureThreshold = 10
+          periodSeconds    = 15
+          timeoutSeconds   = 10
+          successThreshold = 1
+          failureThreshold = 3
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            port   = var.service_port
+            path   = "/minio/health/live"
+          }
+          periodSeconds    = 30
+          timeoutSeconds   = 10
+          successThreshold = 1
+          failureThreshold = 3
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            port   = var.service_port
+            path   = "/minio/health/ready"
+          }
+          periodSeconds    = 15
+          timeoutSeconds   = 10
+          successThreshold = 1
+          failureThreshold = 3
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "cert-secret-volume"
+        csi = {
+          driver   = "csi.cert-manager.io"
+          readOnly = true
+          volumeAttributes = {
+            "csi.cert-manager.io/issuer-name" = var.ca_issuer_name
+            "csi.cert-manager.io/issuer-kind" = "ClusterIssuer"
+            "csi.cert-manager.io/dns-names" = join(",", [
+              "$${POD_NAME}.${local.headless_service}.${var.namespace}",
+              var.service_hostname,
+            ])
+            "csi.cert-manager.io/ip-sans" = join(",", [
+              var.service_ip,
+            ])
+            "csi.cert-manager.io/key-algorithm" = "ECDSA"
+            "csi.cert-manager.io/key-size"      = "521"
+            "csi.cert-manager.io/key-usages" = join(",", [
+              "digital signature",
+              "key encipherment",
+            ])
+          }
+        }
+      },
+    ]
+    dnsConfig = {
+      options = [
+        {
+          name  = "ndots"
+          value = "5"
+        },
+      ]
+    }
+  }
 }
 
 resource "helm_release" "wrapper" {
   chart            = "../helm-wrapper"
-  name             = "${var.name}-resources"
-  namespace        = var.namespace
-  create_namespace = true
-  wait             = true
-  wait_for_jobs    = false
-  max_history      = 2
-  values = [
-    yamlencode({
-      manifests = local.manifests
-    }),
-  ]
-}
-
-resource "helm_release" "minio" {
   name             = var.name
   namespace        = var.namespace
-  repository       = "https://charts.min.io"
-  chart            = "minio"
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "5.4.0"
   max_history      = 2
   timeout          = var.timeout
   values = [
     yamlencode({
-      image = {
-        repository = var.images.minio.repository
-        tag        = var.images.minio.tag
-      }
-      podAnnotations = {
-        "checksum/tls" = sha256(module.tls.manifest)
-      }
-      clusterDomain     = var.cluster_domain
-      mode              = "distributed"
-      rootUser          = var.root_user.id
-      rootPassword      = var.root_user.secret
-      priorityClassName = "system-node-critical"
-      persistence = {
-        storageClass = "local-path"
-      }
-      drivesPerNode = 1
-      replicas      = var.replicas
-      resources = {
-        requests = {
-          memory = "4Gi"
-        }
-        limits = {
-          memory = "4Gi"
-        }
-      }
-      service = {
-        type = "LoadBalancer"
-        port = var.service_port
-        annotations = {
-          "lbipam.cilium.io/ips" = var.service_ip
-        }
-      }
-      certsPath = "/opt/minio/certs"
-      tls = {
-        enabled    = true
-        publicCrt  = "tls.crt"
-        privateKey = "tls.key"
-        certSecret = module.tls.name
-      }
-      trustedCertsSecret = module.tls.name
-      ingress = {
-        enabled = false
-      }
-      environment = {
-        MINIO_API_REQUESTS_DEADLINE  = "2m"
-        MINIO_STORAGE_CLASS_STANDARD = "EC:2"
-        MINIO_STORAGE_CLASS_RRS      = "EC:2"
-      }
-      buckets        = []
-      users          = []
-      policies       = []
-      customCommands = []
-      svcaccts       = []
-      affinity = {
-        podAntiAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = [
-            {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app"
-                    operator = "In"
-                    values = [
-                      var.name,
-                    ]
-                  },
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            },
-          ]
-        }
-      }
-      metrics = {
-        # this configures for old endpoints. Create a serviceMonitor manually
-        serviceMonitor = {
-          enabled     = false
-          includeNode = false
-        }
-      }
+      manifests = local.manifests
     }),
   ]
 }
