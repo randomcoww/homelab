@@ -307,14 +307,14 @@ resource "helm_release" "cilium" {
       }
       extraConfig = {
         enable-remote-node-masquerade = "true" # enable BPF masquerade to outside
+        direct-routing-device         = "phy-service"
       }
       devices = join(",", [
         "phy-service", # direct
-        "phy-node",    # pod to router (cp nodes)
-        "phy-wan",     # pod to internet (gw nodes)
-        "phy-backup",  # pod to internet backup (gw nodes)
-        "phy-lan",     # pod to boot client
-        "vrrp.+",      # pod to user client
+        "phy-node",    # router (cp nodes)
+        "phy-wan",     # internet (gw nodes)
+        "phy-backup",  # internet backup (gw nodes)
+        "vrrp.+",      # client devices phy-lan VIP
       ])
       kubeProxyReplacement                = true
       k8sServiceHost                      = local.vips.apiserver.ip
