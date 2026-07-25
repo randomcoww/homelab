@@ -527,8 +527,8 @@ module "statefulset" {
             "csi.cert-manager.io/ip-sans" = join(",", [
               var.service_ip,
             ])
-            "csi.cert-manager.io/key-algorithm" = "ECDSA"
-            "csi.cert-manager.io/key-size"      = "521"
+            "csi.cert-manager.io/key-algorithm" = "RSA" # compatibility with iPXE
+            "csi.cert-manager.io/key-size"      = "4096"
             "csi.cert-manager.io/key-usages" = join(",", [
               "digital signature",
               "key encipherment",
