@@ -26,14 +26,11 @@ module "gateway" {
     local.vips.gateway.ip,
     local.networks.kubernetes_pod.prefix,
     local.networks.kubernetes_service.prefix,
-    ], flatten([
-      for _, host in local.members.gateway :
-      [
-        for _, network in host.networks :
-        cidrhost(network.prefix, host.netnum)
-        if lookup(network, "enable_netnum", false)
-      ]
-  ]))
+    ], [
+    for _, network in each.value.networks :
+    cidrhost(network.prefix, each.value.netnum)
+    if lookup(network, "enable_netnum", false)
+  ])
   keepalived_router_id      = 13
   keepalived_path           = local.ha.keepalived_config_path
   keepalived_interface_name = each.value.networks[local.vips.gateway.network.name].interface
