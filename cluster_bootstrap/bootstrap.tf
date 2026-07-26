@@ -312,10 +312,9 @@ resource "helm_release" "cilium" {
         "phy-node",    # router (cp nodes)
         "phy-wan",     # internet (gw nodes)
       ])
-      kubeProxyReplacement                = true
-      k8sServiceHost                      = local.vips.apiserver.ip
-      k8sServicePort                      = local.host_ports.apiserver
-      kubeProxyReplacementHealthzBindAddr = "0.0.0.0:${local.host_ports.kube_proxy_healthz}"
+      kubeProxyReplacement = true
+      k8sServiceHost       = local.vips.apiserver.ip
+      k8sServicePort       = local.host_ports.apiserver
       ipam = {
         mode = "kubernetes"
         operator = {
@@ -325,7 +324,7 @@ resource "helm_release" "cilium" {
         }
       }
       priorityClassName = "system-node-critical"
-    })
+    }),
   ]
   depends_on = [
     kubernetes_labels.labels,

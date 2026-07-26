@@ -166,7 +166,6 @@ locals {
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 10250 # prometheus operator assumes this port and is not configurable
-    kube_proxy_healthz = 10256 # cilium kubeproxy health
     etcd_client        = 58082
     etcd_peer          = 58083
     etcd_metrics       = 58086
