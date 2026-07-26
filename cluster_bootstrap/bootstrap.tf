@@ -256,9 +256,8 @@ resource "helm_release" "cilium" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      routingMode                  = "native"
-      autoDirectNodeRoutes         = true
-      directRoutingSkipUnreachable = true
+      routingMode          = "native"
+      autoDirectNodeRoutes = true
       bpf = {
         masquerade = true
       }
@@ -306,21 +305,17 @@ resource "helm_release" "cilium" {
         }
       }
       extraConfig = {
-        enable-remote-node-masquerade = "true" # enable BPF masquerade to outside
-        direct-routing-device         = "phy-service"
+        direct-routing-device = "phy-service"
       }
       devices = join(",", [
         "phy-service", # direct
         "phy-node",    # router (cp nodes)
         "phy-wan",     # internet (gw nodes)
-        "phy-backup",  # internet backup (gw nodes)
-        "vrrp.+",      # client devices phy-lan VIP
       ])
       kubeProxyReplacement                = true
       k8sServiceHost                      = local.vips.apiserver.ip
       k8sServicePort                      = local.host_ports.apiserver
       kubeProxyReplacementHealthzBindAddr = "0.0.0.0:${local.host_ports.kube_proxy_healthz}"
-      ##
       ipam = {
         mode = "kubernetes"
         operator = {
