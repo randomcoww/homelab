@@ -81,7 +81,6 @@ resource "helm_release" "cert-manager" {
   ]
   depends_on = [
     kubernetes_labels.labels,
-    helm_release.cert-manager-crds,
   ]
 }
 
