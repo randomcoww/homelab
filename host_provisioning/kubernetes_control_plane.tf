@@ -1,0 +1,115 @@
+
+resource "random_bytes" "apiserver_encryption_key" {
+  length = 32
+}
+
+module "etcd" {
+  for_each = local.members.etcd
+  source   = "./modules/etcd_member"
+
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = local.endpoints.etcd.name
+  namespace      = local.endpoints.etcd.namespace
+  host_key       = each.key
+  cluster_token  = local.kubernetes.cluster_name
+  ca = {
+    algorithm       = tls_private_key.etcd-ca.algorithm
+    private_key_pem = tls_private_key.etcd-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+  }
+  peer_ca = {
+    algorithm       = tls_private_key.etcd-peer-ca.algorithm
+    private_key_pem = tls_private_key.etcd-peer-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-peer-ca.cert_pem
+  }
+  images = {
+    etcd         = local.container_images_digest.etcd
+    etcd_wrapper = local.container_images_digest.etcd_wrapper
+  }
+  ports = {
+    etcd_client  = local.host_ports.etcd_client
+    etcd_peer    = local.host_ports.etcd_peer
+    etcd_metrics = local.host_ports.etcd_metrics
+  }
+  node_ip = cidrhost(local.networks.etcd.prefix, each.value.netnum)
+  members = {
+    for host_key, host in local.members.etcd :
+    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  s3_resource_prefix   = "https://${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url}/${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}-"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.secret_access_key
+  static_pod_path      = local.kubernetes.static_pod_manifest_path
+  data_storage_path    = "${local.kubernetes.containers_path}/etcd"
+}
+
+module "kubernetes-master" {
+  for_each = local.members.kubernetes-master
+  source   = "./modules/kubernetes_master"
+
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = "kube-master"
+  cluster_name   = local.kubernetes.cluster_name
+  front_proxy_ca = {
+    algorithm       = tls_private_key.kubernetes-front-proxy-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-front-proxy-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-front-proxy-ca.cert_pem
+  }
+  kubernetes_ca = {
+    algorithm       = tls_private_key.kubernetes-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  }
+  etcd_ca = {
+    algorithm       = tls_private_key.etcd-ca.algorithm
+    private_key_pem = tls_private_key.etcd-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+  }
+  service_account = {
+    algorithm       = tls_private_key.service-account.algorithm
+    public_key_pem  = tls_private_key.service-account.public_key_pem
+    private_key_pem = tls_private_key.service-account.private_key_pem
+  }
+  etcd_members = {
+    for host_key, host in local.members.etcd :
+    host_key => host_key == each.key ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  images = {
+    apiserver          = local.container_images_digest.kube_apiserver
+    controller_manager = local.container_images_digest.kube_controller_manager
+    scheduler          = local.container_images_digest.kube_scheduler
+  }
+  ports = {
+    apiserver          = local.host_ports.apiserver
+    apiserver_backend  = local.host_ports.apiserver_backend
+    controller_manager = local.host_ports.controller_manager
+    scheduler          = local.host_ports.scheduler
+    etcd_client        = local.host_ports.etcd_client
+    etcd_metrics       = local.host_ports.etcd_metrics
+    bgp                = local.host_ports.bgp
+  }
+  kubelet_client_user        = local.kubernetes.kubelet_client_user
+  cluster_apiserver_endpoint = local.endpoints.apiserver.service_fqdn
+  kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
+  kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
+  node_ips = compact([
+    for _, network in each.value.networks :
+    try(cidrhost(network.prefix, each.value.netnum), null)
+  ])
+  apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
+  apiserver_ip             = local.vips.apiserver.ip
+  cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
+  static_pod_path          = local.kubernetes.static_pod_manifest_path
+  feature_gates            = local.kubernetes.feature_gates
+  bird_path                = local.ha.bird_config_path
+  bird_cache_table_name    = local.ha.bird_cache_table_name
+  haproxy_path             = local.ha.haproxy_config_path
+  bgp_prefix               = each.value.networks.node.prefix
+  bgp_as                   = local.ha.bgp_as
+  bgp_neighbor_netnums = {
+    for host_key, host in local.members.gateway :
+    host_key => host.netnum if each.key != host_key
+  }
+}

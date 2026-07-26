@@ -7,6 +7,14 @@ module "base" {
   hosts_entry    = "${cidrhost(each.value.networks.service.prefix, each.value.netnum)} ${each.value.fqdn} ${each.key}"
 }
 
+module "disks" {
+  for_each = local.members.disks
+  source   = "./modules/disks"
+
+  butane_version = local.butane_version
+  disks          = lookup(each.value, "disks", {})
+}
+
 module "upstream-dns" {
   for_each       = local.members.upstream-dns
   source         = "./modules/upstream_dns"
