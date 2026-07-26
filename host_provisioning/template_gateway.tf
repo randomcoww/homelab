@@ -8,7 +8,6 @@ module "gateway" {
   host_netnum    = each.value.netnum
   wan_interface_names = [
     each.value.networks.wan.interface,
-    each.value.networks.backup.interface,
   ]
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name

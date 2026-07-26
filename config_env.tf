@@ -72,12 +72,6 @@ locals {
       vlan_id     = 30
       enable_dhcp = true
     }
-    # Backup WAN
-    backup = {
-      vlan_id     = 1024
-      metric      = 4096
-      enable_dhcp = true
-    }
     # Cluster internal
     kubernetes_service = {
       network = "10.96.0.0"

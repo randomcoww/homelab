@@ -35,11 +35,6 @@ locals {
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
-        phy-backup = {
-          source  = "phy0"
-          network = "backup"
-          mac     = "52-54-00-63-6e-b4"
-        }
       }
       bridge_interfaces = {
         phy-lan = {
@@ -56,7 +51,6 @@ locals {
           "service",
           "etcd",
           "wan",
-          "backup",
         ] :
         name => {
           interface = "phy-${name}"
@@ -118,11 +112,6 @@ locals {
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
-        phy-backup = {
-          source  = "phy0"
-          network = "backup"
-          mac     = "52-54-00-63-6e-b4"
-        }
       }
       bridge_interfaces = {
         phy-lan = {
@@ -139,7 +128,6 @@ locals {
           "service",
           "etcd",
           "wan",
-          "backup",
         ] :
         name => {
           interface = "phy-${name}"
