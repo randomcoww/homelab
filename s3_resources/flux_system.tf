@@ -114,7 +114,7 @@ module "registry" {
   service_ip          = local.endpoints.registry.service_ip
 }
 
-# cert-manager
+# cert-manager-crs
 
 module "cert-manager-issuer-acme-prod-secret" {
   source    = "../modules/secret"
@@ -337,6 +337,64 @@ module "mountpoint-s3-csi" {
 
 locals {
   flux_system = {
+
+    cert-manager-crs = concat([
+      for _, m in [
+        # letsencrypt prod
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "ClusterIssuer"
+          metadata = {
+            name = local.kubernetes.cert_issuers.acme_prod
+          }
+          spec = {
+            acme = {
+              server = "https://acme-v02.api.letsencrypt.org/directory"
+              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
+              privateKeySecretRef = {
+                name = module.cert-manager-issuer-acme-prod-secret.name
+              }
+              disableAccountKeyGeneration = true
+              solvers = [
+                {
+                  dns01 = {
+                    cloudflare = {
+                      apiTokenSecretRef = {
+                        name = module.cert-manager-issuer-acme-prod-secret.name
+                        key  = "cloudflare-token"
+                      }
+                    }
+                  }
+                  selector = {
+                    dnsZones = [
+                      local.domains.public,
+                    ]
+                  }
+                },
+              ]
+            }
+          }
+        },
+
+        # internal CA
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "ClusterIssuer"
+          metadata = {
+            name = local.kubernetes.cert_issuers.ca_internal
+          }
+          spec = {
+            ca = {
+              secretName = module.cert-manager-issuer-ca-internal-secret.name
+            }
+          }
+        },
+      ] :
+      yamlencode(m)
+      ], [
+      module.cert-manager-issuer-acme-prod-secret.manifest,
+      module.cert-manager-issuer-ca-internal-secret.manifest,
+    ])
 
     cilium-crs = [
       for _, m in [
@@ -664,64 +722,6 @@ locals {
       ] :
       yamlencode(m)
     ]
-
-    cert-manager-cr = concat([
-      for _, m in [
-        # letsencrypt prod
-        {
-          apiVersion = "cert-manager.io/v1"
-          kind       = "ClusterIssuer"
-          metadata = {
-            name = local.kubernetes.cert_issuers.acme_prod
-          }
-          spec = {
-            acme = {
-              server = "https://acme-v02.api.letsencrypt.org/directory"
-              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
-              privateKeySecretRef = {
-                name = module.cert-manager-issuer-acme-prod-secret.name
-              }
-              disableAccountKeyGeneration = true
-              solvers = [
-                {
-                  dns01 = {
-                    cloudflare = {
-                      apiTokenSecretRef = {
-                        name = module.cert-manager-issuer-acme-prod-secret.name
-                        key  = "cloudflare-token"
-                      }
-                    }
-                  }
-                  selector = {
-                    dnsZones = [
-                      local.domains.public,
-                    ]
-                  }
-                },
-              ]
-            }
-          }
-        },
-
-        # internal CA
-        {
-          apiVersion = "cert-manager.io/v1"
-          kind       = "ClusterIssuer"
-          metadata = {
-            name = local.kubernetes.cert_issuers.ca_internal
-          }
-          spec = {
-            ca = {
-              secretName = module.cert-manager-issuer-ca-internal-secret.name
-            }
-          }
-        },
-      ] :
-      yamlencode(m)
-      ], [
-      module.cert-manager-issuer-acme-prod-secret.manifest,
-      module.cert-manager-issuer-ca-internal-secret.manifest,
-    ])
 
     metrics-server = [
       for _, m in [
