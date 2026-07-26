@@ -277,10 +277,26 @@ locals {
           }
         }
       },
+
+      # cert issuer
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Issuer"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          ca = {
+            secretName = module.cert-issuer-secret.name
+          }
+        }
+      },
     ] :
     yamlencode(m)
     ], [
     module.secret.manifest,
+    module.cert-issuer-secret.manifest,
     module.service.manifest,
     module.service-headless.manifest,
     module.statefulset.manifest,
@@ -296,6 +312,18 @@ module "secret" {
   data = {
     rootUser     = var.root_user.id
     rootPassword = var.root_user.secret
+  }
+}
+
+module "cert-issuer-secret" {
+  source    = "../../../modules/secret"
+  name      = "${var.name}-cert-issuer"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    "tls.crt" = var.ca.cert_pem
+    "tls.key" = var.ca.private_key_pem
   }
 }
 
@@ -518,8 +546,8 @@ module "statefulset" {
           driver   = "csi.cert-manager.io"
           readOnly = true
           volumeAttributes = {
-            "csi.cert-manager.io/issuer-name" = var.ca_issuer_name
-            "csi.cert-manager.io/issuer-kind" = "ClusterIssuer"
+            "csi.cert-manager.io/issuer-name" = var.name
+            "csi.cert-manager.io/issuer-kind" = "Issuer"
             "csi.cert-manager.io/dns-names" = join(",", [
               "$${POD_NAME}.${local.headless_service}.${var.namespace}",
               var.service_hostname,

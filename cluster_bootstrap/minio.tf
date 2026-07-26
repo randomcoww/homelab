@@ -21,7 +21,7 @@ module "minio" {
     id     = random_password.minio-access-key-id.result
     secret = random_password.minio-secret-access-key.result
   }
-  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
+  ca               = data.terraform_remote_state.host.outputs.internal_ca
   service_hostname = local.endpoints.minio.service
   service_ip       = local.endpoints.minio.service_ip
 
