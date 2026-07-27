@@ -631,7 +631,7 @@ module "hostapd" {
     sae_pwe                       = 2
     sae_require_mfp               = 1
     interface                     = "wlan0"
-    bridge                        = "phy-lan"
+    bridge                        = "br-lan"
     driver                        = "nl80211"
     wpa                           = 2
     wpa_key_mgmt                  = "SAE"
