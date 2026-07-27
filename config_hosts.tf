@@ -9,9 +9,6 @@ locals {
           # match_mac = "b0-41-6f-16-a2-dd"
           mtu = local.default_mtu
         }
-        wlan0 = {
-          match_mac = "a8-59-5f-be-af-f0" # AX200
-        }
       }
       vlan_interfaces = {
         phy-node = {
@@ -36,24 +33,24 @@ locals {
           mac     = "52-54-00-63-6e-b3"
         }
       }
-      bridge_interfaces = {
-        phy-lan = {
-          sources = [
-            "phy0",
-          ]
-        }
-      }
       networks = {
-        for _, name in [
-          "lan",
-          "node",
-          "sync",
-          "service",
-          "etcd",
-          "wan",
-        ] :
-        name => {
-          interface = "phy-${name}"
+        lan = {
+          interface = "phy0"
+        }
+        node = {
+          interface = "phy-node"
+        }
+        sync = {
+          interface = "phy-sync"
+        }
+        service = {
+          interface = "phy-service"
+        }
+        etcd = {
+          interface = "phy-etcd"
+        }
+        wan = {
+          interface = "phy-wan"
         }
       }
       disks = {
@@ -71,9 +68,9 @@ locals {
         }
       }
       boot_args = [
-        "ttm.pages_limit=8388608",   # 32G
-        "ttm.page_pool_size=262144", # 1G preallocated
-        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=${32 * 512 * 512}",   # 32G
+        "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
+        "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -86,9 +83,6 @@ locals {
           # match_mac = "b0-41-6f-16-f9-89"
           mtu = local.default_mtu
         }
-        wlan0 = {
-          match_mac = "ec-4c-8c-50-17-ed" # AX200
-        }
       }
       vlan_interfaces = {
         phy-node = {
@@ -113,24 +107,24 @@ locals {
           mac     = "52-54-00-63-6e-b3"
         }
       }
-      bridge_interfaces = {
-        phy-lan = {
-          sources = [
-            "phy0",
-          ]
-        }
-      }
       networks = {
-        for _, name in [
-          "lan",
-          "node",
-          "sync",
-          "service",
-          "etcd",
-          "wan",
-        ] :
-        name => {
-          interface = "phy-${name}"
+        lan = {
+          interface = "phy0"
+        }
+        node = {
+          interface = "phy-node"
+        }
+        sync = {
+          interface = "phy-sync"
+        }
+        service = {
+          interface = "phy-service"
+        }
+        etcd = {
+          interface = "phy-etcd"
+        }
+        wan = {
+          interface = "phy-wan"
         }
       }
       disks = {
@@ -148,9 +142,9 @@ locals {
         }
       }
       boot_args = [
-        "ttm.pages_limit=8388608",   # 32G
-        "ttm.page_pool_size=262144", # 1G preallocated
-        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=${32 * 512 * 512}",   # 32G
+        "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
+        "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -162,9 +156,6 @@ locals {
           match_mac = "b0-41-6f-16-9e-76"
           # match_mac = "b0-41-6f-16-9e-77"
           mtu = local.default_mtu
-        }
-        wlan0 = {
-          match_mac = "a8-59-5f-98-b9-80" # AX200
         }
       }
       vlan_interfaces = {
@@ -181,22 +172,18 @@ locals {
           network = "etcd"
         }
       }
-      bridge_interfaces = {
-        phy-lan = {
-          sources = [
-            "phy0",
-          ]
-        }
-      }
       networks = {
-        for _, name in [
-          "lan",
-          "node",
-          "service",
-          "etcd",
-        ] :
-        name => {
-          interface = "phy-${name}"
+        lan = {
+          interface = "phy0"
+        }
+        node = {
+          interface = "phy-node"
+        }
+        service = {
+          interface = "phy-service"
+        }
+        etcd = {
+          interface = "phy-etcd"
         }
       }
       disks = {
@@ -214,9 +201,9 @@ locals {
         }
       }
       boot_args = [
-        "ttm.pages_limit=8388608",   # 32G
-        "ttm.page_pool_size=262144", # 1G preallocated
-        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=${32 * 512 * 512}",   # 32G
+        "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
+        "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -247,21 +234,24 @@ locals {
         }
       }
       bridge_interfaces = {
-        phy-lan = {
+        br-lan = {
           sources = [
             "phy0",
           ]
         }
       }
       networks = {
-        for _, name in [
-          "lan",
-          "node",
-          "service",
-          "etcd",
-        ] :
-        name => {
-          interface = "phy-${name}"
+        lan = {
+          interface = "br-lan"
+        }
+        node = {
+          interface = "phy-node"
+        }
+        service = {
+          interface = "phy-service"
+        }
+        etcd = {
+          interface = "phy-etcd"
         }
       }
       disks = {
@@ -279,12 +269,12 @@ locals {
         }
       }
       boot_args = [
-        "ttm.pages_limit=33554432",    # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
-        "ttm.page_pool_size=25165824", # 96G preallocated
-        "pcie_aspm=off",               # TODO: workaround for r8169 transmit queue timed out issue
-        "mt7925e.disable_aspm=1",      # TODO: workaround for mt7925e stability
-        "mt7925_common.disable_clc=1", # TODO: workaround for mt7925e stability
-        "swiotlb=65536",               # TODO: workaround for mt7925e stability
+        "ttm.pages_limit=${128 * 512 * 512}",   # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
+        "ttm.page_pool_size=${96 * 512 * 512}", # 96G preallocated
+        "pcie_aspm=off",                        # TODO: workaround for r8169 transmit queue timed out issue
+        "mt7925e.disable_aspm=1",               # TODO: workaround for mt7925e stability
+        "mt7925_common.disable_clc=1",          # TODO: workaround for mt7925e stability
+        "swiotlb=65536",                        # TODO: workaround for mt7925e stability
       ]
     }
   }
