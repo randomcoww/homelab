@@ -59,9 +59,6 @@ resource "helm_release" "cilium" {
           enabled = true
         }
       }
-      extraConfig = {
-        direct-routing-device = "phy-service"
-      }
       devices = join(",", [
         "phy-service", # direct
         "phy-node",    # router (cp nodes)
