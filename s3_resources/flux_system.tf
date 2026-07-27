@@ -967,7 +967,7 @@ locals {
                 period            = "2m"
                 forceReboot       = true
                 drainTimeout      = "6m"
-                alertFilterRegexp = "^(Watchdog|PrometheusNotConnectedToAlertmanagers)$"
+                alertFilterRegexp = "^(Watchdog|PrometheusNotConnectedToAlertmanagers|NodeDiskIOSaturation)$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
                 ]
