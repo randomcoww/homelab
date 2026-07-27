@@ -49,16 +49,6 @@ locals {
         apiserver = 2
       }
     }
-    # Conntrack sync
-    sync = {
-      network        = "192.168.224.0"
-      cidr           = 26
-      vlan_id        = 90
-      mtu            = 1500
-      table_id       = 221
-      table_priority = 32760
-      enable_netnum  = true
-    }
     # Etcd peering
     etcd = {
       network       = "192.168.228.0"

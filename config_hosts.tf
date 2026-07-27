@@ -15,10 +15,6 @@ locals {
           source  = "phy0"
           network = "node"
         }
-        phy-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy-service = {
           source  = "phy0"
           network = "service"
@@ -39,9 +35,6 @@ locals {
         }
         node = {
           interface = "phy-node"
-        }
-        sync = {
-          interface = "phy-sync"
         }
         service = {
           interface = "phy-service"
@@ -89,10 +82,6 @@ locals {
           source  = "phy0"
           network = "node"
         }
-        phy-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy-service = {
           source  = "phy0"
           network = "service"
@@ -113,9 +102,6 @@ locals {
         }
         node = {
           interface = "phy-node"
-        }
-        sync = {
-          interface = "phy-sync"
         }
         service = {
           interface = "phy-service"

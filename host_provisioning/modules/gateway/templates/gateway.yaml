@@ -25,7 +25,7 @@ storage:
 
             chain input {
               type filter hook input priority -10; policy accept;
-              iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
+              iifname ${keepalived_interface_name} pkttype multicast jump mark-for-accept;
               iifname {${join(",", wan_interface_names)}} meta mark & ${fw_mark} == 0x00000000 drop;
             }
 
@@ -50,18 +50,13 @@ storage:
             state BACKUP
             advert_int 0.2
             virtual_router_id ${keepalived_router_id}
-            interface ${sync_interface_name}
-            track_interface {
-              ${keepalived_interface_name}
-              %{~ for _, interface in wan_interface_names ~}
-              ${interface}
-              %{~ endfor ~}
-            }
+            interface ${keepalived_interface_name}
             no_accept
+            use_vmac
             vmac_xmit_base
             priority 100
             virtual_ipaddress {
-              ${keepalived_vip} dev ${keepalived_interface_name} use_vmac
+              ${keepalived_vip}
             }
             virtual_rules {
               to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}

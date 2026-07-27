@@ -20,7 +20,6 @@ module "gateway" {
   }
   node_prefix               = each.value.networks.node.prefix
   service_prefix            = each.value.networks.service.prefix
-  sync_interface_name       = each.value.networks.sync.interface
   keepalived_router_id      = 13
   keepalived_path           = local.ha.keepalived_config_path
   keepalived_interface_name = each.value.networks[local.vips.gateway.network.name].interface

@@ -46,10 +46,6 @@ variable "service_prefix" {
   type = string
 }
 
-variable "sync_interface_name" {
-  type = string
-}
-
 variable "keepalived_path" {
   type = string
 }
