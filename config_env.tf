@@ -113,7 +113,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1784555602@sha256:798ac8339499ffbcb09e8f0776f88e73a5c963eecbfedbfb836192bbfb6b80cc"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1784562851@sha256:d4140ca16b874f2ebc8288c2244c941ea2404bc2fca2cb44a2afde948fddb8bb"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-19.1784555119@sha256:7af85428f3f6738a380c5d9d3f2643e2e15d86925797ab47c58a4e4c9169fe4c"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:3bc6ae0e872ecd4b003e97e9cb58ec0fb56b02d46ad97ea67e2fa4ff2e8ff759"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:d0aaeb14880e6e92bde1518fcc7261e995783367d63d95203383607bef9c6516"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.3@sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf"
@@ -123,7 +123,7 @@ locals {
     thanos           = "quay.io/thanos/thanos:v0.42.2@sha256:6249f7aaadd3695df637fb2eb4cb9a9955611eee691c3970892fe9c0dc3f2db6"
     stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.20.1784591297@sha256:ce3d08064776a6ca7cc96ae9f093b4588728cba2ab8f56ead07f513c06448eeb"
-    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.151@sha256:75efbb5f8ff8ab6558927c491dd0967ab903700fd65096c628146db7ed68fd25"
+    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.153@sha256:b42e3ea34a596826f6a2c30b3d81415b0478f5bdf620f1580865372f18442698"
 
     # models (model_file)
     "Qwen3.6-27B-BF16-00001-of-00002.gguf"                               = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16:v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486"
