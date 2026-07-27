@@ -46,16 +46,8 @@ variable "service_prefix" {
   type = string
 }
 
-variable "sync_prefix" {
-  type = string
-}
-
 variable "sync_interface_name" {
   type = string
-}
-
-variable "conntrackd_ignore_ipv4" {
-  type = list(string)
 }
 
 variable "keepalived_path" {

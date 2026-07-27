@@ -15,9 +15,7 @@ locals {
       bgp_neighbor_netnums      = var.bgp_neighbor_netnums
       node_prefix               = var.node_prefix
       service_prefix            = var.service_prefix
-      sync_prefix               = var.sync_prefix
       sync_interface_name       = var.sync_interface_name
-      conntrackd_ignore_ipv4    = var.conntrackd_ignore_ipv4
       keepalived_path           = var.keepalived_path
       keepalived_interface_name = var.keepalived_interface_name
       keepalived_vip            = var.keepalived_vip

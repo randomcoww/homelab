@@ -5,8 +5,6 @@ systemd:
   units:
     - name: nftables@gateway.service
       enabled: true
-    - name: conntrackd.service
-      enabled: true
 storage:
   files:
     # https://blog.fhrnet.eu/2019/03/07/ecmp-on-linux/
@@ -144,47 +142,3 @@ storage:
           RouteTable=${master_default_route.table_id}
           UseTimezone=false
     %{~ endfor ~}
-    - path: /etc/conntrackd/conntrackd.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |
-          Sync {
-            Mode FTFW {
-              DisableExternalCache on
-              PurgeTimeout 5
-              StartupResync on
-            }
-            Multicast {
-              IPv4_address 225.0.0.50
-              Group 3780
-              IPv4_interface ${cidrhost(sync_prefix, host_netnum)}
-              Interface ${sync_interface_name}
-              SndSocketBuffer 24985600
-              RcvSocketBuffer 24985600
-              Checksum on
-            }
-          }
-          General {
-            Systemd on
-            HashSize 32768
-            HashLimit 131072
-            LockFile /var/lock/conntrack.lock
-            UNIX {
-              Path /var/run/conntrackd.ctl
-            }
-            NetlinkBufferSize 2097152
-            NetlinkBufferSizeMaxGrowth 8388608
-            Filter From Userspace {
-              Protocol Accept {
-                TCP
-              }
-              Address Ignore {
-                IPv4_address 127.0.0.1
-                IPv6_address ::1
-                %{~ for _, address in conntrackd_ignore_ipv4 ~}
-                IPv4_address ${address}
-                %{~ endfor ~}
-              }
-            }
-          }

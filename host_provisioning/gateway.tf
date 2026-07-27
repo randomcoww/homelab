@@ -18,19 +18,9 @@ module "gateway" {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
   }
-  node_prefix         = each.value.networks.node.prefix
-  service_prefix      = each.value.networks.service.prefix
-  sync_prefix         = each.value.networks.sync.prefix
-  sync_interface_name = each.value.networks.sync.interface
-  conntrackd_ignore_ipv4 = concat([
-    local.vips.gateway.ip,
-    local.networks.kubernetes_pod.prefix,
-    local.networks.kubernetes_service.prefix,
-    ], [
-    for _, network in each.value.networks :
-    cidrhost(network.prefix, each.value.netnum)
-    if lookup(network, "enable_netnum", false)
-  ])
+  node_prefix               = each.value.networks.node.prefix
+  service_prefix            = each.value.networks.service.prefix
+  sync_interface_name       = each.value.networks.sync.interface
   keepalived_router_id      = 13
   keepalived_path           = local.ha.keepalived_config_path
   keepalived_interface_name = each.value.networks[local.vips.gateway.network.name].interface
