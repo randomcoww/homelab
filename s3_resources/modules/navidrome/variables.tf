@@ -37,13 +37,16 @@ variable "ingress_hostname" {
   type = string
 }
 
-variable "auth_middleware" {
-  type    = any
-  default = {}
-}
-
 variable "gateway_ref" {
   type = any
+}
+
+variable "auth_backend_ref" {
+  type = object({
+    name      = string
+    namespace = string
+    port      = number
+  })
 }
 
 variable "minio_endpoint" {

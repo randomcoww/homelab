@@ -764,6 +764,11 @@ module "navidrome" {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace
   }
+  auth_backend_ref = {
+    name      = local.endpoints.authelia.name
+    namespace = local.endpoints.authelia.namespace
+    port      = 80
+  }
   minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_data_bucket = "music"
   minio_bucket      = "navidrome"
@@ -906,5 +911,6 @@ locals {
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     stump           = module.stump.manifests
+    navidrome       = module.navidrome.manifests
   }
 }
