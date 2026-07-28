@@ -888,11 +888,15 @@ locals {
               # manifest #
 
               configuration = {
-                prometheusUrl     = "https://${local.endpoints.prometheus.ingress}"
-                period            = "2m"
-                forceReboot       = true
-                drainTimeout      = "6m"
-                alertFilterRegexp = "^(Watchdog|PrometheusNotConnectedToAlertmanagers|NodeDiskIOSaturation)$"
+                prometheusUrl = "https://${local.endpoints.prometheus.ingress}"
+                period        = "2m"
+                forceReboot   = true
+                drainTimeout  = "6m"
+                alertFilterRegexp = "^(${join("|", sort([
+                  "Watchdog",                              # always on
+                  "PrometheusNotConnectedToAlertmanagers", # not using alert manager
+                  "NodeDiskIOSaturation",                  # triggers too often
+                ]))})$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
                 ]
