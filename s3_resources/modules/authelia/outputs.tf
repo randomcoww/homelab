@@ -134,6 +134,33 @@ output "manifests" {
           }
         }
       },
+
+      # externalAuth reference grants
+      {
+        apiVersion = "gateway.networking.k8s.io/v1"
+        kind       = "ReferenceGrant"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          from = [
+            for _, ns in var.reference_grant_namespaces :
+            {
+              group     = "gateway.networking.k8s.io"
+              kind      = "HTTPRoute"
+              namespace = ns
+            }
+          ]
+          to = [
+            {
+              group = ""
+              kind  = "Service"
+              name  = var.name
+            },
+          ]
+        }
+      },
     ] :
     yamlencode(m)
   ])

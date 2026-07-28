@@ -84,3 +84,8 @@ variable "redis_sentinel_endpoint" {
     master_name = string
   })
 }
+
+variable "reference_grant_namespaces" {
+  type    = list(string)
+  default = ["default"]
+}

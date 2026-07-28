@@ -151,6 +151,10 @@ module "authelia" {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace
   }
+
+  reference_grant_namespaces = [
+    "default",
+  ]
 }
 
 # llama-cpp
@@ -702,6 +706,11 @@ module "qrcode-hostapd" {
   gateway_ref = {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace
+  }
+  auth_backend_ref = {
+    name      = local.endpoints.authelia.name
+    namespace = local.endpoints.authelia.namespace
+    port      = 80
   }
 }
 
