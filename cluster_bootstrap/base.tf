@@ -1,5 +1,5 @@
 locals {
-  cert_manager_version = "1.21.0" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+  cert_manager_version = "1.21.1" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 }
 
 resource "kubernetes_labels" "labels" {

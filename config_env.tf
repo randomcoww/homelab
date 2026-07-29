@@ -89,7 +89,7 @@ locals {
     etcd                    = "registry.k8s.io/etcd:3.7.1@sha256:a9983dd6d9283138ab926daa307c6c25623636703ecf5645d5df4d666ce9eba2"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
-    minio    = "cgr.dev/chainguard/minio:latest@sha256:5e9065ee2d2b2f9e76e29fe1ec247b24a905acaef4853c6af64b7a2510a1b606"
+    minio    = "cgr.dev/chainguard/minio:latest@sha256:d386393960d3126c034d6597b752bc33a02a2c237069788aabcf6d035c166b27"
     registry = "ghcr.io/distribution/distribution:3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8"
     # tier 2
     kea               = "reg.cluster.internal/randomcoww/kea:v3.2.0.1785197392@sha256:1f994d9e9b384bc0048d8d683e2340a35208d2793ff2dba11bd92e67b31c444e"
@@ -103,7 +103,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785197412@sha256:59292fd54e70d5d7276a20afe555fc552774dd0dcbec74c5577e10e87eea2103"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:d0aaeb14880e6e92bde1518fcc7261e995783367d63d95203383607bef9c6516"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:5d6d903ab82afa56ee32792d477f36bc63d3e5ca04fcb6947e28a5cfd987fad3"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.3@sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf"
