@@ -38,6 +38,7 @@ output "manifests" {
           }
           releaseName = var.name
           install = {
+            createNamespace = true
             remediation = {
               retries = -1
             }

@@ -49,7 +49,7 @@ module "juicefs-secret" {
   data = {
     # juicefs params
     name       = var.name
-    metaurl    = "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${var.name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
+    metaurl    = "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${var.name}-juicefs-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
     storage    = "minio"
     bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
     access-key = var.minio_user.id

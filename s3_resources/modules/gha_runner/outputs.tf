@@ -67,6 +67,7 @@ output "manifests" {
           }
           releaseName = k.name # should match runner name in github jobs
           install = {
+            createNamespace = true
             remediation = {
               retries = -1
             }
@@ -175,6 +176,7 @@ output "manifests" {
           }
           releaseName = var.name
           install = {
+            createNamespace = true
             remediation = {
               retries = -1
             }

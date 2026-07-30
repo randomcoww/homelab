@@ -61,12 +61,13 @@ output "manifests" {
           volumeName = "${var.name}-${var.minio_bucket}"
         }
       },
-      # data volume metadata
+
+      # juicefs data volume metadata
       {
         apiVersion = "postgresql.cnpg.io/v1"
         kind       = "Cluster"
         metadata = {
-          name      = "${var.name}-pg"
+          name      = "${var.name}-juicefs-pg"
           namespace = var.namespace
           labels = {
             "cnpg.io/reload" = "true"
@@ -90,6 +91,18 @@ output "manifests" {
             requests = {
               memory = "256Mi"
             }
+          }
+        }
+      },
+
+      # NS
+      {
+        apiVersion = "v1"
+        kind       = "Namespace"
+        metadata = {
+          name = var.namespace
+          annotations = {
+            "kustomize.toolkit.fluxcd.io/prune" = "disabled"
           }
         }
       },
