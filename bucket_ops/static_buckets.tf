@@ -1,5 +1,5 @@
-locals {
-  minio_static_buckets = {
+resource "minio_s3_bucket" "static-bucket" {
+  for_each = {
     boot = {
       acl = "public-read"
     }
@@ -7,10 +7,6 @@ locals {
     music  = {}
     fluxcd = {}
   }
-}
-
-resource "minio_s3_bucket" "static-bucket" {
-  for_each = local.minio_static_buckets
 
   bucket         = each.key
   acl            = lookup(each.value, "acl", "private")
