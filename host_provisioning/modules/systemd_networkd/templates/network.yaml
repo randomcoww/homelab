@@ -56,25 +56,3 @@ storage:
           %{~ endif ~}
           %{~ endif ~}
     %{~ endfor ~}
-
-    # wifi
-    %{~ for name, config in wlan_networks ~}
-    - path: /etc/systemd/network/20-${config.interface}.network.d/20-${name}.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Link]
-          ARP=true
-          RequiredForOnline=false
-          ActivationPolicy=always-up
-
-          [DHCPv4]
-          RouteMetric=${lookup(config, "metric", 1024)}
-          RoutesToDNS=false
-          RoutesToNTP=false
-
-          [Network]
-          LinkLocalAddressing=false
-          DHCP=${lookup(config, "enable_dhcp", false)}
-          MulticastDNS=${lookup(config, "enable_mdns", false)}
-    %{~ endfor ~}

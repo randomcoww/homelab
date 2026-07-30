@@ -9,7 +9,6 @@ locals {
       bridge_interfaces   = var.bridge_interfaces
       vlan_interfaces     = var.vlan_interfaces
       networks            = var.networks
-      wlan_networks       = var.wlan_networks
     })
   ]
 }

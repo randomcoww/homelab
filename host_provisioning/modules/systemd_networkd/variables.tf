@@ -29,8 +29,3 @@ variable "networks" {
   type    = any
   default = {}
 }
-
-variable "wlan_networks" {
-  type    = any
-  default = {}
-}

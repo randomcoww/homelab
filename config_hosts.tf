@@ -287,11 +287,6 @@ locals {
         for name, network in lookup(host, "networks", {}) :
         name => merge(local.networks[name], network)
       }
-      wlan_networks = {
-        for name, network in lookup(host, "wlan_networks", {}) :
-        name => merge(local.networks[name], network)
-      }
-
       physical_interfaces = lookup(host, "physical_interfaces", {})
       bridge_interfaces   = lookup(host, "bridge_interfaces", {})
       vlan_interfaces = {

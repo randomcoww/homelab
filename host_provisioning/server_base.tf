@@ -33,7 +33,6 @@ module "systemd-networkd" {
   bridge_interfaces   = each.value.bridge_interfaces
   vlan_interfaces     = each.value.vlan_interfaces
   networks            = each.value.networks
-  wlan_networks       = each.value.wlan_networks
 }
 
 module "server" {
