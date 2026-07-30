@@ -86,7 +86,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785197412@sha256:59292fd54e70d5d7276a20afe555fc552774dd0dcbec74c5577e10e87eea2103"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:5d6d903ab82afa56ee32792d477f36bc63d3e5ca04fcb6947e28a5cfd987fad3"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:75e3528c976a0ba311d8d870f029466e7b74636057a654bf3e09d1c0e3a11ed3"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.3@sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf"
@@ -94,10 +94,10 @@ locals {
     camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.13.0@sha256:64b30ffdbbc4ae0e28200a66dfbd6f55ac4188229eb34ef769afcf7be40faa6e"
     navidrome        = "ghcr.io/navidrome/navidrome:0.63.2@sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:ee91f7a174ac4d6a6b0685b3a60e321f0a9dbbb691f9b0e285be2ba1d1be8328"
-    thanos           = "quay.io/thanos/thanos:v0.42.2@sha256:6249f7aaadd3695df637fb2eb4cb9a9955611eee691c3970892fe9c0dc3f2db6"
+    thanos           = "quay.io/thanos/thanos:v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8"
     stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.20.1785197062@sha256:de99808bde61f0e15043bbe1bc3c3dc866fa5dea422191eacec22ff2c97bf62e"
-    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.153@sha256:b42e3ea34a596826f6a2c30b3d81415b0478f5bdf620f1580865372f18442698"
+    hermes_webui     = "ghcr.io/nesquena/hermes-webui:0.52.157@sha256:4fcd14d58dc00f842e713e273ab9ed86f8db885e0ec4703421a417307b86546e"
 
     # models (model_file)
     "Qwen3.6-27B-BF16-00001-of-00002.gguf"                               = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16:v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486"
