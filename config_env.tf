@@ -1,7 +1,6 @@
 locals {
-  timezone       = "America/Los_Angeles"
-  butane_version = "1.5.0"
-  default_mtu    = 1500
+  timezone    = "America/Los_Angeles"
+  default_mtu = 1500
 
   users = {
     ssh = {
@@ -26,7 +25,7 @@ locals {
       table_id       = 220
       table_priority = 32760
       enable_netnum  = true
-      netnums = {
+      vips = {
         gateway = 2
       }
     }
@@ -45,7 +44,7 @@ locals {
       vlan_id       = 80
       mtu           = 1500
       enable_netnum = true
-      netnums = {
+      vips = {
         apiserver = 2
       }
     }
@@ -71,10 +70,6 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-  }
-
-  fw_marks = {
-    accept = "0x00002000"
   }
 
   # use same regex for renovate
@@ -129,18 +124,6 @@ locals {
     "jina-embeddings-v5-omni-small-text-matching-vision-mmproj-F16.gguf" = "reg.cluster.internal/randomcoww/jina-embeddings-v5-omni-small-text-matching-q8-0:v1781728112@sha256:21c5b33ae3bc351542d97bd312d002fbe127d954608bd5b56a0c5bc711fabd54"
   }
 
-  host_images = {
-    for name, tag in {
-      # these fields are updated by renovate - don't use var substitutions
-      default = "44.20260727.20.1.1785201466" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
-    } :
-    name => {
-      kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
-      initrd = "fedora-coreos-${tag}-live-initramfs.$${buildarch:uristring}.img"
-      rootfs = "fedora-coreos-${tag}-live-rootfs.$${buildarch:uristring}.img"
-    }
-  }
-
   host_ports = {
     kea_peer           = 50060
     kea_metrics        = 58087
@@ -167,13 +150,9 @@ locals {
     kubernetes_mcp  = 8080
   }
 
-  ha = {
-    keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
-    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
-    bird_config_path       = "/etc/bird.conf.d"
-    bird_cache_table_name  = "cache"
-    bgp_as                 = 65005 # host bird
-    bgp_as_cluster         = 65006 # cilium
+  bgp = {
+    host_as    = 65005 # host bird
+    cluster_as = 65006 # cilium
   }
 
   domain_regex = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
@@ -349,7 +328,7 @@ locals {
   vips = merge([
     for network_name, network in local.networks :
     try({
-      for service, netnum in network.netnums :
+      for service, netnum in network.vips :
       service => {
         ip      = cidrhost(network.prefix, netnum)
         network = local.networks[network_name]

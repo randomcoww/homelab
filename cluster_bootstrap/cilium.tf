@@ -134,13 +134,13 @@ resource "helm_release" "cilium-crs" {
               }
               bgpInstances = [
                 {
-                  name     = "instance-${local.ha.bgp_as}"
-                  localASN = local.ha.bgp_as_cluster
+                  name     = "instance-${local.bgp.host_as}"
+                  localASN = local.bgp.cluster_as
                   peers = [
                     for k, host in local.members.gateway :
                     {
                       name        = "peer-${k}"
-                      peerASN     = local.ha.bgp_as
+                      peerASN     = local.bgp.host_as
                       peerAddress = cidrhost(local.networks.service.prefix, host.netnum)
                       peerConfigRef = {
                         name = "cilium-peer"

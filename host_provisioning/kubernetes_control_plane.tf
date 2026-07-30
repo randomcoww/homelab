@@ -103,11 +103,11 @@ module "kubernetes-master" {
   cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates
-  bird_path                = local.ha.bird_config_path
-  bird_cache_table_name    = local.ha.bird_cache_table_name
-  haproxy_path             = local.ha.haproxy_config_path
+  bird_path                = local.bird_config_path
+  bird_cache_table_name    = local.bird_cache_table_name
+  haproxy_path             = local.haproxy_config_path
   bgp_prefix               = each.value.networks.node.prefix
-  bgp_as                   = local.ha.bgp_as
+  bgp_as                   = local.bgp.host_as
   bgp_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key

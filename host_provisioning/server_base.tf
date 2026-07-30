@@ -59,10 +59,10 @@ module "server" {
     public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
   }
   # HA config
-  keepalived_path       = local.ha.keepalived_config_path
-  haproxy_path          = local.ha.haproxy_config_path
-  bird_path             = local.ha.bird_config_path
-  bird_cache_table_name = local.ha.bird_cache_table_name
+  keepalived_path       = local.keepalived_config_path
+  haproxy_path          = local.haproxy_config_path
+  bird_path             = local.bird_config_path
+  bird_cache_table_name = local.bird_cache_table_name
   bgp_router_id = reverse(sort(compact([
     for _, network in each.value.networks :
     cidrhost(network.prefix, each.value.netnum)

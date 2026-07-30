@@ -1,4 +1,15 @@
 locals {
+  butane_version = "1.5.0"
+
+  fw_marks = {
+    accept = "0x00002000"
+  }
+
+  keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
+  haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
+  bird_config_path       = "/etc/bird.conf.d"
+  bird_cache_table_name  = "cache"
+
   ignition_snippets = {
     for host_key in keys(local.hosts) :
     host_key => sort(flatten([

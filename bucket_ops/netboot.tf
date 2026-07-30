@@ -1,4 +1,16 @@
 locals {
+  host_images = {
+    for name, tag in {
+      default = "44.20260727.20.1.1785201466" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+    } :
+    name => {
+      kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
+      initrd = "fedora-coreos-${tag}-live-initramfs.$${buildarch:uristring}.img"
+      rootfs = "fedora-coreos-${tag}-live-rootfs.$${buildarch:uristring}.img"
+    }
+  }
+  current_host_image = local.host_images.default
+
   netboot_args = {
     for host_key, host in local.hosts :
     host_key => sort(concat([
@@ -7,9 +19,9 @@ locals {
       "ignition.firstboot",
       "ignition.platform.id=metal",
       "coreos.no_persist_ip",
-      "initrd=${host.host_image.initrd}",
+      "initrd=${local.current_host_image.initrd}",
       "ignition.config.url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ignition-$${mac:hexhyp}",
-      "coreos.live.rootfs_url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/${host.host_image.rootfs}",
+      "coreos.live.rootfs_url=https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/${local.current_host_image.rootfs}",
       "rd.driver.blacklist=nouveau,nova_core",
       "modprobe.blacklist=nouveau,nova_core",
       "selinux=0",
@@ -22,10 +34,10 @@ locals {
       for k, host in local.hosts :
       k => host.match_macs
     }) :
-    mac => merge(local.hosts[host_key[0]].host_image, {
+    mac => merge(local.current_host_image, {
       host_key = host_key[0]
       netboot_args = concat(local.netboot_args[host_key[0]], [
-        "digest=${sha256("${join(" ", concat([local.hosts[host_key[0]].host_image.kernel], local.netboot_args[host_key[0]]))} ${data.ct_config.ignition[host_key[0]].rendered}")}",
+        "digest=${sha256("${join(" ", concat([local.current_host_image.kernel], local.netboot_args[host_key[0]]))} ${data.ct_config.ignition[host_key[0]].rendered}")}",
       ])
     })
   }

@@ -1,8 +1,7 @@
 locals {
   base_hosts = {
     k-0 = {
-      host_image = local.host_images.default
-      netnum     = 1
+      netnum = 1
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-a2-dc"
@@ -68,8 +67,7 @@ locals {
     }
 
     k-1 = {
-      host_image = local.host_images.default
-      netnum     = 3
+      netnum = 3
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-f9-88"
@@ -135,8 +133,7 @@ locals {
     }
 
     k-2 = {
-      host_image = local.host_images.default
-      netnum     = 5
+      netnum = 5
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-9e-76"
@@ -194,8 +191,7 @@ locals {
     }
 
     k-3 = {
-      host_image = local.host_images.default
-      netnum     = 6
+      netnum = 6
       physical_interfaces = {
         phy0 = {
           match_mac = "9c-bf-0d-01-0e-7b"
