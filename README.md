@@ -123,8 +123,8 @@ tofu -chdir=cluster_bootstrap apply
 Create resources on MinIO needed for host provisioning and FluxCD Kustomizations. This may also trigger a rolling reboot of hosts managed by Kured.
 
 ```bash
-tofu -chdir=s3_resources init -upgrade && \
-tofu -chdir=s3_resources apply
+tofu -chdir=bucket_ops init -upgrade && \
+tofu -chdir=bucket_ops apply
 ```
 
 ## Service management
@@ -206,19 +206,19 @@ EOF
 LDAP admin:
 
 ```bash
-tofu -chdir=s3_resources output lldap
+tofu -chdir=bucket_ops output lldap
 ```
 
 llama.cpp OpenAI compatible endpoint:
 
 ```bash
-tofu -chdir=s3_resources output llama-cpp
+tofu -chdir=bucket_ops output llama-cpp
 ```
 
 Hermes Agent OpenAI compatible endpoint:
 
 ```bash
-tofu -chdir=s3_resources output hermes-agent
+tofu -chdir=bucket_ops output hermes-agent
 ```
 
 Internal registry:
