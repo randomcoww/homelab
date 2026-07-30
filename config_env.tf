@@ -310,7 +310,8 @@ locals {
         name = "llama-cpp"
       }
       navidrome = {
-        name = "navidrome"
+        name   = "navidrome"
+        tunnel = true
       }
       stump = {
         name   = "stump"

@@ -107,7 +107,7 @@ resource "helm_release" "fluxcd-bucket" {
           kubernetes-mcp         = []
           hermes-agent           = ["juicefs-csi-driver", "cloudnative-pg"]
           stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver", "cloudnative-pg"]
-          fluxcd                 = ["mountpoint-s3-csi"]
+          navidrome              = ["mountpoint-s3-csi"]
           hostapd                = []
         } :
         yamlencode({
