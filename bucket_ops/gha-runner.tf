@@ -43,7 +43,7 @@ module "gha-runner" {
     username = var.github_username
     token    = var.github_token
   }
-  ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
+  ca_issuer_name    = local.cert_issuers.ca_internal
   registry_endpoint = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   minio_endpoint    = "${local.endpoints.minio.service}:${local.service_ports.minio}"
   minio_user        = minio_iam_user.gha-runner

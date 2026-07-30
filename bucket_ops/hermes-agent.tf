@@ -191,7 +191,7 @@ module "hermes-agent" {
     # HERMES_WEBUI_OIDC_ALLOW_VALUES            = var.smtp_username
     # HERMES_WEBUI_OIDC_ALLOW_PRIVATE_ENDPOINTS = true
   }
-  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
+  ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes_agent.ingress
   gateway_ref = {
     name      = local.endpoints.cilium.name

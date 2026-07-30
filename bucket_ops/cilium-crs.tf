@@ -26,7 +26,7 @@ resource "minio_s3_object" "fluxcd-cilium-crs" {
             name      = local.endpoints.cilium.name
             namespace = local.endpoints.cilium.namespace
             annotations = {
-              "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+              "cert-manager.io/cluster-issuer" = local.cert_issuers.acme_prod
             }
           }
           spec = {

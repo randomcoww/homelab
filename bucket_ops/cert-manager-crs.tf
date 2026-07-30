@@ -1,6 +1,11 @@
 # Cert-manager with CRDs installed in bootstrap
 
 locals {
+  cert_issuers = {
+    acme_prod   = "letsencrypt-prod"
+    ca_internal = "internal"
+  }
+
   cert-manager-crs = concat([
     for _, m in [
       # letsencrypt prod
@@ -8,7 +13,7 @@ locals {
         apiVersion = "cert-manager.io/v1"
         kind       = "ClusterIssuer"
         metadata = {
-          name = local.kubernetes.cert_issuers.acme_prod
+          name = local.cert_issuers.acme_prod
         }
         spec = {
           acme = {
@@ -44,7 +49,7 @@ locals {
         apiVersion = "cert-manager.io/v1"
         kind       = "ClusterIssuer"
         metadata = {
-          name = local.kubernetes.cert_issuers.ca_internal
+          name = local.cert_issuers.ca_internal
         }
         spec = {
           ca = {
@@ -62,7 +67,7 @@ locals {
 
 module "cert-manager-issuer-acme-prod-secret" {
   source    = "../modules/secret"
-  name      = local.kubernetes.cert_issuers.acme_prod
+  name      = local.cert_issuers.acme_prod
   namespace = local.endpoints.cert_manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
@@ -74,7 +79,7 @@ module "cert-manager-issuer-acme-prod-secret" {
 
 module "cert-manager-issuer-ca-internal-secret" {
   source    = "../modules/secret"
-  name      = local.kubernetes.cert_issuers.ca_internal
+  name      = local.cert_issuers.ca_internal
   namespace = local.endpoints.cert_manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
@@ -93,7 +98,7 @@ resource "minio_s3_object" "fluxcd-cert-manager-crs" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.kubernetes.cert_issuers.acme_prod
+            name = local.cert_issuers.acme_prod
           }
           spec = {
             acme = {
@@ -129,7 +134,7 @@ resource "minio_s3_object" "fluxcd-cert-manager-crs" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.kubernetes.cert_issuers.ca_internal
+            name = local.cert_issuers.ca_internal
           }
           spec = {
             ca = {

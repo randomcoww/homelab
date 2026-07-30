@@ -7,7 +7,7 @@ module "kubernetes-mcp" {
   }
   service_hostname = local.endpoints.kubernetes_mcp.service
   service_port     = local.service_ports.kubernetes_mcp
-  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
+  ca_issuer_name   = local.cert_issuers.ca_internal
 }
 
 resource "minio_s3_object" "fluxcd-kubernetes-mcp" {

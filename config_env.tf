@@ -1,19 +1,7 @@
 locals {
-  timezone    = "America/Los_Angeles"
-  default_mtu = 1500
-
-  users = {
-    ssh = {
-      name     = "fcos"
-      home_dir = "/var/home/fcos"
-      groups = [
-        "adm",
-        "sudo",
-        "systemd-journal",
-        "wheel",
-      ],
-    }
-  }
+  timezone       = "America/Los_Angeles"
+  default_mtu    = 9000
+  butane_version = "1.5.0"
 
   base_networks = {
     # Client access
@@ -182,10 +170,6 @@ locals {
     kubelet_client_user      = "kube-apiserver-kubelet-client"
     helm_release_timeout     = 600
 
-    cert_issuers = {
-      acme_prod   = "letsencrypt-prod"
-      ca_internal = "internal"
-    }
     feature_gates = {
       ClusterTrustBundle                      = true
       ClusterTrustBundleProjection            = true

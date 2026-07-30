@@ -44,7 +44,7 @@ module "registry" {
   images = {
     registry = local.container_images_digest.registry
   }
-  ca_issuer_name      = local.kubernetes.cert_issuers.ca_internal
+  ca_issuer_name      = local.cert_issuers.ca_internal
   minio_endpoint      = "${local.endpoints.minio.service_ip}:${local.service_ports.minio}" # needs to be reachable and resolvable from host
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"

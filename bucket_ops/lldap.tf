@@ -28,7 +28,7 @@ module "lldap" {
     LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp_password
     LLDAP_LDAPS_OPTIONS__ENABLED              = true
   }
-  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
+  ca_issuer_name   = local.cert_issuers.ca_internal
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
   gateway_ref = {
