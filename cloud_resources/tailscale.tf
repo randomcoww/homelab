@@ -79,3 +79,13 @@ resource "tailscale_oauth_client" "k8s-operator" {
     tailscale_acl.cluster,
   ]
 }
+
+# outputs
+
+output "tailscale_oauth_client" {
+  value = {
+    id  = tailscale_oauth_client.k8s-operator.id
+    key = tailscale_oauth_client.k8s-operator.key
+  }
+  sensitive = true
+}

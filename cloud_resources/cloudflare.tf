@@ -192,3 +192,39 @@ resource "cloudflare_dns_record" "record" {
   type    = "CNAME"
   proxied = true
 }
+
+# outputs
+
+output "cloudflare_dns_api_token" {
+  value     = cloudflare_api_token.dns.value
+  sensitive = true
+}
+
+output "r2_bucket" {
+  value = {
+    for _, name in concat(local.r2_buckets, [
+      data.terraform_remote_state.sr.config.bucket,
+    ]) :
+
+    name => {
+      url               = "${local.cloudflare_account_id}.r2.cloudflarestorage.com"
+      bucket            = name
+      access_key_id     = cloudflare_api_token.r2_bucket[name].id
+      secret_access_key = sha256(cloudflare_api_token.r2_bucket[name].value)
+    }
+  }
+  sensitive = true
+}
+
+output "cloudflare_tunnel" {
+  value = merge({
+    for _, k in [
+      "account_id",
+      "name",
+      "id",
+      "tunnel_secret",
+    ] :
+    k => cloudflare_zero_trust_tunnel_cloudflared.tunnel[k]
+  })
+  sensitive = true
+}

@@ -31,3 +31,14 @@ resource "tls_locally_signed_cert" "kubernetes-client" {
     "client_auth",
   ]
 }
+
+# provider credentials for other terraform modules
+# providers are not able to accept resource outputs as inputs, so they are generated here
+output "kubernetes_client" {
+  value = {
+    algorithm       = tls_private_key.kubernetes-client.algorithm
+    private_key_pem = tls_private_key.kubernetes-client.private_key_pem
+    cert_pem        = tls_locally_signed_cert.kubernetes-client.cert_pem
+  }
+  sensitive = true
+}

@@ -24,3 +24,12 @@ resource "tls_self_signed_cert" "internal-ca" {
     "client_auth",
   ]
 }
+
+output "internal_ca" {
+  value = {
+    algorithm       = tls_private_key.internal-ca.algorithm
+    private_key_pem = tls_private_key.internal-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.internal-ca.cert_pem
+  }
+  sensitive = true
+}

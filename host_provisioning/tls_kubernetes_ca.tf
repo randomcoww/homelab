@@ -60,3 +60,12 @@ resource "tls_private_key" "service-account" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
+
+output "kubernetes_ca" {
+  value = {
+    algorithm       = tls_private_key.kubernetes-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  }
+  sensitive = true
+}
