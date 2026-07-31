@@ -160,6 +160,57 @@ output "ignition_snippet" {
               EOF
           }
         }
+        ], flatten([
+
+          # Bridge interfaces
+          for name, iface in var.bridge_interfaces : [
+            for _, source in iface.sources :
+            {
+              path = "/etc/systemd/network/20-${source}.network.d/10-bridge-${name}.conf"
+              mode = 420
+              contents = {
+                inline = <<-EOF
+                [Network]
+                Bridge=${name}
+                EOF
+              }
+            }
+          ]
+        ]), [
+        for name, iface in var.bridge_interfaces :
+        {
+          path = "/etc/systemd/network/12-${name}.netdev"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [NetDev]
+              Name=${name}
+              Kind=bridge
+              MACAddress=${lookup(iface, "mac", "none")}
+              EOF
+          }
+        }
+        ], [
+        for name, iface in var.bridge_interfaces :
+        {
+          path = "/etc/systemd/network/20-${name}.network"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [Match]
+              Name=${name}
+
+              [Link]
+              ARP=false
+              RequiredForOnline=false
+
+              [Network]
+              LinkLocalAddressing=false
+              DHCP=false
+              MulticastDNS=false
+              EOF
+          }
+        }
         ], [
 
         # Interface config for each network

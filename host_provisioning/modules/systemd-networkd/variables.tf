@@ -20,6 +20,11 @@ variable "vlan_interfaces" {
   default = {}
 }
 
+variable "bridge_interfaces" {
+  type    = any
+  default = {}
+}
+
 variable "networks" {
   type    = any
   default = {}

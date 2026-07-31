@@ -31,6 +31,7 @@ module "systemd-networkd" {
   host_netnum         = each.value.netnum
   physical_interfaces = each.value.physical_interfaces
   vlan_interfaces     = each.value.vlan_interfaces
+  bridge_interfaces   = each.value.bridge_interfaces
   networks            = each.value.networks
 }
 
