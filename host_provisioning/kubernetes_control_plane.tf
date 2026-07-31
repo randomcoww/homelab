@@ -50,7 +50,7 @@ module "kubernetes-master" {
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
-  name           = "kube-master"
+  name           = "master"
   cluster_name   = local.kubernetes.cluster_name
   front_proxy_ca = {
     algorithm       = tls_private_key.kubernetes-front-proxy-ca.algorithm

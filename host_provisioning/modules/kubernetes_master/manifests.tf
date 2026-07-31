@@ -1,179 +1,94 @@
 locals {
   config_path = "${var.config_base_path}/${var.name}"
-  pki = {
+
+  kubeconfig_files = {
     for key, f in {
-      kubernetes-ca-cert = {
-        contents = var.kubernetes_ca.cert_pem
-      }
-      kubernetes-ca-key = {
-        contents = var.kubernetes_ca.private_key_pem
-      }
-      apiserver-cert = {
-        contents = tls_locally_signed_cert.kube-apiserver.cert_pem
-      }
-      apiserver-key = {
-        contents = tls_private_key.kube-apiserver.private_key_pem
-      }
-      kubelet-client-cert = {
-        contents = tls_locally_signed_cert.kube-apiserver-kubelet-client.cert_pem
-      }
-      kubelet-client-key = {
-        contents = tls_private_key.kube-apiserver-kubelet-client.private_key_pem
-      }
-      front-proxy-client-ca-cert = {
-        contents = var.front_proxy_ca.cert_pem
-      }
-      front-proxy-client-cert = {
-        contents = tls_locally_signed_cert.front-proxy-client.cert_pem
-      }
-      front-proxy-client-key = {
-        contents = tls_private_key.front-proxy-client.private_key_pem
-      }
-      etcd-ca-cert = {
-        contents = var.etcd_ca.cert_pem
-      }
-      etcd-client-cert = {
-        contents = tls_locally_signed_cert.kube-apiserver-etcd-client.cert_pem
-      }
-      etcd-client-key = {
-        contents = tls_private_key.kube-apiserver-etcd-client.private_key_pem
-      }
-      service-account-cert = {
-        contents = var.service_account.public_key_pem
-      }
-      service-account-key = {
-        contents = var.service_account.private_key_pem
-      }
+      "controller-manager.kubeconfig" = module.controller-manager-kubeconfig.manifest
+      "scheduler.kubeconfig"          = module.scheduler-kubeconfig.manifest
     } :
-    key => merge(f, {
-      path = "${local.config_path}/${key}.pem"
-    })
+    key => {
+      mode = 384
+      path = "${local.config_path}/${key}"
+      contents = {
+        inline = f
+      }
+    }
   }
 
-  kubeconfig = {
+  config_files = {
     for key, f in {
-      controller-manager = {
-        contents = module.controller-manager-kubeconfig.manifest
-      }
-      scheduler = {
-        contents = module.scheduler-kubeconfig.manifest
-      }
-    } :
-    key => merge(f, {
-      path = "${local.config_path}/${key}.kubeconfig"
-    })
-  }
-
-  config = {
-    for key, f in {
-      scheduler = {
-        contents = yamlencode({
-          kind       = "KubeSchedulerConfiguration"
-          apiVersion = "kubescheduler.config.k8s.io/v1"
-          clientConnection = {
-            kubeconfig = local.kubeconfig.scheduler.path
-          }
-          leaderElection = {
-            leaderElect = true
-          }
-        })
-      }
-      apiserver_encryption = {
-        contents = yamlencode({
-          apiVersion = "apiserver.config.k8s.io/v1"
-          kind       = "EncryptionConfiguration"
-          resources = [
-            {
-              resources = [
-                "secrets",
-                "configmaps",
-              ]
-              providers = [
-                {
-                  aescbc = {
-                    keys = [
-                      {
-                        name   = "key1"
-                        secret = var.apiserver_encryption_key
-                      },
-                    ]
-                  }
-                },
-                {
-                  identity = {}
-                },
-              ]
-            },
-          ]
-        })
-      }
-    } :
-    key => merge(f, {
-      path = "${local.config_path}/${key}.config"
-    })
-  }
-
-  static_pod = {
-    for key, f in {
-      apiserver = {
-        contents = module.apiserver.manifest
-      }
-      controller-manager = {
-        contents = module.controller-manager.manifest
-      }
-      scheduler = {
-        contents = module.scheduler.manifest
-      }
-    } :
-    key => merge(f, {
-      path = "${var.static_pod_path}/${key}.yaml"
-    })
-  }
-
-  ignition_snippets = concat([
-    for f in fileset(".", "${path.module}/templates/*.yaml") :
-    templatefile(f, {
-      butane_version        = var.butane_version
-      fw_mark               = var.fw_mark
-      name                  = var.name
-      ports                 = var.ports
-      apiserver_ip          = var.apiserver_ip
-      cluster_apiserver_ip  = var.cluster_apiserver_ip
-      haproxy_path          = var.haproxy_path
-      bird_path             = var.bird_path
-      bird_cache_table_name = var.bird_cache_table_name
-      bgp_prefix            = var.bgp_prefix
-      bgp_as                = var.bgp_as
-      bgp_neighbor_netnums  = var.bgp_neighbor_netnums
-    })
-    ], [
-    yamlencode({
-      variant = "fcos"
-      version = var.butane_version
-      storage = {
-        files = [
-          for _, f in concat(
-            values(local.pki),
-            values(local.kubeconfig),
-            values(local.config),
-            values(local.static_pod),
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
+      "scheduler.config" = yamlencode({
+        kind       = "KubeSchedulerConfiguration"
+        apiVersion = "kubescheduler.config.k8s.io/v1"
+        clientConnection = {
+          kubeconfig = local.kubeconfig_files["scheduler.kubeconfig"].path
+        }
+        leaderElection = {
+          leaderElect = true
+        }
+      })
+      "apiserver-encryption.config" = yamlencode({
+        apiVersion = "apiserver.config.k8s.io/v1"
+        kind       = "EncryptionConfiguration"
+        resources = [
+          {
+            resources = [
+              "secrets",
+              "configmaps",
+            ]
+            providers = [
+              {
+                aescbc = {
+                  keys = [
+                    {
+                      name   = "key1"
+                      secret = var.apiserver_encryption_key
+                    },
+                  ]
+                }
+              },
+              {
+                identity = {}
+              },
+            ]
+          },
         ]
+      })
+    } :
+    key => {
+      mode = 384
+      path = "${local.config_path}/${key}"
+      contents = {
+        inline = f
       }
-    }),
-  ])
+    }
+  }
 
-  pod_manifests = [
-    for pod in local.static_pod :
-    pod.contents
-  ]
+  pki_files = {
+    for key, f in {
+      "kubernetes-ca.crt"         = var.kubernetes_ca.cert_pem
+      "kubernetes-ca.key"         = var.kubernetes_ca.private_key_pem
+      "apiserver.crt"             = tls_locally_signed_cert.kube-apiserver.cert_pem
+      "apiserver.key"             = tls_private_key.kube-apiserver.private_key_pem
+      "kubelet-client.crt"        = tls_locally_signed_cert.kube-apiserver-kubelet-client.cert_pem
+      "kubelet-client.key"        = tls_private_key.kube-apiserver-kubelet-client.private_key_pem
+      "front-proxy-client-ca.crt" = var.front_proxy_ca.cert_pem
+      "front-proxy-client.crt"    = tls_locally_signed_cert.front-proxy-client.cert_pem
+      "front-proxy-client.key"    = tls_private_key.front-proxy-client.private_key_pem
+      "etcd-ca.crt"               = var.etcd_ca.cert_pem
+      "etcd-client.crt"           = tls_locally_signed_cert.kube-apiserver-etcd-client.cert_pem
+      "etcd-client.key"           = tls_private_key.kube-apiserver-etcd-client.private_key_pem
+      "service-account.crt"       = var.service_account.public_key_pem
+      "service-account.key"       = var.service_account.private_key_pem
+    } :
+    key => {
+      mode = 384
+      path = "${local.config_path}/${key}"
+      contents = {
+        inline = f
+      }
+    }
+  }
 }
 
 module "controller-manager-kubeconfig" {
@@ -220,10 +135,10 @@ module "apiserver" {
           "--authorization-mode=Node,RBAC",
           "--bind-address=0.0.0.0",
           "--secure-port=${var.ports.apiserver_backend}",
-          "--client-ca-file=${local.pki.kubernetes-ca-cert.path}",
-          "--etcd-cafile=${local.pki.etcd-ca-cert.path}",
-          "--etcd-certfile=${local.pki.etcd-client-cert.path}",
-          "--etcd-keyfile=${local.pki.etcd-client-key.path}",
+          "--client-ca-file=${local.pki_files["kubernetes-ca.crt"].path}",
+          "--etcd-cafile=${local.pki_files["etcd-ca.crt"].path}",
+          "--etcd-certfile=${local.pki_files["etcd-client.crt"].path}",
+          "--etcd-keyfile=${local.pki_files["etcd-client.key"].path}",
           "--etcd-servers=${join(",", [
             for _, ip in var.etcd_members :
             "https://${ip}:${var.ports.etcd_client}"
@@ -235,21 +150,21 @@ module "apiserver" {
           "--requestheader-extra-headers-prefix=X-Remote-Extra-",
           "--requestheader-group-headers=X-Remote-Group",
           "--requestheader-username-headers=X-Remote-User",
-          "--requestheader-client-ca-file=${local.pki.front-proxy-client-ca-cert.path}",
-          "--proxy-client-cert-file=${local.pki.front-proxy-client-cert.path}",
-          "--proxy-client-key-file=${local.pki.front-proxy-client-key.path}",
-          "--kubelet-certificate-authority=${local.pki.kubernetes-ca-cert.path}",
-          "--kubelet-client-certificate=${local.pki.kubelet-client-cert.path}",
-          "--kubelet-client-key=${local.pki.kubelet-client-key.path}",
+          "--requestheader-client-ca-file=${local.pki_files["front-proxy-client-ca.crt"].path}",
+          "--proxy-client-cert-file=${local.pki_files["front-proxy-client.crt"].path}",
+          "--proxy-client-key-file=${local.pki_files["front-proxy-client.key"].path}",
+          "--kubelet-certificate-authority=${local.pki_files["kubernetes-ca.crt"].path}",
+          "--kubelet-client-certificate=${local.pki_files["kubelet-client.crt"].path}",
+          "--kubelet-client-key=${local.pki_files["kubelet-client.key"].path}",
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
           "--runtime-config=api/all=true",
           "--service-account-issuer=https://${var.cluster_apiserver_endpoint}",
-          "--service-account-key-file=${local.pki.service-account-cert.path}",
-          "--service-account-signing-key-file=${local.pki.service-account-key.path}",
+          "--service-account-key-file=${local.pki_files["service-account.crt"].path}",
+          "--service-account-signing-key-file=${local.pki_files["service-account.key"].path}",
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
-          "--tls-cert-file=${local.pki.apiserver-cert.path}",
-          "--tls-private-key-file=${local.pki.apiserver-key.path}",
-          "--encryption-provider-config=${local.config.apiserver_encryption.path}",
+          "--tls-cert-file=${local.pki_files["apiserver.crt"].path}",
+          "--tls-private-key-file=${local.pki_files["apiserver.key"].path}",
+          "--encryption-provider-config=${local.config_files["apiserver-encryption.config"].path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [
@@ -337,12 +252,12 @@ module "controller-manager" {
           "--bind-address=127.0.0.1",
           "--cluster-cidr=${var.kubernetes_pod_prefix}",
           "--cluster-name=${var.cluster_name}",
-          "--cluster-signing-cert-file=${local.pki.kubernetes-ca-cert.path}",
-          "--cluster-signing-key-file=${local.pki.kubernetes-ca-key.path}",
-          "--kubeconfig=${local.kubeconfig.controller-manager.path}",
+          "--cluster-signing-cert-file=${local.pki_files["kubernetes-ca.crt"].path}",
+          "--cluster-signing-key-file=${local.pki_files["kubernetes-ca.key"].path}",
+          "--kubeconfig=${local.kubeconfig_files["controller-manager.kubeconfig"].path}",
           "--leader-elect=true",
-          "--root-ca-file=${local.pki.kubernetes-ca-cert.path}",
-          "--service-account-private-key-file=${local.pki.service-account-key.path}",
+          "--root-ca-file=${local.pki_files["kubernetes-ca.crt"].path}",
+          "--service-account-private-key-file=${local.pki_files["service-account.key"].path}",
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
           "--use-service-account-credentials=true",
           "--secure-port=${var.ports.controller_manager}",
@@ -420,7 +335,7 @@ module "scheduler" {
         image = var.images.scheduler
         command = compact(concat([
           "kube-scheduler",
-          "--config=${local.config.scheduler.path}",
+          "--config=${local.config_files["scheduler.config"].path}",
           "--secure-port=${var.ports.scheduler}",
           "--bind-address=127.0.0.1",
           "--v=2",

@@ -1,78 +1,24 @@
 locals {
   config_path       = "${var.config_base_path}/${var.name}"
   etcd_wrapper_path = "/etcd-wrapper"
-  pki = {
+
+  pki_files = {
     for key, f in {
-      ca-cert = {
-        contents = var.ca.cert_pem
-      }
-      cert = {
-        contents = tls_locally_signed_cert.kube-etcd.cert_pem
-      }
-      key = {
-        contents = tls_private_key.kube-etcd.private_key_pem
-      }
-      peer-ca-cert = {
-        contents = var.peer_ca.cert_pem
-      }
-      peer-cert = {
-        contents = tls_locally_signed_cert.kube-etcd-peer.cert_pem
-      }
-      peer-key = {
-        contents = tls_private_key.kube-etcd-peer.private_key_pem
-      }
+      "ca.crt"           = var.ca.cert_pem
+      "etcd.crt"         = tls_locally_signed_cert.kube-etcd.cert_pem
+      "etcd.key"         = tls_private_key.kube-etcd.private_key_pem
+      "etcd-peer-ca.crt" = var.peer_ca.cert_pem
+      "etcd-peer.crt"    = tls_locally_signed_cert.kube-etcd-peer.cert_pem
+      "etcd-peer.key"    = tls_private_key.kube-etcd-peer.private_key_pem
     } :
-    key => merge(f, {
-      path = "${local.config_path}/${key}.pem"
-    })
-  }
-  initial_startup_delay_seconds = 240
-
-  static_pod = {
-    for key, f in {
-      etcd-wrapper = {
-        contents = module.etcd-wrapper.manifest
+    key => {
+      mode = 384
+      path = "${local.config_path}/${key}"
+      contents = {
+        inline = f
       }
-    } :
-    key => merge(f, {
-      path = "${var.static_pod_path}/${key}.yaml"
-    })
+    }
   }
-
-  ignition_snippets = concat([
-    for f in fileset(".", "${path.module}/templates/*.yaml") :
-    templatefile(f, {
-      butane_version = var.butane_version
-      name           = var.name
-      fw_mark        = var.fw_mark
-      ports          = var.ports
-    })
-    ], [
-    yamlencode({
-      variant = "fcos"
-      version = var.butane_version
-      storage = {
-        files = [
-          for _, f in concat(
-            values(local.pki),
-            values(local.static_pod),
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
-        ]
-      }
-    }),
-  ])
-
-  pod_manifests = [
-    for pod in local.static_pod :
-    pod.contents
-  ]
 }
 
 module "etcd-wrapper" {
@@ -95,7 +41,7 @@ module "etcd-wrapper" {
           "-s3-backup-resource-prefix",
           var.s3_resource_prefix,
           "-initial-cluster-timeout",
-          "${local.initial_startup_delay_seconds}s",
+          "${var.initial_startup_delay_seconds}s",
         ]
         env = concat([
           {
@@ -119,12 +65,12 @@ module "etcd-wrapper" {
               "${host_key}=https://${ip}:${var.ports.etcd_peer}"
             ])
             "ETCD_INITIAL_CLUSTER_TOKEN" = var.cluster_token
-            "ETCD_TRUSTED_CA_FILE"       = local.pki.ca-cert.path
-            "ETCD_CERT_FILE"             = local.pki.cert.path
-            "ETCD_KEY_FILE"              = local.pki.key.path
-            "ETCD_PEER_TRUSTED_CA_FILE"  = local.pki.peer-ca-cert.path
-            "ETCD_PEER_CERT_FILE"        = local.pki.peer-cert.path
-            "ETCD_PEER_KEY_FILE"         = local.pki.peer-key.path
+            "ETCD_TRUSTED_CA_FILE"       = local.pki_files["ca.crt"].path
+            "ETCD_CERT_FILE"             = local.pki_files["etcd.crt"].path
+            "ETCD_KEY_FILE"              = local.pki_files["etcd.key"].path
+            "ETCD_PEER_TRUSTED_CA_FILE"  = local.pki_files["etcd-peer-ca.crt"].path
+            "ETCD_PEER_CERT_FILE"        = local.pki_files["etcd-peer.crt"].path
+            "ETCD_PEER_KEY_FILE"         = local.pki_files["etcd-peer.key"].path
             "ETCD_STRICT_RECONFIG_CHECK" = true
             "ETCD_LOG_LEVEL"             = "info"
             "ETCD_LISTEN_METRICS_URLS"   = "http://127.0.0.1:${var.ports.etcd_metrics},http://$(POD_IP):${var.ports.etcd_metrics}"
@@ -172,7 +118,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/readyz"
           }
-          failureThreshold = 12 + ceil(local.initial_startup_delay_seconds / 10)
+          failureThreshold = 12 + ceil(var.initial_startup_delay_seconds / 10)
         }
         volumeMounts = [
           {

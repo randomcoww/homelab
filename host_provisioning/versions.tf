@@ -10,10 +10,4 @@ terraform {
     skip_s3_checksum            = true
     use_path_style              = true
   }
-  required_providers {
-    ct = {
-      source  = "coreos/ct"
-      version = "0.14.0"
-    }
-  }
 }

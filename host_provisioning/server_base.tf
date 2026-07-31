@@ -30,7 +30,6 @@ module "systemd-networkd" {
   fw_mark             = local.fw_marks.accept
   host_netnum         = each.value.netnum
   physical_interfaces = each.value.physical_interfaces
-  bridge_interfaces   = each.value.bridge_interfaces
   vlan_interfaces     = each.value.vlan_interfaces
   networks            = each.value.networks
 }

@@ -4,7 +4,7 @@ module "kubernetes-worker" {
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
-  name           = "kube-worker"
+  name           = "worker"
   cluster_name   = local.kubernetes.cluster_name
   kubernetes_ca = {
     algorithm       = tls_private_key.kubernetes-ca.algorithm

@@ -61,6 +61,11 @@ variable "members" {
   type = map(string)
 }
 
+variable "initial_startup_delay_seconds" {
+  type    = number
+  default = 240
+}
+
 variable "s3_resource_prefix" {
   type = string
 }
@@ -79,7 +84,7 @@ variable "static_pod_path" {
 
 variable "config_base_path" {
   type    = string
-  default = "/var/lib"
+  default = "/var/lib/kubernetes"
 }
 
 variable "data_storage_path" {

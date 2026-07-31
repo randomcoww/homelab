@@ -59,7 +59,7 @@ variable "cluster_dns_ip" {
 
 variable "config_base_path" {
   type    = string
-  default = "/var/lib"
+  default = "/var/lib/kubernetes"
 }
 
 variable "kubelet_root_path" {
@@ -84,6 +84,11 @@ variable "cni_bin_path" {
 
 variable "cni_config_path" {
   type = string
+}
+
+variable "crio_socket" {
+  type    = string
+  default = "/run/crio/crio.sock"
 }
 
 variable "graceful_shutdown_delay" {

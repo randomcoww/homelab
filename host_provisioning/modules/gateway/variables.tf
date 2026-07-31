@@ -30,6 +30,11 @@ variable "bgp_as_peer" {
   type = number
 }
 
+variable "bgp_as_members" {
+  type    = number
+  default = 65500
+}
+
 variable "bgp_port" {
   type = number
 }
@@ -44,6 +49,28 @@ variable "node_prefix" {
 
 variable "service_prefix" {
   type = string
+}
+
+variable "master_default_route" {
+  type = object({
+    table_id       = number
+    table_priority = number
+  })
+  default = {
+    table_id       = 250
+    table_priority = 32770
+  }
+}
+
+variable "slave_default_route" {
+  type = object({
+    table_id       = number
+    table_priority = number
+  })
+  default = {
+    table_id       = 240
+    table_priority = 32780
+  }
 }
 
 variable "keepalived_path" {

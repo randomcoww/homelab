@@ -15,11 +15,6 @@ variable "physical_interfaces" {
   default = {}
 }
 
-variable "bridge_interfaces" {
-  type    = any
-  default = {}
-}
-
 variable "vlan_interfaces" {
   type    = any
   default = {}

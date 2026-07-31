@@ -61,3 +61,13 @@ variable "bgp_router_id" {
 variable "bgp_port" {
   type = number
 }
+
+variable "backup_bind_mount_path" {
+  type    = string
+  default = "/var/devfiles"
+}
+
+variable "backup_temp_image_path" {
+  type    = string
+  default = "/var/tmp/coreos-temp.iso"
+}
