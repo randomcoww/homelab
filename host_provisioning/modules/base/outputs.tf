@@ -206,7 +206,7 @@ output "ignition_snippet" {
           mode      = 384
           contents = {
             inline = <<-EOF
-              %sudo ALL=(ALL) NOPASSWD = ALL
+              %sudo ALL=(ALL) NOPASSWD: ALL
               EOF
           }
         },
