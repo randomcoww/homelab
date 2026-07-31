@@ -87,7 +87,7 @@ tofu() {
 
 ### Run external configuration
 
-Generate external and other cluster wide resources like CAs:
+Generate external services:
 
 ```bash
 tofu -chdir=cloud_resources init -upgrade && \
@@ -113,7 +113,7 @@ tofu -chdir=host_provisioning apply
 
 ### Deploy services to Kubernetes
 
-Bootstrap low level Kubernetes services needed for FluxCD including MinIO.
+Bootstrap low level Kubernetes services needed for FluxCD including MinIO for bucket ops.
 
 ```bash
 tofu -chdir=cluster_bootstrap init -upgrade && \
