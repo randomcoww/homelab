@@ -83,8 +83,6 @@ locals {
     # tier 3
     gha_runner       = "ghcr.io/actions/actions-runner:2.336.0@sha256:0cfdcc701ce933c6d243c6b0b2da767366dc9f2e99961d4c3754b0b78084cdda"
     litestream       = "docker.io/litestream/litestream:0.5.15@sha256:f45ca298a567bef6edd23d43429b5f80721473a9a9719e467f11d7888999403e"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785197412@sha256:59292fd54e70d5d7276a20afe555fc552774dd0dcbec74c5577e10e87eea2103"
-    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:75e3528c976a0ba311d8d870f029466e7b74636057a654bf3e09d1c0e3a11ed3"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
@@ -264,10 +262,6 @@ locals {
       }
       searxng = {
         name = "searxng"
-      }
-      qrcode_hostapd = {
-        name    = "qrcode-hostapd"
-        ingress = "hostapd.${local.domains.public}"
       }
       llama_cpp = {
         name = "llama-cpp"
