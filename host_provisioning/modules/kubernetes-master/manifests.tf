@@ -112,7 +112,7 @@ module "scheduler-kubeconfig" {
 }
 
 module "apiserver" {
-  source = "../../../modules/static_pod"
+  source = "../../../modules/static-pod"
   name   = var.apiserver_label
   spec = {
     # kube-vip with local kube-proxy
@@ -239,7 +239,7 @@ module "apiserver" {
 }
 
 module "controller-manager" {
-  source = "../../../modules/static_pod"
+  source = "../../../modules/static-pod"
   name   = "kube-contoller-manager"
   spec = {
     containers = [
@@ -326,7 +326,7 @@ module "controller-manager" {
 }
 
 module "scheduler" {
-  source = "../../../modules/static_pod"
+  source = "../../../modules/static-pod"
   name   = "kube-scheduler"
   spec = {
     containers = [

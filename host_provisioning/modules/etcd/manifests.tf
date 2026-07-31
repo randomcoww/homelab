@@ -22,7 +22,7 @@ locals {
 }
 
 module "etcd-wrapper" {
-  source    = "../../../modules/static_pod"
+  source    = "../../../modules/static-pod"
   name      = var.name
   namespace = var.namespace
   spec = {
