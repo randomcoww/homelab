@@ -120,7 +120,7 @@ tofu -chdir=cluster_bootstrap init -upgrade && \
 tofu -chdir=cluster_bootstrap apply
 ```
 
-Create resources on MinIO needed for host provisioning and FluxCD Kustomizations. This may also trigger a rolling reboot of hosts managed by Kured.
+Create MinIO objects and FluxCD kustomizations. This includes iPXE and ignition for network booting. This may trigger Kured to reboot nodes.
 
 ```bash
 tofu -chdir=bucket_ops init -upgrade && \
