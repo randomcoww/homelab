@@ -26,7 +26,7 @@ output "manifests" {
           chart = {
             spec = {
               chart   = "kube-prometheus-stack"
-              version = "87.21.0" # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+              version = "88.0.1" # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
