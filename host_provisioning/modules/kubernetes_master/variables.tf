@@ -118,6 +118,10 @@ variable "apiserver_ip" {
   type = string
 }
 
+variable "apiserver_label" {
+  type = string
+}
+
 variable "cluster_apiserver_ip" {
   type = string
 }

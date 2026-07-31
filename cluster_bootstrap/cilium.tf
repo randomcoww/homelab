@@ -103,7 +103,7 @@ resource "helm_release" "cilium-crs" {
               name = "cilium-peer"
             }
             spec = {
-              ebgpMultihop = 4
+              ebgpMultihop = 1
               gracefulRestart = {
                 enabled = true
               }

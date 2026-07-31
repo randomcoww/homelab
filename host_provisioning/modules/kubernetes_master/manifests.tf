@@ -113,7 +113,7 @@ module "scheduler-kubeconfig" {
 
 module "apiserver" {
   source = "../../../modules/static_pod"
-  name   = "kube-apiserver"
+  name   = var.apiserver_label
   spec = {
     # kube-vip with local kube-proxy
     hostAliases = [

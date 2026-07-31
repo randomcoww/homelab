@@ -184,6 +184,11 @@ locals {
         namespace      = "default"
         cluster_netnum = 1
       }
+      apiserver_lb = {
+        name           = "kube-apiserver"
+        namespace      = "kube-system"
+        service_netnum = 2
+      }
       etcd = {
         name      = "etcd"
         namespace = "kube-system"
