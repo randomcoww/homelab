@@ -87,7 +87,7 @@ tofu() {
 
 ### Run external configuration
 
-Generate external services:
+Configure external services:
 
 ```bash
 tofu -chdir=cloud_resources init -upgrade && \
