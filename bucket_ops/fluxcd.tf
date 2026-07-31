@@ -135,6 +135,7 @@ resource "helm_release" "fluxcd-bucket" {
           hermes-agent           = ["juicefs-csi-driver"]
           stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver"]
           navidrome              = ["mountpoint-s3-csi"]
+          hostapd                = []
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
