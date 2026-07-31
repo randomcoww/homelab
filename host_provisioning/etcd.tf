@@ -1,6 +1,6 @@
 module "etcd" {
   for_each = local.members.etcd
-  source   = "./modules/etcd_member"
+  source   = "./modules/etcd"
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
