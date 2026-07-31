@@ -1,5 +1,4 @@
-
-module "apiserver_lb_service" {
+module "apiserver-lb-service" {
   source    = "../modules/service"
   name      = local.endpoints.apiserver_lb.name
   namespace = local.endpoints.apiserver_lb.namespace
@@ -145,7 +144,7 @@ resource "helm_release" "cilium-crs" {
         ], [
 
         # cilium loadbalancer for apiserver
-        module.apiserver_lb_service.manifest,
+        module.apiserver-lb-service.manifest,
       ])
     }),
   ]
