@@ -1,5 +1,5 @@
 module "kubernetes-mcp" {
-  source    = "./modules/kubernetes_mcp"
+  source    = "./modules/kubernetes-mcp"
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
   images = {

@@ -32,7 +32,7 @@ resource "minio_iam_user_policy_attachment" "gha-runner" {
 }
 
 module "gha-runner" {
-  source               = "./modules/gha_runner"
+  source               = "./modules/gha-runner"
   name                 = "gha"
   namespace            = "arc-runners"
   controller_namespace = "arc-systems"

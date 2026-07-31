@@ -1,5 +1,5 @@
 module "device-plugin" {
-  source    = "./modules/device_plugin"
+  source    = "./modules/device-plugin"
   name      = "device-plugin"
   namespace = "kube-system"
   images = {

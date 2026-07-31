@@ -4,7 +4,7 @@ resource "random_password" "llama-cpp-auth-token" {
 }
 
 module "llama-cpp" {
-  source    = "./modules/llama_cpp"
+  source    = "./modules/llama-cpp"
   name      = local.endpoints.llama_cpp.name
   namespace = local.endpoints.llama_cpp.namespace
   images = {

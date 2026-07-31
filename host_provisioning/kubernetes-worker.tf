@@ -1,6 +1,6 @@
 module "kubernetes-worker" {
   for_each = local.members.kubernetes-worker
-  source   = "./modules/kubernetes_worker"
+  source   = "./modules/kubernetes-worker"
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept

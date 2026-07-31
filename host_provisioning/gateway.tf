@@ -1,4 +1,3 @@
-
 module "gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"

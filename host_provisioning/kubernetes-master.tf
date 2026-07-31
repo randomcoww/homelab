@@ -1,11 +1,10 @@
-
 resource "random_bytes" "apiserver_encryption_key" {
   length = 32
 }
 
 module "kubernetes-master" {
   for_each = local.members.kubernetes-master
-  source   = "./modules/kubernetes_master"
+  source   = "./modules/kubernetes-master"
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept

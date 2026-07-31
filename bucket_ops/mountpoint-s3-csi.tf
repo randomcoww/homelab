@@ -31,7 +31,7 @@ resource "minio_iam_user_policy_attachment" "mountpoint-s3-csi" {
 }
 
 module "mountpoint-s3-csi" {
-  source    = "./modules/mountpoint_s3_csi"
+  source    = "./modules/mountpoint-s3-csi"
   name      = local.endpoints.mountpoint_s3_csi.name
   namespace = local.endpoints.mountpoint_s3_csi.namespace
   images = {

@@ -4,7 +4,7 @@ resource "random_password" "camofox-browser-auth-token" {
 }
 
 module "camofox-browser" {
-  source    = "./modules/camofox_browser"
+  source    = "./modules/camofox-browser"
   name      = local.endpoints.camofox_browser.name
   namespace = local.endpoints.camofox_browser.namespace
   images = {

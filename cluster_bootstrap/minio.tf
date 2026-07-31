@@ -9,7 +9,7 @@ resource "random_password" "minio-secret-access-key" {
 }
 
 module "minio" {
-  source    = "./modules/minio_release"
+  source    = "./modules/minio"
   name      = local.endpoints.minio.name
   namespace = local.endpoints.minio.namespace
   timeout   = local.kubernetes.helm_release_timeout

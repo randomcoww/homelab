@@ -44,7 +44,7 @@ resource "random_password" "hermes-agent-auth-token" {
 }
 
 module "hermes-agent" {
-  source    = "./modules/hermes_agent"
+  source    = "./modules/hermes-agent"
   name      = local.endpoints.hermes_agent.name
   namespace = local.endpoints.hermes_agent.namespace
   images = {

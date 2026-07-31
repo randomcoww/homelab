@@ -17,14 +17,14 @@ module "disks" {
 
 module "upstream-dns" {
   for_each       = local.members.upstream-dns
-  source         = "./modules/upstream_dns"
+  source         = "./modules/upstream-dns"
   butane_version = local.butane_version
   upstream_dns   = local.upstream_dns
 }
 
 module "systemd-networkd" {
   for_each = local.members.systemd-networkd
-  source   = "./modules/systemd_networkd"
+  source   = "./modules/systemd-networkd"
 
   butane_version      = local.butane_version
   fw_mark             = local.fw_marks.accept
