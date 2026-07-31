@@ -40,6 +40,33 @@ module "minio-user-secret-fluxcd" {
   })
 }
 
+resource "helm_release" "fluxcd" {
+  name             = local.endpoints.fluxcd.name
+  namespace        = local.endpoints.fluxcd.namespace
+  repository       = "https://fluxcd-community.github.io/helm-charts"
+  chart            = "flux2"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  version          = "2.19.0"
+  timeout          = local.kubernetes.helm_release_timeout
+  max_history      = 2
+  values = [
+    yamlencode({
+      clusterDomain = local.domains.kubernetes
+      imageAutomationController = {
+        create = false
+      }
+      imageReflectionController = {
+        create = false
+      }
+      notificationController = {
+        create = false
+      }
+    }),
+  ]
+}
+
 resource "helm_release" "fluxcd-bucket" {
   chart            = "../helm-wrapper"
   name             = "${local.endpoints.fluxcd.name}-bucket"
@@ -95,18 +122,18 @@ resource "helm_release" "fluxcd-bucket" {
           prometheus             = []
           registry               = []
           kea                    = []
-          juicefs-csi-driver     = []
+          juicefs-csi-driver     = ["cloudnative-pg"]
           mountpoint-s3-csi      = []
           cloudflare-tunnel      = []
-          lldap                  = []
-          authelia               = []
+          lldap                  = ["cloudnative-pg"]
+          authelia               = ["lldap"]
           gha-runner             = []
           llama-cpp              = []
           camofox-browser        = []
           searxng                = []
           kubernetes-mcp         = []
-          hermes-agent           = ["juicefs-csi-driver", "cloudnative-pg"]
-          stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver", "cloudnative-pg"]
+          hermes-agent           = ["juicefs-csi-driver"]
+          stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver"]
           navidrome              = ["mountpoint-s3-csi"]
         } :
         yamlencode({
@@ -135,5 +162,8 @@ resource "helm_release" "fluxcd-bucket" {
         })
       ])
     }),
+  ]
+  depends_on = [
+    helm_release.fluxcd,
   ]
 }
