@@ -13,7 +13,6 @@ resource "minio_s3_object" "fluxcd-tailscale-crs" {
             hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
             subnetRouter = {
               advertiseRoutes = distinct([
-                local.networks[local.vips.apiserver.network.name].prefix,
                 local.networks.service.prefix,
                 local.networks.kubernetes_service.prefix,
               ])

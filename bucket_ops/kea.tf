@@ -34,7 +34,6 @@ module "kea" {
       classless_static_route = [
         # allow local access to these from clients that set default route over VPN
         for _, prefix in distinct([
-          local.networks[local.vips.apiserver.network.name].prefix,
           local.networks.service.prefix,
           local.networks.kubernetes_service.prefix,
         ]) :

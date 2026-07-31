@@ -65,7 +65,7 @@ resource "helm_release" "cilium" {
         "phy-wan",     # internet (gw nodes)
       ])
       kubeProxyReplacement = true
-      k8sServiceHost       = local.vips.apiserver.ip
+      k8sServiceHost       = local.endpoints.apiserver_lb.service_ip
       k8sServicePort       = local.host_ports.apiserver
       ipam = {
         mode = "kubernetes"
@@ -130,7 +130,9 @@ resource "helm_release" "cilium-crs" {
             }
             spec = {
               nodeSelector = {
-                matchLabels = {}
+                matchLabels = {
+                  # "node-role.kubernetes.io/control-plane" = "true"
+                }
               }
               bgpInstances = [
                 {

@@ -18,7 +18,7 @@ module "kubernetes-worker" {
   }
   host_netnum             = each.value.netnum
   cluster_domain          = local.domains.kubernetes
-  apiserver_endpoint      = "https://${local.vips.apiserver.ip}:${local.host_ports.apiserver}"
+  apiserver_endpoint      = "https://${local.endpoints.apiserver_lb.service_ip}:${local.host_ports.apiserver}"
   kubernetes_pod_prefix   = local.networks.kubernetes_pod.prefix
   node_prefix             = each.value.networks.service.prefix
   cluster_dns_ip          = local.endpoints.kube_dns.cluster_ip

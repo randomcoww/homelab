@@ -106,7 +106,6 @@ output "ignition_snippet" {
               EOF
             }
           },
-          # This is written by kube-vip but is needed by apiserver and kube-proxy before kube-vip is able to come up
           {
             path = "/etc/systemd/network/20-lo.network"
             mode = 420

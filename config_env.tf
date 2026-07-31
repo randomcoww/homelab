@@ -32,9 +32,6 @@ locals {
       vlan_id       = 80
       mtu           = 1500
       enable_netnum = true
-      vips = {
-        apiserver = 2
-      }
     }
     # Etcd peering
     etcd = {

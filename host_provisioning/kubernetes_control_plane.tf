@@ -99,7 +99,7 @@ module "kubernetes-master" {
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
   apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
-  apiserver_ip             = local.vips.apiserver.ip
+  apiserver_ip             = local.endpoints.apiserver_lb.service_ip
   apiserver_label          = local.endpoints.apiserver_lb.name
   cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
   static_pod_path          = local.kubernetes.static_pod_manifest_path
