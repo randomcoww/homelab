@@ -133,7 +133,7 @@ module "statefulset" {
                 "sh",
                 "-c",
                 <<-EOF
-                while !ip link set ${var.config.interface} master ${var.config.bridge}; do
+                while ! ip link set ${var.config.interface} master ${var.config.bridge}; do
                 sleep 1
                 done
                 EOF
