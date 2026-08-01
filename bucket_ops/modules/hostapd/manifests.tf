@@ -40,7 +40,10 @@ locals {
       pmk_r1_push           = 1
       ft_psk_generate_local = 1
       mobility_domain       = random_id.hostapd-mobility-domain.hex
-    }, var.config)
+      }, {
+      for k, v in var.config :
+      k => v if k != "bridge" # handle bridge link manually so that it doesn't get removed on exit
+    })
   ]
 }
 
@@ -121,6 +124,21 @@ module "statefulset" {
             add = [
               "NET_ADMIN",
             ]
+          }
+        }
+        lifecycle = {
+          postStart = {
+            exec = {
+              command = [
+                "sh",
+                "-c",
+                <<-EOF
+                while !ip link set ${var.config.interface} master ${var.config.bridge}; do
+                sleep 1
+                done
+                EOF
+              ]
+            }
           }
         }
       },
