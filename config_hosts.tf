@@ -6,7 +6,7 @@ locals {
         phy0 = {
           match_mac = "b0-41-6f-16-a2-dc"
           # match_mac = "b0-41-6f-16-a2-dd"
-          mtu = local.default_mtu
+          mtu = local.base_mtu
         }
       }
       vlan_interfaces = {
@@ -72,7 +72,7 @@ locals {
         phy0 = {
           match_mac = "b0-41-6f-16-f9-88"
           # match_mac = "b0-41-6f-16-f9-89"
-          mtu = local.default_mtu
+          mtu = local.base_mtu
         }
       }
       vlan_interfaces = {
@@ -138,7 +138,7 @@ locals {
         phy0 = {
           match_mac = "b0-41-6f-16-9e-76"
           # match_mac = "b0-41-6f-16-9e-77"
-          mtu = local.default_mtu
+          mtu = local.base_mtu
         }
       }
       vlan_interfaces = {
@@ -195,7 +195,10 @@ locals {
       physical_interfaces = {
         phy0 = {
           match_mac = "9c-bf-0d-01-0e-7b"
-          mtu       = local.default_mtu
+          mtu       = local.base_mtu
+        }
+        wlan0 = {
+          match_mac = "dc-56-7b-03-4c-e5" # MT7925
         }
       }
       vlan_interfaces = {
@@ -212,9 +215,16 @@ locals {
           network = "etcd"
         }
       }
+      bridge_interfaces = {
+        br-lan = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface = "phy0"
+          interface = "br-lan"
         }
         node = {
           interface = "phy-node"
@@ -244,6 +254,9 @@ locals {
         "ttm.pages_limit=${128 * 512 * 512}",   # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
         "ttm.page_pool_size=${96 * 512 * 512}", # 96G preallocated
         "pcie_aspm=off",                        # TODO: workaround for r8169 transmit queue timed out issue
+        "mt7925e.disable_aspm=1",               # TODO: workaround for mt7925e stability
+        "mt7925_common.disable_clc=1",          # TODO: workaround for mt7925e stability
+        "swiotlb=65536",                        # TODO: workaround for mt7925e stability
       ]
     }
   }

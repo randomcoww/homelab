@@ -1,6 +1,6 @@
 locals {
   timezone       = "America/Los_Angeles"
-  default_mtu    = 9000
+  base_mtu       = 9000
   butane_version = "1.5.0"
 
   base_networks = {
@@ -9,7 +9,6 @@ locals {
       network        = "192.168.192.0"
       cidr           = 24
       vlan_id        = 2048
-      mtu            = 1500 # may bridge to wifi - fix to 1500
       table_id       = 220
       table_priority = 32760
       enable_netnum  = true
@@ -22,7 +21,6 @@ locals {
       network       = "192.168.200.0"
       cidr          = 24
       vlan_id       = 60
-      mtu           = 1500
       enable_netnum = true
     }
     # Kubernetes service external IP and LB
@@ -30,7 +28,6 @@ locals {
       network       = "192.168.208.0"
       cidr          = 24
       vlan_id       = 80
-      mtu           = 1500
       enable_netnum = true
     }
     # Etcd peering
@@ -38,7 +35,6 @@ locals {
       network       = "192.168.228.0"
       cidr          = 26
       vlan_id       = 70
-      mtu           = 1500
       enable_netnum = true
     }
     # Primary WAN
@@ -80,7 +76,7 @@ locals {
     # tier 3
     gha_runner       = "ghcr.io/actions/actions-runner:2.336.0@sha256:0cfdcc701ce933c6d243c6b0b2da767366dc9f2e99961d4c3754b0b78084cdda"
     litestream       = "docker.io/litestream/litestream:0.5.15@sha256:f45ca298a567bef6edd23d43429b5f80721473a9a9719e467f11d7888999403e"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785197412@sha256:59292fd54e70d5d7276a20afe555fc552774dd0dcbec74c5577e10e87eea2103"
+    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785541604@sha256:a19eea79403f34c87750a8c1cf50c363cf9b1b5a60467d5f1bf8e5cca3813456"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:79c2be18a18367484474bae9b18a8cd9085114ab3dcd49cac091cad8c548a0a9"
