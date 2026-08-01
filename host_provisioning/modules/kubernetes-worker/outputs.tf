@@ -166,13 +166,16 @@ output "ignition_snippet" {
               EOF
             }
           },
-          # needed if bridging wlan, can be turned off for cilium
+
+          # needed for hostapd and not needed for cilium
           {
             path = "/etc/sysctl.d/99-bridge-iptables.conf"
             mode = 420
             contents = {
               inline = <<-EOF
               net.bridge.bridge-nf-call-iptables=0
+              net.bridge.bridge-nf-call-ip6tables=0
+              net.bridge.bridge-nf-call-arptables=0
               EOF
             }
           },
