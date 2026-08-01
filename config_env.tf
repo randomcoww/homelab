@@ -79,7 +79,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1785541604@sha256:a19eea79403f34c87750a8c1cf50c363cf9b1b5a60467d5f1bf8e5cca3813456"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:79c2be18a18367484474bae9b18a8cd9085114ab3dcd49cac091cad8c548a0a9"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:ec536bcd1e83577aad4cc07f7ecb9a30858a9a905d2d57c8796abc83f872a036"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.7.3@sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf"
