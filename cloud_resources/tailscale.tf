@@ -11,7 +11,7 @@ resource "tailscale_acl" "cluster" {
         "tag:k8s" = ["tag:k8s"]
       }
       routes = {
-        "${cidrsubnet(local.networks.service.prefix, -1, 0)}" = ["tag:k8s", "tag:k8s-subnet-router"] # hack to use a bigger range so that service network route can be overriden for local access
+        cidrsubnet(local.networks.service.prefix, -1, 0) = ["tag:k8s", "tag:k8s-subnet-router"] # hack to use a bigger range so that route can be overriden locally
       }
     }
     acls = []
@@ -23,7 +23,7 @@ resource "tailscale_acl" "cluster" {
       },
       {
         src = ["autogroup:member"]
-        dst = ["${local.networks.service.prefix}"] # limit grant to actual service network range
+        dst = [local.networks.service.prefix] # limit grant to actual subnet
         ip  = ["*"]
       },
     ]
