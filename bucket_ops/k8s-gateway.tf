@@ -75,6 +75,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                 annotations = {
                   "lbipam.cilium.io/ips" = local.endpoints.k8s_gateway.service_ip
                 }
+                useTcp = true
               }
               affinity = {
                 podAntiAffinity = {
@@ -83,7 +84,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                       labelSelector = {
                         matchExpressions = [
                           {
-                            key      = "app"
+                            key      = "app.kubernetes.io/name"
                             operator = "In"
                             values = [
                               local.endpoints.k8s_gateway.name,
