@@ -35,7 +35,6 @@ module "kea" {
         # allow local access to these from clients that set default route over VPN
         for _, prefix in distinct([
           local.networks.service.prefix,
-          local.networks.kubernetes_service.prefix,
         ]) :
         "${prefix} - ${local.vips.gateway.ip}"
       ]
