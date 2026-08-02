@@ -2,28 +2,30 @@
 resource "tailscale_acl" "cluster" {
   acl = jsonencode({
     tagOwners = {
-      "tag:terraform"    = ["autogroup:member"]
-      "tag:k8s-operator" = ["autogroup:admin"]
-      "tag:k8s"          = ["tag:k8s-operator"]
+      "tag:k8s-operator"      = ["autogroup:admin"]
+      "tag:k8s"               = ["tag:k8s-operator"]
+      "tag:k8s-subnet-router" = ["tag:k8s-operator"]
     },
     autoApprovers = {
       services = {
         "tag:k8s" = ["tag:k8s"]
-      },
+      }
+      routes = {
+        "${cidrsubnet(local.networks.service.prefix, -1, 0)}" = ["tag:k8s", "tag:k8s-subnet-router"] # hack to use a bigger range so that service network route can be overriden for local access
+      }
     },
-    acls = [
-      {
-        action = "accept"
-        src    = ["*"]
-        dst    = ["*:*"]
-      },
-    ],
+    acls = []
     grants = [
       {
         src = ["*"]
         dst = ["tag:k8s-operator"]
         ip  = ["tcp:443"]
-      }
+      },
+      {
+        src = ["autogroup:member"]
+        dst = ["${local.networks.service.prefix}"] # limit grant to actual service network range
+        ip  = ["*"]
+      },
     ],
     nodeAttrs = [
       {

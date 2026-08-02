@@ -11,6 +11,9 @@ resource "minio_s3_object" "fluxcd-tailscale-crs" {
           spec = {
             replicas       = 2
             hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
+            tags = [
+              "tag:k8s-subnet-router",
+            ]
             subnetRouter = {
               advertiseRoutes = distinct([
                 cidrsubnet(local.networks.service.prefix, -1, 0), # hack to use a bigger range so that service network route can be overriden for local access
