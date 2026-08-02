@@ -33,9 +33,12 @@ module "kea" {
       ]
       classless_static_route = [
         # allow local access to these from clients that set default route over VPN
-        for _, prefix in distinct([
+        for _, prefix in distinct(concat([
           local.networks.service.prefix,
-        ]) :
+          ], [
+          for _, ep in local.endpoints :
+          "${ep.service_ip}/32" if contains(keys(ep), "service_ip") # specific reoutes for high priority
+        ])) :
         "${prefix} - ${local.vips.gateway.ip}"
       ]
       mtu = lookup(local.networks.lan, "mtu", 1500)
