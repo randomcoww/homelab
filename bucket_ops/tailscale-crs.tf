@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-tailscale-crs" {
             hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
             subnetRouter = {
               advertiseRoutes = distinct([
-                local.networks.service.prefix,
+                cidrsubnet(local.networks.service.prefix, -1, 0), # hack to use a bigger range so that service network route can be overriden for local access
               ])
             }
           }
