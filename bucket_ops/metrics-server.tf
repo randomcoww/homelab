@@ -77,7 +77,7 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
                       labelSelector = {
                         matchExpressions = [
                           {
-                            key      = "app"
+                            key      = "app.kubernetes.io/instance"
                             operator = "In"
                             values = [
                               "metrics-server",

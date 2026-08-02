@@ -27,9 +27,6 @@ resource "helm_release" "kube-dns" {
           enabled = false # create in prometheus chart
         }
       }
-      customLabels = {
-        app = local.endpoints.kube_dns.name
-      }
       service = {
         clusterIP = local.endpoints.kube_dns.cluster_ip
       }
@@ -40,10 +37,10 @@ resource "helm_release" "kube-dns" {
               labelSelector = {
                 matchExpressions = [
                   {
-                    key      = "app"
+                    key      = "app.kubernetes.io/instance"
                     operator = "In"
                     values = [
-                      "kube-dns",
+                      local.endpoints.kube_dns.name,
                     ]
                   },
                 ]

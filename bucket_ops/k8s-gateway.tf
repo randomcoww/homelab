@@ -84,7 +84,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                       labelSelector = {
                         matchExpressions = [
                           {
-                            key      = "app.kubernetes.io/name"
+                            key      = "app.kubernetes.io/instance"
                             operator = "In"
                             values = [
                               local.endpoints.k8s_gateway.name,

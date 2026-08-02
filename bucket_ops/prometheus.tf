@@ -70,7 +70,7 @@ module "prometheus" {
         port       = local.service_ports.coredns_metrics
         targetPort = local.service_ports.coredns_metrics
         selector = {
-          app = local.endpoints.kube_dns.name
+          "app.kubernetes.io/name" = "coredns"
         }
       }
     }
