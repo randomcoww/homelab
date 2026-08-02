@@ -5,7 +5,7 @@ resource "tailscale_acl" "cluster" {
       "tag:k8s-operator"      = ["autogroup:admin"]
       "tag:k8s"               = ["tag:k8s-operator"]
       "tag:k8s-subnet-router" = ["tag:k8s-operator"]
-    },
+    }
     autoApprovers = {
       services = {
         "tag:k8s" = ["tag:k8s"]
@@ -13,7 +13,7 @@ resource "tailscale_acl" "cluster" {
       routes = {
         "${cidrsubnet(local.networks.service.prefix, -1, 0)}" = ["tag:k8s", "tag:k8s-subnet-router"] # hack to use a bigger range so that service network route can be overriden for local access
       }
-    },
+    }
     acls = []
     grants = [
       {
@@ -26,7 +26,7 @@ resource "tailscale_acl" "cluster" {
         dst = ["${local.networks.service.prefix}"] # limit grant to actual service network range
         ip  = ["*"]
       },
-    ],
+    ]
     nodeAttrs = [
       {
         attr   = ["mullvad"]
