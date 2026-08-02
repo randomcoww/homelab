@@ -65,7 +65,7 @@ locals {
     etcd                    = "registry.k8s.io/etcd:3.7.1@sha256:a9983dd6d9283138ab926daa307c6c25623636703ecf5645d5df4d666ce9eba2"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
-    minio    = "cgr.dev/chainguard/minio:latest@sha256:82253cf7ef17ca975187a938245bec6be17576a037556b0adb72d8e13c426360"
+    minio    = "cgr.dev/chainguard/minio:latest@sha256:5f2b82fe2edccafed7902f423f171ae5e6b8b363fae72441c0e0e4289dc45555"
     registry = "ghcr.io/distribution/distribution:3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8"
     # tier 2
     kea               = "reg.cluster.internal/randomcoww/kea:v3.2.0.1785197392@sha256:1f994d9e9b384bc0048d8d683e2340a35208d2793ff2dba11bd92e67b31c444e"
