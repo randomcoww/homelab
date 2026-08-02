@@ -14,7 +14,6 @@ resource "minio_s3_object" "fluxcd-tailscale-crs" {
             subnetRouter = {
               advertiseRoutes = distinct([
                 local.networks.service.prefix,
-                local.networks.kubernetes_service.prefix,
               ])
             }
           }
