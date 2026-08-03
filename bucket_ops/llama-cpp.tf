@@ -3,35 +3,6 @@ resource "random_password" "llama-cpp-auth-token" {
   override_special = "-_"
 }
 
-locals {
-  model_images = [
-    {
-      repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16"
-      tag        = "v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
-      files = {
-        qwen-3-6-27b        = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
-        qwen-3-6-27b-mmproj = "Qwen3.6-27B-mmproj-BF16.gguf"
-      }
-    },
-    {
-      repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16"
-      tag        = "v1783493322@sha256:0df8bc92746e34aefffc89708257c576743abc2577d4454d176e9af044a54e60" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
-      files = {
-        gemma-4-31b        = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
-        gemma-4-31b-mtp    = "gemma-4-31B-it-BF16-MTP.gguf"
-        gemma-4-31b-mmproj = "gemma-4-31B-it-mmproj-BF16.gguf"
-      }
-    },
-    {
-      repository = "reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
-      tag        = "v1781645858@sha256:b6ddc70ec2752d59bbaaa936ec2ae6e4ee1e5a5ced5fb4cd8d77e4a272585039" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
-      files = {
-        whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
-      }
-    },
-  ]
-}
-
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
   name      = local.endpoints.llama_cpp.name
@@ -43,7 +14,32 @@ module "llama-cpp" {
     }
   }
   models = merge([
-    for _, image in local.model_images : {
+    for _, image in [
+      {
+        repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16"
+        tag        = "v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
+        files = {
+          qwen-3-6-27b        = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
+          qwen-3-6-27b-mmproj = "Qwen3.6-27B-mmproj-BF16.gguf"
+        }
+      },
+      {
+        repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16"
+        tag        = "v1783493322@sha256:0df8bc92746e34aefffc89708257c576743abc2577d4454d176e9af044a54e60" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
+        files = {
+          gemma-4-31b        = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
+          gemma-4-31b-mtp    = "gemma-4-31B-it-BF16-MTP.gguf"
+          gemma-4-31b-mmproj = "gemma-4-31B-it-mmproj-BF16.gguf"
+        }
+      },
+      {
+        repository = "reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
+        tag        = "v1781645858@sha256:b6ddc70ec2752d59bbaaa936ec2ae6e4ee1e5a5ced5fb4cd8d77e4a272585039" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
+        files = {
+          whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
+        }
+      },
+      ] : {
       for key, file in image.files :
       key => {
         image = "${image.repository}:${image.tag}"

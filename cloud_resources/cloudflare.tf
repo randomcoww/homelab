@@ -1,9 +1,6 @@
 locals {
   cloudflare_account_id = data.cloudflare_accounts.accounts.result[0].id
   cloudflare_zone_id    = data.cloudflare_zones.zones.result[0].id
-  cloudflare_zone_country_whitelist = [
-    "US", "JP",
-  ]
   r2_buckets = [
     "etcd",
     "documents",
@@ -132,9 +129,11 @@ resource "cloudflare_ruleset" "geo_filter" {
   phase   = "http_request_firewall_custom"
   rules = [
     {
-      action     = "block"
-      expression = "(not ip.geoip.country in {\"${join("\" \"", local.cloudflare_zone_country_whitelist)}\"})"
-      enabled    = true
+      action = "block"
+      expression = "(not ip.geoip.country in {\"${join("\" \"", [
+        "US", "JP",
+      ])}\"})"
+      enabled = true
     },
   ]
 }

@@ -1,14 +1,5 @@
 locals {
   # OIDC clients
-  authelia_oidc_claims_policies = {
-    stump_policy = {
-      id_token = [
-        "email",
-        "name",
-      ]
-    }
-  }
-
   authelia_oidc_clients_base = {
     stump = {
       client_name = "Stump"
@@ -22,7 +13,7 @@ locals {
       redirect_uris = [
         "https://${local.endpoints.stump.ingress}/api/v2/auth/oidc/callback",
       ]
-      claims_policy = "stump_policy"
+      claims_policy = "stump_policy" # defined and used under oidc_claims_policies
       consent_mode  = "implicit"
     }
     hermes-dashboard = {
@@ -108,8 +99,15 @@ module "authelia" {
     username = random_password.lldap-user.result
     password = random_password.lldap-password.result
   }
-  oidc_clients         = local.authelia_oidc_clients
-  oidc_claims_policies = local.authelia_oidc_claims_policies
+  oidc_clients = local.authelia_oidc_clients
+  oidc_claims_policies = {
+    stump_policy = {
+      id_token = [
+        "email",
+        "name",
+      ]
+    }
+  }
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
