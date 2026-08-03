@@ -10,7 +10,7 @@ module "llama-cpp" {
   images = {
     llama_swap = {
       repository = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
-      tag        = "unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/llama-swap-ffmpeg
+      tag        = "unified-vulkan-2026-08-03.1785766351@sha256:1361addc3e4b553fef5d20b7815bef75b92a4b6199913175c06343090e98958c" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
   }
   models = merge([
