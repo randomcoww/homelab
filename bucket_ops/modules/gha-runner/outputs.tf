@@ -105,7 +105,7 @@ output "manifests" {
                 containers = [
                   {
                     name  = "runner"
-                    image = "${var.images.gha_runner.repository}:${var.images.gha_runner.tag}"
+                    image = "${var.images.gha-runner.repository}:${var.images.gha-runner.tag}"
                     command = [
                       "/home/runner/run.sh",
                     ]

@@ -52,7 +52,7 @@ variable "images" {
       repository = string
       tag        = string
     })
-    controller_manager = object({
+    controller-manager = object({
       repository = string
       tag        = string
     })

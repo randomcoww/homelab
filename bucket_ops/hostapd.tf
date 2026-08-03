@@ -107,8 +107,8 @@ module "hostapd" {
 
 module "qrcode-hostapd" {
   source    = "./modules/qrcode"
-  name      = local.endpoints.qrcode_hostapd.name
-  namespace = local.endpoints.qrcode_hostapd.namespace
+  name      = local.endpoints.qrcode-hostapd.name
+  namespace = local.endpoints.qrcode-hostapd.namespace
   replicas  = 2
   images = {
     qrcode = {
@@ -117,7 +117,7 @@ module "qrcode-hostapd" {
     }
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
-  ingress_hostname = local.endpoints.qrcode_hostapd.ingress
+  ingress_hostname = local.endpoints.qrcode-hostapd.ingress
   gateway_ref = {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace

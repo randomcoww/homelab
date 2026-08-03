@@ -53,8 +53,8 @@ output "manifests" {
           }
           values = {
             image = {
-              repository = var.images.mountpoint_s3_csi.repository
-              tag        = var.images.mountpoint_s3_csi.tag
+              repository = var.images.mountpoint-s3-csi.repository
+              tag        = var.images.mountpoint-s3-csi.tag
             }
             node = {
               kubeletPath = var.kubelet_root_path

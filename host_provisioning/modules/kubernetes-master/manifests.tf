@@ -245,7 +245,7 @@ module "controller-manager" {
     containers = [
       {
         name  = "kube-controller-manager"
-        image = "${var.images.controller_manager.repository}:${var.images.controller_manager.tag}"
+        image = "${var.images.controller-manager.repository}:${var.images.controller-manager.tag}"
         command = compact(concat([
           "kube-controller-manager",
           "--allocate-node-cidrs=true",

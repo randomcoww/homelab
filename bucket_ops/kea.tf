@@ -13,8 +13,8 @@ module "kea" {
     }
   }
   service_ips = [
-    local.endpoints.kea_primary.cluster_ip,
-    local.endpoints.kea_secondary.cluster_ip,
+    local.endpoints.kea-primary.cluster_ip,
+    local.endpoints.kea-secondary.cluster_ip,
   ]
   ports = {
     kea_peer    = local.host_ports.kea_peer
@@ -31,7 +31,7 @@ module "kea" {
         local.vips.gateway.ip,
       ]
       domain_name_servers = [
-        local.endpoints.k8s_gateway.service_ip,
+        local.endpoints.k8s-gateway.service_ip,
       ]
       domain_search = [
         local.domains.kubernetes,

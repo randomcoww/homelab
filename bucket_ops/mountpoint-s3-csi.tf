@@ -32,10 +32,10 @@ resource "minio_iam_user_policy_attachment" "mountpoint-s3-csi" {
 
 module "mountpoint-s3-csi" {
   source    = "./modules/mountpoint-s3-csi"
-  name      = local.endpoints.mountpoint_s3_csi.name
-  namespace = local.endpoints.mountpoint_s3_csi.namespace
+  name      = local.endpoints.mountpoint-s3-csi.name
+  namespace = local.endpoints.mountpoint-s3-csi.namespace
   images = {
-    mountpoint_s3_csi = {
+    mountpoint-s3-csi = {
       repository = "reg.cluster.internal/randomcoww/mountpoint-s3-csi"
       tag        = "v2.7.0.1785766438@sha256:0ede523b2792da2141066a147b8972078702791262fdfb9c3b079fd3af4ce386" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/mountpoint-s3-csi
     }

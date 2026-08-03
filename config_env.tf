@@ -127,7 +127,7 @@ locals {
         namespace      = "default"
         cluster_netnum = 1
       }
-      apiserver_lb = {
+      apiserver-lb = {
         name           = "kube-apiserver"
         namespace      = "kube-system"
         service_netnum = 2
@@ -140,12 +140,12 @@ locals {
         name      = "cilium"
         namespace = "kube-system"
       }
-      kube_dns = {
+      kube-dns = {
         name           = "kube-dns"
         namespace      = "kube-system"
         cluster_netnum = 10
       }
-      k8s_gateway = {
+      k8s-gateway = {
         name           = "k8s-gateway"
         namespace      = "kube-system"
         service_netnum = 33
@@ -161,7 +161,7 @@ locals {
         name      = "fluxcd"
         namespace = "flux-system"
       }
-      cert_manager = {
+      cert-manager = {
         name      = "cert-manager"
         namespace = "cert-manager"
       }
@@ -172,17 +172,17 @@ locals {
         service_netnum = 35
       }
       # - kea needs a known IP for each peer -
-      kea_primary = {
+      kea-primary = {
         cluster_netnum = 12
       }
-      kea_secondary = {
+      kea-secondary = {
         cluster_netnum = 13
       }
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
       }
-      mountpoint_s3_csi = {
+      mountpoint-s3-csi = {
         name      = "s3-csi"
         namespace = "s3-csi"
       }
@@ -193,7 +193,7 @@ locals {
         namespace = "auth"
         ingress   = "ldap.${local.domains.public}"
       }
-      authelia_valkey = {
+      authelia-valkey = {
         name      = "authelia-valkey"
         namespace = "auth"
       }
@@ -205,17 +205,17 @@ locals {
       }
 
       ## client services
-      kubernetes_mcp = {
+      kubernetes-mcp = {
         name = "kubernetes-mcp"
       }
       searxng = {
         name = "searxng"
       }
-      qrcode_hostapd = {
+      qrcode-hostapd = {
         name    = "qrcode-hostapd"
         ingress = "hostapd.${local.domains.public}"
       }
-      llama_cpp = {
+      llama-cpp = {
         name = "llama-cpp"
       }
       navidrome = {
@@ -226,10 +226,10 @@ locals {
         name   = "stump"
         tunnel = true
       }
-      camofox_browser = {
+      camofox-browser = {
         name = "camofox"
       }
-      hermes_agent = {
+      hermes-agent = {
         name = "hermes-agent"
       }
     } :

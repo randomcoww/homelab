@@ -21,11 +21,53 @@ module "daemonset" {
     containers = [
       {
         name  = var.name
-        image = "${var.images.device_plugin.repository}:${var.images.device_plugin.tag}"
-        args = concat(var.args, [
+        image = "${var.images.device-plugin.repository}:${var.images.device-plugin.tag}"
+        args = [
+          "--device",
+          yamlencode({
+            name = "rfkill"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/rfkill"
+                  },
+                ]
+              },
+            ]
+          }),
+          "--device",
+          yamlencode({
+            name = "kvm"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/kvm"
+                  },
+                ]
+              },
+            ]
+          }),
+          "--device",
+          yamlencode({
+            name = "fuse"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/fuse"
+                  },
+                ]
+              },
+            ]
+          }),
           "--listen=0.0.0.0:${local.metrics_port}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",
-        ])
+        ]
         securityContext = {
           privileged = true
         }

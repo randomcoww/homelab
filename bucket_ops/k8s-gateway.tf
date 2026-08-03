@@ -6,8 +6,8 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = local.endpoints.k8s_gateway.name
-            namespace = local.endpoints.k8s_gateway.namespace
+            name      = local.endpoints.k8s-gateway.name
+            namespace = local.endpoints.k8s-gateway.namespace
           }
           spec = {
             interval = "15m"
@@ -18,8 +18,8 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.endpoints.k8s_gateway.name
-            namespace = local.endpoints.k8s_gateway.namespace
+            name      = local.endpoints.k8s-gateway.name
+            namespace = local.endpoints.k8s-gateway.namespace
           }
           spec = {
             interval = "15m"
@@ -30,12 +30,12 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                 version = "3.7.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = local.endpoints.k8s_gateway.name
+                  name = local.endpoints.k8s-gateway.name
                 }
                 interval = "5m"
               }
             }
-            releaseName = local.endpoints.k8s_gateway.name
+            releaseName = local.endpoints.k8s-gateway.name
             install = {
               createNamespace = true
               remediation = {
@@ -70,10 +70,10 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
               service = {
                 type = "LoadBalancer"
                 labels = {
-                  app = local.endpoints.k8s_gateway.name
+                  app = local.endpoints.k8s-gateway.name
                 }
                 annotations = {
-                  "lbipam.cilium.io/ips" = local.endpoints.k8s_gateway.service_ip
+                  "lbipam.cilium.io/ips" = local.endpoints.k8s-gateway.service_ip
                 }
                 useTcp = true
               }
@@ -87,7 +87,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                             key      = "app.kubernetes.io/instance"
                             operator = "In"
                             values = [
-                              local.endpoints.k8s_gateway.name,
+                              local.endpoints.k8s-gateway.name,
                             ]
                           },
                         ]
@@ -170,18 +170,18 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "cilium.io/v2"
           kind       = "CiliumLoadBalancerIPPool"
           metadata = {
-            name = "${local.endpoints.k8s_gateway.namespace}-${local.endpoints.k8s_gateway.name}"
+            name = "${local.endpoints.k8s-gateway.namespace}-${local.endpoints.k8s-gateway.name}"
           }
           spec = {
             blocks = [
               {
-                cidr = "${local.endpoints.k8s_gateway.service_ip}/32"
+                cidr = "${local.endpoints.k8s-gateway.service_ip}/32"
               },
             ]
             serviceSelector = {
               matchLabels = {
-                "io.kubernetes.service.namespace" = local.endpoints.k8s_gateway.namespace
-                "io.kubernetes.service.name"      = local.endpoints.k8s_gateway.name
+                "io.kubernetes.service.namespace" = local.endpoints.k8s-gateway.namespace
+                "io.kubernetes.service.name"      = local.endpoints.k8s-gateway.name
               }
             }
           }

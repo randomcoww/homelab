@@ -5,10 +5,10 @@ resource "random_password" "llama-cpp-auth-token" {
 
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
-  name      = local.endpoints.llama_cpp.name
-  namespace = local.endpoints.llama_cpp.namespace
+  name      = local.endpoints.llama-cpp.name
+  namespace = local.endpoints.llama-cpp.namespace
   images = {
-    llama_swap = {
+    llama-swap = {
       repository = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
       tag        = "unified-vulkan-2026-08-03.1785766351@sha256:1361addc3e4b553fef5d20b7815bef75b92a4b6199913175c06343090e98958c" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
@@ -180,7 +180,7 @@ module "llama-cpp" {
       memory = "96Gi"
     }
   }
-  ingress_hostname = local.endpoints.llama_cpp.ingress
+  ingress_hostname = local.endpoints.llama-cpp.ingress
   gateway_ref = {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace
@@ -213,7 +213,7 @@ resource "minio_s3_object" "fluxcd-llama-cpp" {
 
 output "llama-cpp" {
   value = {
-    base_url = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    base_url = "https://${local.endpoints.llama-cpp.ingress}/v1"
     api_key  = random_password.llama-cpp-auth-token.result
   }
   sensitive = true

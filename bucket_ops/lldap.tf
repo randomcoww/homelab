@@ -29,7 +29,6 @@ module "lldap" {
     LLDAP_SMTP_OPTIONS__SMTP_ENCRYPTION       = "STARTTLS"
     LLDAP_SMTP_OPTIONS__USER                  = var.smtp_username
     LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp_password
-    LLDAP_LDAPS_OPTIONS__ENABLED              = true
   }
   ca_issuer_name   = local.cert_issuers.ca_internal
   service_hostname = local.endpoints.lldap.service_fqdn

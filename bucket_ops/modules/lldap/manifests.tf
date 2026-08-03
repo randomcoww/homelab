@@ -15,6 +15,7 @@ resource "random_password" "storage-secret" {
 locals {
   base_path = "/var/lib/lldap"
   extra_envs = merge(var.extra_configs, {
+    LLDAP_VERBOSE                  = true
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
     LLDAP_LDAPS_OPTIONS__PORT      = var.service_port
@@ -27,6 +28,7 @@ locals {
     LLDAP_LDAP_HOST                = "0.0.0.0"
     LLDAP_HTTP_URL                 = "https://${var.ingress_hostname}"
     LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", split(".", regex(local.domain_regex, var.service_hostname).domain))}"
+    LLDAP_LDAPS_OPTIONS__ENABLED   = true
   })
 }
 

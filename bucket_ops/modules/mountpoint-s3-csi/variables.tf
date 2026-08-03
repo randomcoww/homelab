@@ -13,7 +13,7 @@ variable "release" {
 
 variable "images" {
   type = object({
-    mountpoint_s3_csi = object({
+    mountpoint-s3-csi = object({
       repository = string
       tag        = string
     })

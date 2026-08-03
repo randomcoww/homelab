@@ -23,7 +23,7 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    camofox_browser = object({
+    camofox-browser = object({
       repository = string
       tag        = string
     })

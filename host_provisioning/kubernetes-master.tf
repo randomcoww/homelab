@@ -39,7 +39,7 @@ module "kubernetes-master" {
       repository = "registry.k8s.io/kube-apiserver"
       tag        = "v1.36.3@sha256:b4bc06c81fd76f81174e6c19ddacf477acdf1583e7a5846ebbd513493aef6e43" # renovate: datasource=docker depName=registry.k8s.io/kube-apiserver
     }
-    controller_manager = {
+    controller-manager = {
       repository = "registry.k8s.io/kube-controller-manager"
       tag        = "v1.36.3@sha256:ed56454bf514916079a227f5765b64524fde52106dfcc52978b28634765b78b8" # renovate: datasource=docker depName=registry.k8s.io/kube-controller-manager
     }
@@ -66,8 +66,8 @@ module "kubernetes-master" {
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
   apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
-  apiserver_ip             = local.endpoints.apiserver_lb.service_ip
-  apiserver_label          = local.endpoints.apiserver_lb.name
+  apiserver_ip             = local.endpoints.apiserver-lb.service_ip
+  apiserver_label          = local.endpoints.apiserver-lb.name
   cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates

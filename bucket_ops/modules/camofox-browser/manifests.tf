@@ -99,7 +99,7 @@ module "deployment" {
     containers = [
       {
         name  = var.name
-        image = "${var.images.camofox_browser.repository}:${var.images.camofox_browser.tag}"
+        image = "${var.images.camofox-browser.repository}:${var.images.camofox-browser.tag}"
         env = [
           for k, v in local.extra_envs :
           {

@@ -43,7 +43,7 @@ module "deployment" {
     containers = [
       {
         name  = "${var.name}-kubernetes-mcp"
-        image = "${var.images.kubernetes_mcp.repository}:${var.images.kubernetes_mcp.tag}"
+        image = "${var.images.kubernetes-mcp.repository}:${var.images.kubernetes-mcp.tag}"
         args = [
           "--port",
           tostring(var.service_port),

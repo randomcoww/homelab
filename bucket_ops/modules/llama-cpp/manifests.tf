@@ -120,7 +120,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = "${var.images.llama_swap.repository}:${var.images.llama_swap.tag}"
+        image = "${var.images.llama-swap.repository}:${var.images.llama-swap.tag}"
         command = [
           "llama-swap",
           "--config",

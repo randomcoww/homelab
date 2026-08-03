@@ -1,14 +1,14 @@
 module "kubernetes-mcp" {
   source    = "./modules/kubernetes-mcp"
-  name      = local.endpoints.kubernetes_mcp.name
-  namespace = local.endpoints.kubernetes_mcp.namespace
+  name      = local.endpoints.kubernetes-mcp.name
+  namespace = local.endpoints.kubernetes-mcp.namespace
   images = {
-    kubernetes_mcp = {
+    kubernetes-mcp = {
       repository = "ghcr.io/containers/kubernetes-mcp-server"
       tag        = "v0.0.66@sha256:6d650f4bd6ac303ad82713c997e73a2d001602f9bf17392c9b9a0e30e29c6423" # renovate: datasource=docker depName=ghcr.io/containers/kubernetes-mcp-server
     }
   }
-  service_hostname = local.endpoints.kubernetes_mcp.service
+  service_hostname = local.endpoints.kubernetes-mcp.service
   service_port     = local.service_ports.kubernetes_mcp
   ca_issuer_name   = local.cert_issuers.ca_internal
 }

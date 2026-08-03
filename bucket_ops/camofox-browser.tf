@@ -5,10 +5,10 @@ resource "random_password" "camofox-browser-auth-token" {
 
 module "camofox-browser" {
   source    = "./modules/camofox-browser"
-  name      = local.endpoints.camofox_browser.name
-  namespace = local.endpoints.camofox_browser.namespace
+  name      = local.endpoints.camofox-browser.name
+  namespace = local.endpoints.camofox-browser.namespace
   images = {
-    camofox_browser = {
+    camofox-browser = {
       repository = "ghcr.io/jo-inc/camofox-browser"
       tag        = "1.13.0@sha256:64b30ffdbbc4ae0e28200a66dfbd6f55ac4188229eb34ef769afcf7be40faa6e" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
     }
@@ -20,7 +20,7 @@ module "camofox-browser" {
     PROXY_PASSWORD     = var.scrape_proxy_password
     CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
   }
-  ingress_hostname = local.endpoints.camofox_browser.ingress
+  ingress_hostname = local.endpoints.camofox-browser.ingress
   gateway_ref = {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace

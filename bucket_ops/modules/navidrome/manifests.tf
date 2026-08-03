@@ -20,6 +20,7 @@ locals {
     ND_SEARCHFULLSTRING        = true
     ND_PROMETHEUS_METRICSPATH  = "/metrics"
     ND_SCANNER_PURGEMISSING    = "always"
+    ND_SESSIONTIMEOUT          = "24h"
   })
   db_file = "${local.extra_envs.ND_DATAFOLDER}/navidrome.db" # db name not configurable
 }

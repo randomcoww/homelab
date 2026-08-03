@@ -26,7 +26,7 @@ locals {
       require_pkce          = false
       pkce_challenge_method = ""
       redirect_uris = [
-        "https://${local.endpoints.hermes_agent.ingress}/auth/callback",
+        "https://${local.endpoints.hermes-agent.ingress}/auth/callback",
       ]
       consent_mode = "implicit"
     }
@@ -58,8 +58,8 @@ resource "random_password" "authelia-oidc-client-secret" {
 
 module "authelia-valkey" {
   source    = "./modules/valkey"
-  name      = local.endpoints.authelia_valkey.name
-  namespace = local.endpoints.authelia_valkey.namespace
+  name      = local.endpoints.authelia-valkey.name
+  namespace = local.endpoints.authelia-valkey.namespace
   images = {
     valkey = {
       repository = "ghcr.io/valkey-io/valkey"
@@ -67,7 +67,7 @@ module "authelia-valkey" {
     }
   }
   service_port     = local.service_ports.redis_sentinel
-  service_hostname = local.endpoints.authelia_valkey.service_fqdn
+  service_hostname = local.endpoints.authelia-valkey.service_fqdn
   ca_issuer_name   = local.cert_issuers.ca_internal
 }
 
@@ -85,9 +85,9 @@ module "authelia" {
   ca_issuer_name = local.cert_issuers.ca_internal
   ldap_endpoint  = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
   redis_sentinel_endpoint = {
-    host        = local.endpoints.authelia_valkey.service_fqdn
+    host        = local.endpoints.authelia-valkey.service_fqdn
     port        = local.service_ports.redis_sentinel
-    master_name = local.endpoints.authelia_valkey.name
+    master_name = local.endpoints.authelia-valkey.name
   }
   smtp = {
     host     = var.smtp_host

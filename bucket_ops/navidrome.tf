@@ -53,13 +53,11 @@ module "navidrome" {
     }
   }
   extra_configs = {
+    ND_EXTAUTH_USERHEADER = "Remote-User"
     ND_EXTAUTH_TRUSTEDSOURCES = join(",", [
       local.networks.kubernetes_pod.prefix,
     ])
-    ND_ENABLEUSEREDITING  = false
-    TZ                    = local.timezone
-    ND_EXTAUTH_USERHEADER = "Remote-User"
-    ND_SESSIONTIMEOUT     = "24h"
+    TZ = local.timezone
   }
   ingress_hostname = local.endpoints.navidrome.ingress
   gateway_ref = {
