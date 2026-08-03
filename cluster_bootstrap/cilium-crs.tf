@@ -1,14 +1,14 @@
 module "apiserver-lb-service" {
   source    = "../modules/service"
-  name      = local.endpoints.apiserver_lb.name
-  namespace = local.endpoints.apiserver_lb.namespace
-  app       = local.endpoints.apiserver_lb.name
+  name      = local.endpoints.apiserver-lb.name
+  namespace = local.endpoints.apiserver-lb.namespace
+  app       = local.endpoints.apiserver-lb.name
   release   = "0.1.0"
   annotations = {
-    "lbipam.cilium.io/ips" = local.endpoints.apiserver_lb.service_ip
+    "lbipam.cilium.io/ips" = local.endpoints.apiserver-lb.service_ip
   }
   selector = {
-    k8s-app = local.endpoints.apiserver_lb.name
+    k8s-app = local.endpoints.apiserver-lb.name
   }
   spec = {
     type                  = "LoadBalancer"
@@ -123,18 +123,18 @@ resource "helm_release" "cilium-crs" {
             apiVersion = "cilium.io/v2"
             kind       = "CiliumLoadBalancerIPPool"
             metadata = {
-              name = "${local.endpoints.apiserver_lb.namespace}-${local.endpoints.apiserver_lb.name}"
+              name = "${local.endpoints.apiserver-lb.namespace}-${local.endpoints.apiserver-lb.name}"
             }
             spec = {
               blocks = [
                 {
-                  cidr = "${local.endpoints.apiserver_lb.service_ip}/32"
+                  cidr = "${local.endpoints.apiserver-lb.service_ip}/32"
                 },
               ]
               serviceSelector = {
                 matchLabels = {
-                  "io.kubernetes.service.namespace" = local.endpoints.apiserver_lb.namespace
-                  "io.kubernetes.service.name"      = local.endpoints.apiserver_lb.name
+                  "io.kubernetes.service.namespace" = local.endpoints.apiserver-lb.namespace
+                  "io.kubernetes.service.name"      = local.endpoints.apiserver-lb.name
                 }
               }
             }

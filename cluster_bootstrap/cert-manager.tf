@@ -1,6 +1,6 @@
 resource "helm_release" "cert-manager" {
-  name             = local.endpoints.cert_manager.name
-  namespace        = local.endpoints.cert_manager.namespace
+  name             = local.endpoints.cert-manager.name
+  namespace        = local.endpoints.cert-manager.namespace
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
   create_namespace = true
@@ -85,8 +85,8 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "cert-manager-csi-driver" {
-  name             = "${local.endpoints.cert_manager.name}-csi-driver"
-  namespace        = local.endpoints.cert_manager.namespace
+  name             = "${local.endpoints.cert-manager.name}-csi-driver"
+  namespace        = local.endpoints.cert-manager.namespace
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager-csi-driver"
   create_namespace = true

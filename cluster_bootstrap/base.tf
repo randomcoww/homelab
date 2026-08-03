@@ -161,8 +161,8 @@ data "http" "cert-manager-crds-yaml" {
 
 resource "helm_release" "cert-manager-crds" {
   chart            = "../helm-wrapper"
-  name             = "${local.endpoints.cert_manager.name}-crds"
-  namespace        = local.endpoints.cert_manager.namespace
+  name             = "${local.endpoints.cert-manager.name}-crds"
+  namespace        = local.endpoints.cert-manager.namespace
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
