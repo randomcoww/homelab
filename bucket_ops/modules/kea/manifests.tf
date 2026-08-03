@@ -320,7 +320,7 @@ module "statefulset" {
       },
       {
         name  = "${var.name}-ipxe"
-        image = var.images.ipxe
+        image = "${var.images.ipxe.repository}:${var.images.ipxe.tag}"
         args = [
           "-p",
           "$(POD_IP):${var.ports.ipxe}",
@@ -339,7 +339,7 @@ module "statefulset" {
       # TODO: migrate fully to HTTP boot and remove TFTP
       {
         name  = "${var.name}-ipxe-tftp"
-        image = var.images.ipxe
+        image = "${var.images.ipxe.repository}:${var.images.ipxe.tag}"
         command = [
           "udpsvd",
           "-vE",

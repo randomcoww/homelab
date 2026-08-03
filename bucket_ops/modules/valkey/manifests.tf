@@ -251,7 +251,7 @@ module "statefulset" {
       },
       {
         name  = "${var.name}-sentinel"
-        image = var.images.valkey
+        image = "${var.images.valkey.repository}:${var.images.valkey.tag}"
         command = [
           "sh",
           "-c",

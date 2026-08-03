@@ -377,7 +377,7 @@ module "statefulset" {
       {
         name = "agent"
         image = {
-          reference = var.images.hermes_agent
+          reference = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
         }
       },
       {

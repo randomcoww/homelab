@@ -25,7 +25,7 @@ output "manifests" {
                   containers = [
                     {
                       name  = var.name
-                      image = var.images.registry
+                      image = "${var.images.registry.repository}:${var.images.registry.tag}"
                       args = [
                         "garbage-collect",
                         "--delete-untagged",
