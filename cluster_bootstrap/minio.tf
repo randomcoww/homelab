@@ -16,7 +16,7 @@ module "minio" {
   images = {
     minio = {
       repository = "cgr.dev/chainguard/minio"
-      tag        = "latest@sha256:d386393960d3126c034d6597b752bc33a02a2c237069788aabcf6d035c166b27" # renovate: datasource=docker depName=cgr.dev/chainguard/minio
+      tag        = "latest@sha256:5f2b82fe2edccafed7902f423f171ae5e6b8b363fae72441c0e0e4289dc45555" # renovate: datasource=docker depName=cgr.dev/chainguard/minio
     }
   }
   service_port = local.service_ports.minio
