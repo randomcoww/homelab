@@ -43,8 +43,14 @@ module "navidrome" {
   name      = local.endpoints.navidrome.name
   namespace = local.endpoints.navidrome.namespace
   images = {
-    navidrome  = local.container_images_digest.navidrome
-    litestream = local.container_images_digest.litestream
+    navidrome = {
+      repository = "ghcr.io/navidrome/navidrome"
+      tag        = "0.63.2@sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40" # renovate: datasource=docker depName=ghcr.io/navidrome/navidrome
+    }
+    litestream = {
+      repository = "docker.io/litestream/litestream"
+      tag        = "0.5.15@sha256:f45ca298a567bef6edd23d43429b5f80721473a9a9719e467f11d7888999403e" # renovate: datasource=docker depName=docker.io/litestream/litestream
+    }
   }
   extra_configs = {
     ND_EXTAUTH_TRUSTEDSOURCES = join(",", [

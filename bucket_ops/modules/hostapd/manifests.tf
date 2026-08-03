@@ -90,7 +90,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.hostapd
+        image = "${var.images.hostapd.repository}:${var.images.hostapd.tag}"
         args = [
           local.config_path,
         ]

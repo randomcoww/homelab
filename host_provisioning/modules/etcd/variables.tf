@@ -40,8 +40,14 @@ variable "peer_ca" {
 
 variable "images" {
   type = object({
-    etcd_wrapper = string
-    etcd         = string
+    etcd_wrapper = object({
+      repository = string
+      tag        = string
+    })
+    etcd = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

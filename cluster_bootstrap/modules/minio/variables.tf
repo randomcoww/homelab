@@ -27,7 +27,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    minio = string
+    minio = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

@@ -48,9 +48,18 @@ variable "service_account" {
 
 variable "images" {
   type = object({
-    apiserver          = string
-    controller_manager = string
-    scheduler          = string
+    apiserver = object({
+      repository = string
+      tag        = string
+    })
+    controller_manager = object({
+      repository = string
+      tag        = string
+    })
+    scheduler = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

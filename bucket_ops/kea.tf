@@ -3,8 +3,14 @@ module "kea" {
   name      = "kea"
   namespace = "netboot"
   images = {
-    kea  = local.container_images_digest.kea
-    ipxe = local.container_images_digest.ipxe
+    kea = {
+      repository = "reg.cluster.internal/randomcoww/kea"
+      tag        = "v3.2.0.1785197392@sha256:1f994d9e9b384bc0048d8d683e2340a35208d2793ff2dba11bd92e67b31c444e" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/kea
+    }
+    ipxe = {
+      repository = "reg.cluster.internal/randomcoww/ipxe"
+      tag        = "v2.0.0.1785197477@sha256:332cf9582895e28846c3b7e8c8602643ebafd3c964b88066b369e2ff73a85f96" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
+    }
   }
   service_ips = [
     local.endpoints.kea_primary.cluster_ip,

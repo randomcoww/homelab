@@ -36,8 +36,8 @@ module "mountpoint-s3-csi" {
   namespace = local.endpoints.mountpoint_s3_csi.namespace
   images = {
     mountpoint_s3_csi = {
-      repository = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).depName
-      tag        = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).currentValue
+      repository = "reg.cluster.internal/randomcoww/mountpoint-s3-csi"
+      tag        = "v2.7.0.1785197210@sha256:6b4cc17d45099daf7f1341f33d9f62157ed320e29e40dd5dd7437829ad13981c" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/mountpoint-s3-csi
     }
   }
   kubelet_root_path = local.kubernetes.kubelet_root_path

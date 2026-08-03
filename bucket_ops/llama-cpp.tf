@@ -3,31 +3,54 @@ resource "random_password" "llama-cpp-auth-token" {
   override_special = "-_"
 }
 
+locals {
+  model_images = [
+    {
+      repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16"
+      tag        = "v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
+      files = {
+        qwen-3-6-27b        = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
+        qwen-3-6-27b-mmproj = "Qwen3.6-27B-mmproj-BF16.gguf"
+      }
+    },
+    {
+      repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16"
+      tag        = "v1783493322@sha256:0df8bc92746e34aefffc89708257c576743abc2577d4454d176e9af044a54e60" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
+      files = {
+        gemma-4-31b        = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
+        gemma-4-31b-mtp    = "gemma-4-31B-it-BF16-MTP.gguf"
+        gemma-4-31b-mmproj = "gemma-4-31B-it-mmproj-BF16.gguf"
+      }
+    },
+    {
+      repository = "reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
+      tag        = "v1781645858@sha256:b6ddc70ec2752d59bbaaa936ec2ae6e4ee1e5a5ced5fb4cd8d77e4a272585039" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
+      files = {
+        whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
+      }
+    },
+  ]
+}
+
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
   name      = local.endpoints.llama_cpp.name
   namespace = local.endpoints.llama_cpp.namespace
   images = {
-    llama_swap = local.container_images_digest.llama_cpp_vulkan
-  }
-  models = {
-    for key, model in {
-      qwen-3-6-27b                          = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
-      qwen-3-6-27b-mmproj                   = "Qwen3.6-27B-mmproj-BF16.gguf"
-      gemma-4-31b                           = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
-      gemma-4-31b-mtp                       = "gemma-4-31B-it-BF16-MTP.gguf"
-      gemma-4-31b-mmproj                    = "gemma-4-31B-it-mmproj-BF16.gguf"
-      whisper-large-v3-turbo                = "ggml-large-v3-turbo-q8_0.bin"
-      jina-reranker-m0                      = "jina-reranker-m0-Q8_0.gguf"
-      jina-embeddings-v5-omni               = "jina-embeddings-v5-omni-small-text-matching-Q8_0.gguf"
-      jina-embeddings-v5-omni-audio-mmproj  = "jina-embeddings-v5-omni-small-text-matching-audio-mmproj-F16.gguf"
-      jina-embeddings-v5-omni-vision-mmproj = "jina-embeddings-v5-omni-small-text-matching-vision-mmproj-F16.gguf"
-    } :
-    key => {
-      image = local.container_images_digest[model]
-      file  = model
+    llama_swap = {
+      repository = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
+      tag        = "unified-vulkan-2026-07-27.1785196925@sha256:5ea440407d825d6e0495be30fc2efe5b41d689c9759bb5bf9617ed7dd1a45461" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
   }
+  models = merge([
+    for _, image in local.model_images : {
+      for key, file in image.files :
+      key => {
+        image = "${image.repository}:${image.tag}"
+        file  = file
+      }
+    }
+  ]...)
   api_keys = [
     random_password.llama-cpp-auth-token.result,
   ]
@@ -103,24 +126,6 @@ module "llama-cpp" {
           "whisper-1",
         ]
       }
-      jina-embeddings-v5-omni = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-embeddings-v5-omni} \
-          --embedding \
-          --pooling last \
-          --mmproj $${jina-embeddings-v5-omni-audio-mmproj} \
-          --mmproj $${jina-embeddings-v5-omni-vision-mmproj}
-        EOF
-      }
-      jina-reranker-m0 = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-reranker-m0} \
-          --reranking \
-          --pooling rank
-        EOF
-      }
     }
     groups = {
       agent-concurrent = {
@@ -129,8 +134,6 @@ module "llama-cpp" {
         members = [
           "qwen-3-6-27b",
           "whisper-large-v3-turbo",
-          "jina-embeddings-v5-omni",
-          "jina-reranker-m0",
         ]
       }
     }

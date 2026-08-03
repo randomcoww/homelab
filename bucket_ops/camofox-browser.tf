@@ -8,7 +8,10 @@ module "camofox-browser" {
   name      = local.endpoints.camofox_browser.name
   namespace = local.endpoints.camofox_browser.namespace
   images = {
-    camofox_browser = local.container_images_digest.camofox_browser
+    camofox_browser = {
+      repository = "ghcr.io/jo-inc/camofox-browser"
+      tag        = "1.13.0@sha256:64b30ffdbbc4ae0e28200a66dfbd6f55ac4188229eb34ef769afcf7be40faa6e" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
+    }
   }
   extra_configs = {
     PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname

@@ -19,7 +19,10 @@ variable "release" {
 
 variable "images" {
   type = object({
-    gha_runner = string
+    gha_runner = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

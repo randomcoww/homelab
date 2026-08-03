@@ -105,7 +105,7 @@ module "deployment" {
     containers = [
       {
         name  = var.name
-        image = var.images.searxng
+        image = "${var.images.searxng.repository}:${var.images.searxng.tag}"
         env = [
           for k, v in local.extra_envs :
           {

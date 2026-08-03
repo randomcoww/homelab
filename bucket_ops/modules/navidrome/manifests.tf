@@ -146,7 +146,7 @@ module "litestream-overlay" {
     containers = [
       {
         name  = var.name
-        image = var.images.navidrome
+        image = "${var.images.navidrome.repository}:${var.images.navidrome.tag}"
         ports = [
           {
             containerPort = local.extra_envs.ND_PORT

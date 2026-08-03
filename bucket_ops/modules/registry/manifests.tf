@@ -99,7 +99,7 @@ module "deployment" {
     containers = [
       {
         name  = var.name
-        image = var.images.registry
+        image = "${var.images.registry.repository}:${var.images.registry.tag}"
         args = [
           "serve",
           "${local.config_path}/config.yaml",

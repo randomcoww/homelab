@@ -23,8 +23,14 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    stump      = string
-    litestream = string
+    stump = object({
+      repository = string
+      tag        = string
+    })
+    litestream = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

@@ -23,7 +23,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    kubernetes_mcp = string
+    kubernetes_mcp = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

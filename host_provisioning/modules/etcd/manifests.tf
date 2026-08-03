@@ -29,7 +29,7 @@ module "etcd-wrapper" {
     containers = [
       {
         name  = var.name
-        image = var.images.etcd
+        image = "${var.images.etcd.repository}:${var.images.etcd.tag}"
         command = [
           "${local.etcd_wrapper_path}/bin/etcd-wrapper",
           "-local-client-url",
@@ -140,7 +140,7 @@ module "etcd-wrapper" {
       {
         name = "etcd-wrapper"
         image = {
-          reference = var.images.etcd_wrapper
+          reference = "${var.images.etcd_wrapper.repository}:${var.images.etcd_wrapper.tag}"
         }
       },
       {

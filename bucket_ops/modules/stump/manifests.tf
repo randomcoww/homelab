@@ -160,7 +160,7 @@ module "litestream-overlay" {
     containers = [
       {
         name  = var.name
-        image = var.images.stump
+        image = "${var.images.stump.repository}:${var.images.stump.tag}"
         ports = [
           {
             containerPort = local.extra_envs.STUMP_PORT

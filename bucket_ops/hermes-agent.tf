@@ -48,8 +48,14 @@ module "hermes-agent" {
   name      = local.endpoints.hermes_agent.name
   namespace = local.endpoints.hermes_agent.namespace
   images = {
-    hermes_agent = local.container_images_digest.hermes_agent
-    hermes_webui = local.container_images_digest.hermes_webui
+    hermes_agent = {
+      repository = "reg.cluster.internal/randomcoww/hermes-mnemosyne"
+      tag        = "v2026.7.20.1785197062@sha256:de99808bde61f0e15043bbe1bc3c3dc866fa5dea422191eacec22ff2c97bf62e" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hermes-mnemosyne
+    }
+    hermes_webui = {
+      repository = "ghcr.io/nesquena/hermes-webui"
+      tag        = "0.52.158@sha256:28783c1ec13cda2f65ec1249a8537d3b9353fcfe5f97f4d24865ab524d26815d" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
+    }
   }
   # TODO: investigate apptainer and podman for agent terminal
   extra_configs = {

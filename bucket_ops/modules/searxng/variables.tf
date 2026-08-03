@@ -23,7 +23,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    searxng = string
+    searxng = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

@@ -14,7 +14,10 @@ variable "release" {
 
 variable "images" {
   type = object({
-    qrcode = string
+    qrcode = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

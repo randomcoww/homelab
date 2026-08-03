@@ -14,7 +14,10 @@ module "minio" {
   namespace = local.endpoints.minio.namespace
   timeout   = local.kubernetes.helm_release_timeout
   images = {
-    minio = local.container_images_digest.minio
+    minio = {
+      repository = "cgr.dev/chainguard/minio"
+      tag        = "latest@sha256:d386393960d3126c034d6597b752bc33a02a2c237069788aabcf6d035c166b27" # renovate: datasource=docker depName=cgr.dev/chainguard/minio
+    }
   }
   service_port = local.service_ports.minio
   root_user = {

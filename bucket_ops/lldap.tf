@@ -13,7 +13,10 @@ module "lldap" {
   name      = local.endpoints.lldap.name
   namespace = local.endpoints.lldap.namespace
   images = {
-    lldap = local.container_images_digest.lldap
+    lldap = {
+      repository = "ghcr.io/lldap/lldap"
+      tag        = "v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284" # renovate: datasource=docker depName=ghcr.io/lldap/lldap
+    }
   }
   service_port = local.service_ports.ldaps
   extra_configs = {

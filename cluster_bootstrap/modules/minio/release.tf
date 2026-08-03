@@ -429,7 +429,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.minio
+        image = "${var.images.minio.repository}:${var.images.minio.tag}"
         command = [
           "sh",
           "-ce",

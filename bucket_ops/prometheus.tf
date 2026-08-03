@@ -45,9 +45,9 @@ module "prometheus" {
   namespace = local.endpoints.prometheus.namespace
   images = {
     thanos = {
-      registry   = regex(local.container_image_regex, local.container_images.thanos).repository
-      repository = regex(local.container_image_regex, local.container_images.thanos).image
-      tag        = regex(local.container_image_regex, local.container_images.thanos).tag
+      registry   = "quay.io/thanos"
+      repository = "thanos"
+      tag        = "v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8" # renovate: datasource=docker depName=quay.io/thanos/thanos
     }
   }
   extra_values = {

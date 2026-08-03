@@ -133,7 +133,7 @@ module "deployment" {
     containers = [
       {
         name  = var.name
-        image = var.images.lldap
+        image = "${var.images.lldap.repository}:${var.images.lldap.tag}"
         args = [
           "run",
           "-c",

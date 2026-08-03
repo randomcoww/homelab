@@ -35,9 +35,18 @@ module "kubernetes-master" {
     host_key => host_key == each.key ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   images = {
-    apiserver          = local.container_images_digest.kube_apiserver
-    controller_manager = local.container_images_digest.kube_controller_manager
-    scheduler          = local.container_images_digest.kube_scheduler
+    apiserver = {
+      repository = "registry.k8s.io/kube-apiserver"
+      tag        = "v1.36.3@sha256:b4bc06c81fd76f81174e6c19ddacf477acdf1583e7a5846ebbd513493aef6e43" # renovate: datasource=docker depName=registry.k8s.io/kube-apiserver
+    }
+    controller_manager = {
+      repository = "registry.k8s.io/kube-controller-manager"
+      tag        = "v1.36.3@sha256:ed56454bf514916079a227f5765b64524fde52106dfcc52978b28634765b78b8" # renovate: datasource=docker depName=registry.k8s.io/kube-controller-manager
+    }
+    scheduler = {
+      repository = "registry.k8s.io/kube-scheduler"
+      tag        = "v1.36.3@sha256:128fc07d278d64c4f2cce416ed0a9f37b23a30cdde6f97873d18c9c78e259df4" # renovate: datasource=docker depName=registry.k8s.io/kube-scheduler
+    }
   }
   ports = {
     apiserver          = local.host_ports.apiserver

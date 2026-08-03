@@ -23,7 +23,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    valkey = string
+    valkey = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

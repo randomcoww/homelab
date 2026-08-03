@@ -16,7 +16,10 @@ variable "release" {
 
 variable "images" {
   type = object({
-    litestream = string
+    litestream = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

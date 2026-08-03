@@ -21,7 +21,7 @@ module "daemonset" {
     containers = [
       {
         name  = var.name
-        image = var.images.device_plugin
+        image = "${var.images.device_plugin.repository}:${var.images.device_plugin.tag}"
         args = concat(var.args, [
           "--listen=0.0.0.0:${local.metrics_port}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",

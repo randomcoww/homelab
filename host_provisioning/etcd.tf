@@ -19,8 +19,14 @@ module "etcd" {
     cert_pem        = tls_self_signed_cert.etcd-peer-ca.cert_pem
   }
   images = {
-    etcd         = local.container_images_digest.etcd
-    etcd_wrapper = local.container_images_digest.etcd_wrapper
+    etcd = {
+      repository = "registry.k8s.io/etcd"
+      tag        = "3.7.1@sha256:a9983dd6d9283138ab926daa307c6c25623636703ecf5645d5df4d666ce9eba2" # renovate: datasource=docker depName=registry.k8s.io/etcd
+    }
+    etcd_wrapper = {
+      repository = "ghcr.io/randomcoww/etcd-wrapper"
+      tag        = "v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386" # renovate: datasource=docker depName=ghcr.io/randomcoww/etcd-wrapper
+    }
   }
   ports = {
     etcd_client  = local.host_ports.etcd_client

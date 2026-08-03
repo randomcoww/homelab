@@ -4,7 +4,10 @@ module "searxng" {
   namespace = local.endpoints.searxng.namespace
   replicas  = 2
   images = {
-    searxng = local.container_images_digest.searxng
+    searxng = {
+      repository = "ghcr.io/searxng/searxng"
+      tag        = "latest@sha256:ec536bcd1e83577aad4cc07f7ecb9a30858a9a905d2d57c8796abc83f872a036" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
+    }
   }
   searxng_settings = {
     use_default_settings = {

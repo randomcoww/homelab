@@ -70,7 +70,10 @@ module "authelia-valkey" {
   name      = local.endpoints.authelia_valkey.name
   namespace = local.endpoints.authelia_valkey.namespace
   images = {
-    valkey = local.container_images_digest.valkey
+    valkey = {
+      repository = "ghcr.io/valkey-io/valkey"
+      tag        = "9.1-alpine@sha256:ee91f7a174ac4d6a6b0685b3a60e321f0a9dbbb691f9b0e285be2ba1d1be8328" # renovate: datasource=docker depName=ghcr.io/valkey-io/valkey
+    }
   }
   service_port     = local.service_ports.redis_sentinel
   service_hostname = local.endpoints.authelia_valkey.service_fqdn
@@ -83,9 +86,9 @@ module "authelia" {
   namespace = local.endpoints.authelia.namespace
   images = {
     authelia = {
-      registry   = regex(local.container_image_regex, local.container_images.authelia).repository
-      repository = regex(local.container_image_regex, local.container_images.authelia).image
-      tag        = regex(local.container_image_regex, local.container_images.authelia).tag
+      registry   = "ghcr.io/authelia"
+      repository = "authelia"
+      tag        = "4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b" # renovate: datasource=docker depName=ghcr.io/authelia/authelia
     }
   }
   ca_issuer_name = local.cert_issuers.ca_internal

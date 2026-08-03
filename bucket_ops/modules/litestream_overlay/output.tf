@@ -10,7 +10,7 @@ output "template_spec" {
       for i, db in var.litestream_config.dbs :
       merge({
         name  = "${var.name}-litestream-restore-${i}"
-        image = var.images.litestream
+        image = "${var.images.litestream.repository}:${var.images.litestream.tag}"
         args = [
           "restore",
           "-if-db-not-exists",
@@ -56,7 +56,7 @@ output "template_spec" {
       ], [
       merge({
         name          = "${var.name}-litestream-replicate"
-        image         = var.images.litestream
+        image         = "${var.images.litestream.repository}:${var.images.litestream.tag}"
         restartPolicy = "Always" # sidecar mode
         args = [
           "replicate",

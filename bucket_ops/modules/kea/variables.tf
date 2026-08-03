@@ -14,8 +14,14 @@ variable "release" {
 
 variable "images" {
   type = object({
-    kea  = string
-    ipxe = string
+    kea = object({
+      repository = string
+      tag        = string
+    })
+    ipxe = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

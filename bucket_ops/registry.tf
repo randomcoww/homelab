@@ -42,7 +42,10 @@ module "registry" {
   namespace = local.endpoints.registry.namespace
   replicas  = 2
   images = {
-    registry = local.container_images_digest.registry
+    registry = {
+      repository = "ghcr.io/distribution/distribution"
+      tag        = "3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8" # renovate: datasource=docker depName=ghcr.io/distribution/distribution
+    }
   }
   ca_issuer_name      = local.cert_issuers.ca_internal
   minio_endpoint      = "${local.endpoints.minio.service_ip}:${local.service_ports.minio}" # needs to be reachable and resolvable from host

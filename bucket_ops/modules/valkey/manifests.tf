@@ -157,7 +157,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.valkey
+        image = "${var.images.valkey.repository}:${var.images.valkey.tag}"
         command = [
           "sh",
           "-c",

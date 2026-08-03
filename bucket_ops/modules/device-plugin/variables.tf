@@ -18,7 +18,10 @@ variable "kubelet_root_path" {
 
 variable "images" {
   type = object({
-    device_plugin = string
+    device_plugin = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

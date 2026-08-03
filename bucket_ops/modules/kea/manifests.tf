@@ -239,7 +239,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.kea
+        image = "${var.images.kea.repository}:${var.images.kea.tag}"
         args = [
           "sh",
           "-c",

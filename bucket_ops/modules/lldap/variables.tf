@@ -18,7 +18,10 @@ variable "replicas" {
 
 variable "images" {
   type = object({
-    lldap = string
+    lldap = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

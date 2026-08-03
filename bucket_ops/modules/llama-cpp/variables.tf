@@ -23,7 +23,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    llama_swap = string
+    llama_swap = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

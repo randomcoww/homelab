@@ -44,8 +44,14 @@ module "stump" {
   namespace = local.endpoints.stump.namespace
   replicas  = 1
   images = {
-    stump      = local.container_images_digest.stump
-    litestream = local.container_images_digest.litestream
+    stump = {
+      repository = "docker.io/aaronleopold/stump"
+      tag        = "0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
+    }
+    litestream = {
+      repository = "docker.io/litestream/litestream"
+      tag        = "0.5.15@sha256:f45ca298a567bef6edd23d43429b5f80721473a9a9719e467f11d7888999403e" # renovate: datasource=docker depName=docker.io/litestream/litestream
+    }
   }
   extra_configs = {
     STUMP_OIDC_ISSUER_URL    = "https://${local.endpoints.authelia.ingress}"

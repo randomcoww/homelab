@@ -224,7 +224,7 @@ module "statefulset" {
     initContainers = [
       {
         name  = "${var.name}-config"
-        image = var.images.hermes_agent
+        image = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
         command = [
           "bash",
           "-c",
@@ -263,7 +263,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.hermes_agent
+        image = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
         args = [
           "gateway",
           "run",
@@ -309,7 +309,7 @@ module "statefulset" {
       },
       {
         name  = "${var.name}-webui"
-        image = var.images.hermes_webui
+        image = "${var.images.hermes_webui.repository}:${var.images.hermes_webui.tag}"
         envFrom = [
           {
             secretRef = {

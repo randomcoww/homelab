@@ -13,7 +13,10 @@ module "hostapd" {
   name     = "hostapd"
   replicas = 1
   images = {
-    hostapd = local.container_images_digest.hostapd
+    hostapd = {
+      repository = "reg.cluster.internal/randomcoww/hostapd"
+      tag        = "v2.11.1785541604@sha256:a19eea79403f34c87750a8c1cf50c363cf9b1b5a60467d5f1bf8e5cca3813456" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hostapd
+    }
   }
   affinity = {
     nodeAffinity = {
@@ -108,7 +111,10 @@ module "qrcode-hostapd" {
   namespace = local.endpoints.qrcode_hostapd.namespace
   replicas  = 2
   images = {
-    qrcode = local.container_images_digest.qrcode_generator
+    qrcode = {
+      repository = "reg.cluster.internal/randomcoww/qrcode-resource"
+      tag        = "v1785197353@sha256:3b36ada0e19ab5c52db7b63ae7526b3e90ef421505f3a2011bbc7cfd720a592e" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qrcode-resource
+    }
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
   ingress_hostname = local.endpoints.qrcode_hostapd.ingress

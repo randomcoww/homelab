@@ -127,7 +127,7 @@ module "apiserver" {
     containers = [
       {
         name  = "kube-apiserver"
-        image = var.images.apiserver
+        image = "${var.images.apiserver.repository}:${var.images.apiserver.tag}"
         command = compact(concat([
           "kube-apiserver",
           "--advertise-address=$(POD_IP)",
@@ -245,7 +245,7 @@ module "controller-manager" {
     containers = [
       {
         name  = "kube-controller-manager"
-        image = var.images.controller_manager
+        image = "${var.images.controller_manager.repository}:${var.images.controller_manager.tag}"
         command = compact(concat([
           "kube-controller-manager",
           "--allocate-node-cidrs=true",
@@ -332,7 +332,7 @@ module "scheduler" {
     containers = [
       {
         name  = "kube-scheduler"
-        image = var.images.scheduler
+        image = "${var.images.scheduler.repository}:${var.images.scheduler.tag}"
         command = compact(concat([
           "kube-scheduler",
           "--config=${local.config_files["scheduler.config"].path}",

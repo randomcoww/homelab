@@ -24,8 +24,14 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    hermes_agent = string
-    hermes_webui = string
+    hermes_agent = object({
+      repository = string
+      tag        = string
+    })
+    hermes_webui = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

@@ -18,7 +18,10 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    registry = string
+    registry = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

@@ -14,7 +14,10 @@ variable "release" {
 
 variable "images" {
   type = object({
-    hostapd = string
+    hostapd = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 

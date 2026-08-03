@@ -166,7 +166,7 @@ module "deployment" {
     containers = [
       {
         name  = var.name
-        image = var.images.qrcode
+        image = "${var.images.qrcode.repository}:${var.images.qrcode.tag}"
         args = [
           "-p",
           "0.0.0.0:${local.qrcode_port}",
