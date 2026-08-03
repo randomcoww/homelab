@@ -1,31 +1,27 @@
 locals {
   config_envs = merge(var.extra_config_envs, {
-    HERMES_HOME        = "/opt/data"
-    API_SERVER_ENABLED = true
-    API_SERVER_HOST    = "0.0.0.0"
-    API_SERVER_PORT    = 8642
+    HERMES_HOME                 = "/opt/data"
+    API_SERVER_ENABLED          = true
+    API_SERVER_HOST             = "0.0.0.0"
+    API_SERVER_PORT             = 8642
+    HERMES_STREAM_READ_TIMEOUT  = 1800
+    HERMES_STREAM_STALE_TIMEOUT = 1800
+    HERMES_CRON_TIMEOUT         = 1800
+    GATEWAY_ALLOW_ALL_USERS     = true
+    # mnemosyne vars #
+    MNEMOSYNE_HOST_LLM_ENABLED = true
     # custom vars #
     INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
     INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
   })
   agent_envs = merge({
-    HERMES_UID       = 10000
-    HERMES_GID       = 10000
-    HERMES_DASHBOARD = false
-    SSL_CERT_FILE    = "/etc/ssl/certs/ca-certificates.crt"
+    HERMES_UID            = 10000
+    HERMES_GID            = 10000
+    HERMES_DASHBOARD      = true
+    HERMES_DASHBOARD_PORT = 9119
+    HERMES_DASHBOARD_HOST = "0.0.0.0"
+    SSL_CERT_FILE         = "/etc/ssl/certs/ca-certificates.crt"
   }, var.extra_agent_envs)
-  webui_envs = merge({
-    WANTED_UID                     = local.agent_envs.HERMES_UID
-    WANTED_GID                     = local.agent_envs.HERMES_GID
-    HERMES_WEBUI_SKIP_ONBOARDING   = 1
-    HERMES_WEBUI_HOST              = "0.0.0.0"
-    HERMES_WEBUI_PORT              = 8787
-    HERMES_WEBUI_STATE_DIR         = "${local.config_envs.HERMES_HOME}/webui"
-    HERMES_WEBUI_DEFAULT_WORKSPACE = "${local.config_envs.HERMES_HOME}/workspace"
-    HERMES_WEBUI_AGENT_DIR         = "/opt/hermes"
-    HERMES_WEBUI_GATEWAY_BASE_URL  = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
-    HERMES_WEBUI_GATEWAY_API_KEY   = local.config_envs.API_SERVER_KEY
-  }, var.extra_webui_envs)
 
   files = {
     "config.yaml" = yamlencode(var.extra_configs)
@@ -86,18 +82,6 @@ module "secret" {
   data      = local.files
 }
 
-module "env-secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-env"
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = {
-    for k, v in merge(local.webui_envs, local.config_envs, local.agent_envs) :
-    tostring(k) => tostring(v)
-  }
-}
-
 module "juicefs-secret" {
   source    = "../../../modules/secret"
   name      = "${var.name}-juicefs"
@@ -134,9 +118,9 @@ module "service" {
     ports = [
       {
         name       = "webui"
-        port       = local.webui_envs.HERMES_WEBUI_PORT
+        port       = local.agent_envs.HERMES_DASHBOARD_PORT
         protocol   = "TCP"
-        targetPort = local.webui_envs.HERMES_WEBUI_PORT
+        targetPort = local.agent_envs.HERMES_DASHBOARD_PORT
       },
       {
         name       = "apiserver"
@@ -176,7 +160,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.webui_envs.HERMES_WEBUI_PORT
+            port = local.agent_envs.HERMES_DASHBOARD_PORT
           },
         ]
       },
@@ -211,7 +195,6 @@ module "statefulset" {
   replicas  = var.replicas
   annotations = {
     "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/env-secret"        = sha256(module.env-secret.manifest)
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
     "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
   }
@@ -221,10 +204,11 @@ module "statefulset" {
         memory = "4Gi"
       }
     }
+    # do not use fsGroup with juicefs
     initContainers = [
       {
         name  = "${var.name}-config"
-        image = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
+        image = "${var.images.hermes-agent.repository}:${var.images.hermes-agent.tag}"
         command = [
           "bash",
           "-c",
@@ -263,7 +247,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
+        image = "${var.images.hermes-agent.repository}:${var.images.hermes-agent.tag}"
         args = [
           "gateway",
           "run",
@@ -280,6 +264,9 @@ module "statefulset" {
         ports = [
           {
             containerPort = local.config_envs.API_SERVER_PORT
+          },
+          {
+            containerPort = local.agent_envs.HERMES_DASHBOARD_PORT
           },
         ]
         startupProbe = {
@@ -303,45 +290,6 @@ module "statefulset" {
           httpGet = {
             scheme = "HTTP"
             port   = local.config_envs.API_SERVER_PORT
-            path   = "/health"
-          }
-        }
-      },
-      {
-        name  = "${var.name}-webui"
-        image = "${var.images.hermes_webui.repository}:${var.images.hermes_webui.tag}"
-        envFrom = [
-          {
-            secretRef = {
-              name = module.env-secret.name
-            }
-          },
-        ]
-        volumeMounts = concat(local.common_volume_mounts, [
-          {
-            name      = "agent"
-            mountPath = local.webui_envs.HERMES_WEBUI_AGENT_DIR
-            subPath   = "opt/hermes"
-          },
-        ])
-        ports = [
-          {
-            containerPort = local.webui_envs.HERMES_WEBUI_PORT
-          },
-        ]
-        livenessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.webui_envs.HERMES_WEBUI_PORT
-            path   = "/health"
-          }
-          initialDelaySeconds = 10
-          timeoutSeconds      = 2
-        }
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.webui_envs.HERMES_WEBUI_PORT
             path   = "/health"
           }
         }
@@ -372,12 +320,6 @@ module "statefulset" {
         name = "tmp"
         emptyDir = {
           medium = "Memory"
-        }
-      },
-      {
-        name = "agent"
-        image = {
-          reference = "${var.images.hermes_agent.repository}:${var.images.hermes_agent.tag}"
         }
       },
       {

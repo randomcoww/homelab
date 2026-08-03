@@ -45,16 +45,12 @@ resource "random_password" "hermes-agent-auth-token" {
 
 module "hermes-agent" {
   source    = "./modules/hermes-agent"
-  name      = local.endpoints.hermes_agent.name
-  namespace = local.endpoints.hermes_agent.namespace
+  name      = local.endpoints.hermes-agent.name
+  namespace = local.endpoints.hermes-agent.namespace
   images = {
-    hermes_agent = {
+    hermes-agent = {
       repository = "reg.cluster.internal/randomcoww/hermes-mnemosyne"
       tag        = "v2026.7.30.1785766404@sha256:4f373589be481638afba21c8f92430f3e9fdf202c557a74f3853193967acbca8" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hermes-mnemosyne
-    }
-    hermes_webui = {
-      repository = "ghcr.io/nesquena/hermes-webui"
-      tag        = "0.52.158@sha256:28783c1ec13cda2f65ec1249a8537d3b9353fcfe5f97f4d24865ab524d26815d" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
     }
   }
   # TODO: investigate apptainer and podman for agent terminal
@@ -83,7 +79,7 @@ module "hermes-agent" {
     }
     mcp_servers = {
       kubernetes = {
-        url = "https://${local.endpoints.kubernetes_mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
+        url = "https://${local.endpoints.kubernetes-mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
         client_cert = [
           "$${INTERNAL_CLIENT_CERT_PATH}",
           "$${INTERNAL_CLIENT_KEY_PATH}",
@@ -156,31 +152,29 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL             = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    OPENAI_API_KEY              = random_password.llama-cpp-auth-token.result
-    SEARXNG_URL                 = "https://${local.endpoints.searxng.ingress}"
-    CAMOFOX_URL                 = "https://${local.endpoints.camofox_browser.ingress}"
-    CAMOFOX_API_KEY             = random_password.camofox-browser-auth-token.result
-    AUXILIARY_VISION_PROVIDER   = "auto"
-    HERMES_STREAM_READ_TIMEOUT  = 1800
-    HERMES_STREAM_STALE_TIMEOUT = 1800
-    HERMES_CRON_TIMEOUT         = 1800
-    HERMES_TIMEZONE             = local.timezone
-    GITHUB_TOKEN                = var.github_token
-    API_SERVER_MODEL_NAME       = local.endpoints.hermes_agent.name
-    API_SERVER_KEY              = random_password.hermes-agent-auth-token.result
-    GATEWAY_ALLOW_ALL_USERS     = true
-    SLACK_BOT_TOKEN             = var.slack_bot_token
-    SLACK_APP_TOKEN             = var.slack_app_token
-    SLACK_ALLOWED_USERS         = var.slack_allowed_users
-    SLACK_HOME_CHANNEL          = var.slack_home_channel
-    SLACK_HOME_CHANNEL_NAME     = "bot"
+    OPENAI_BASE_URL                     = "https://${local.endpoints.llama-cpp.ingress}/v1"
+    OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
+    SEARXNG_URL                         = "https://${local.endpoints.searxng.ingress}"
+    CAMOFOX_URL                         = "https://${local.endpoints.camofox-browser.ingress}"
+    CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
+    HERMES_TIMEZONE                     = local.timezone
+    GITHUB_TOKEN                        = var.github_token
+    API_SERVER_MODEL_NAME               = local.endpoints.hermes-agent.name
+    API_SERVER_KEY                      = random_password.hermes-agent-auth-token.result
+    SLACK_BOT_TOKEN                     = var.slack_bot_token
+    SLACK_APP_TOKEN                     = var.slack_app_token
+    SLACK_ALLOWED_USERS                 = var.slack_allowed_users
+    SLACK_HOME_CHANNEL                  = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME             = "bot"
+    AUXILIARY_VISION_PROVIDER           = "auto"
+    HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
+    HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
+    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.ingress}"
+    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.ingress}"
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    GROQ_BASE_URL  = "https://${local.endpoints.llama-cpp.ingress}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
     GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
-    # mnemosyne vars #
-    MNEMOSYNE_HOST_LLM_ENABLED = true
     # custom vars #
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
@@ -188,17 +182,8 @@ module "hermes-agent" {
   extra_agent_envs = {
     "TZ" = local.timezone
   }
-  extra_webui_envs = {
-    # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
-    # HERMES_WEBUI_OIDC_CLIENT_ID               = local.authelia_oidc_clients.hermes-dashboard.client_id
-    # HERMES_WEBUI_OIDC_CLIENT_SECRET           = local.authelia_oidc_clients.hermes-dashboard.client_secret
-    # HERMES_WEBUI_OIDC_ISSUER                  = "https://${local.endpoints.authelia.ingress}"
-    # HERMES_WEBUI_OIDC_ALLOW_CLAIM             = "email"
-    # HERMES_WEBUI_OIDC_ALLOW_VALUES            = var.smtp_username
-    # HERMES_WEBUI_OIDC_ALLOW_PRIVATE_ENDPOINTS = true
-  }
   ca_issuer_name   = local.cert_issuers.ca_internal
-  ingress_hostname = local.endpoints.hermes_agent.ingress
+  ingress_hostname = local.endpoints.hermes-agent.ingress
   gateway_ref = {
     name      = local.endpoints.cilium.name
     namespace = local.endpoints.cilium.namespace
@@ -234,7 +219,7 @@ resource "minio_s3_object" "fluxcd-hermes-agent" {
 
 output "hermes-agent" {
   value = {
-    base_url = "https://${local.endpoints.hermes_agent.ingress}/v1"
+    base_url = "https://${local.endpoints.hermes-agent.ingress}/v1"
     api_key  = random_password.hermes-agent-auth-token.result
   }
   sensitive = true
