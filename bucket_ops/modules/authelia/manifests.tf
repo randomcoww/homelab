@@ -1,13 +1,13 @@
 locals {
   envs = {
-    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE       = "/custom/ldap-client-key.pem"
-    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE = "/custom/ldap-client-cert.pem"
-    AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE                     = "/custom/redis-client-key.pem"
-    AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE               = "/custom/redis-client-cert.pem"
+    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE       = "/custom/ldap-client.key"
+    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE = "/custom/ldap-client.crt"
+    AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE                     = "/custom/redis-client.key"
+    AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE               = "/custom/redis-client.crt"
     AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE                         = "/custom/posgres-password"
     AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE               = "/custom/oidc-hmac-secret"
   }
-  authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
+  authelia_oidc_jwk_key_file       = "/custom/oidc-jwk.key"
   autehlia_oidc_client_shared_path = "/oidc"
   domain_regex                     = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
 
