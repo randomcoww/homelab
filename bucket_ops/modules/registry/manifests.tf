@@ -19,10 +19,10 @@ module "secret" {
         addr   = "0.0.0.0:${var.service_port}"
         prefix = "/"
         tls = {
-          certificate = "${local.config_path}/tls/cert.pem"
-          key         = "${local.config_path}/tls/key.pem"
+          certificate = "${local.config_path}/tls/tls.crt"
+          key         = "${local.config_path}/tls/tls.key"
           clientcas = [
-            "${local.config_path}/tls/ca-cert.pem",
+            "${local.config_path}/tls/ca.crt",
           ]
           clientauth = "require-and-verify-client-cert"
         }
@@ -180,28 +180,8 @@ module "deployment" {
       },
       {
         name = "registry-tls"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = "${var.name}-tls"
-                items = [
-                  {
-                    key  = "ca.crt"
-                    path = "ca-cert.pem"
-                  },
-                  {
-                    key  = "tls.crt"
-                    path = "cert.pem"
-                  },
-                  {
-                    key  = "tls.key"
-                    path = "key.pem"
-                  },
-                ]
-              }
-            },
-          ]
+        secret = {
+          secretName = "${var.name}-tls"
         }
       },
       {
