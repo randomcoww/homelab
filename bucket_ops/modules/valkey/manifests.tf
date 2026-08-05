@@ -32,9 +32,8 @@ tls-cert-file ${local.base_path}/valkey.crt
 tls-key-file ${local.base_path}/valkey.key
 tls-auto-reload-interval 86400
 
-%{if member.name != local.initial_master~}
-replicaof ${local.initial_master}.${local.headless_service_fqdn} ${local.redis_port}
-%{~endif}
+%{if member.name != local.initial_master}replicaof ${local.initial_master}.${local.headless_service_fqdn} ${local.redis_port}
+%{endif~}
 replica-announce-ip ${member.name}.${local.headless_service_fqdn}
 min-replicas-to-write 1
 min-replicas-max-lag 10
@@ -68,8 +67,7 @@ sentinel down-after-milliseconds ${var.name} 5000
 sentinel failover-timeout ${var.name} 60000
 sentinel parallel-syncs ${var.name} 1
 sentinel myid ${sha1(member.name)}
-%{~for _, remote in local.members}%{if remote.name != member.name}
-sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.service_port} ${sha1(remote.name)}
+%{for _, remote in local.members}%{if remote.name != member.name}sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.service_port} ${sha1(remote.name)}
 %{endif}%{endfor~}
 EOF
   }

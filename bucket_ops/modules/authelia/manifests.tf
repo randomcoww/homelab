@@ -196,11 +196,10 @@ locals {
             "sh",
             "-c",
             <<-EOF
-            %{~for key, v in var.oidc_clients~}
-            authelia crypto hash generate \
-              --password "$${OIDC_CLIENT_SECRET_${v.client_id}}" pbkdf2 | sed -e 's/Digest: //' > "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
-            %{~endfor~}
-            EOF
+%{for key, v in var.oidc_clients}authelia crypto hash generate \
+  --password "$${OIDC_CLIENT_SECRET_${v.client_id}}" pbkdf2 | sed -e 's/Digest: //' > "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
+%{endfor~}
+EOF
           ]
           env = [
             for key, v in var.oidc_clients :
