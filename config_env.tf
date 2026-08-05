@@ -3,56 +3,80 @@ locals {
   base_mtu       = 9000
   butane_version = "1.5.0"
 
-  base_networks = {
-    # Client access
-    lan = {
-      network        = "192.168.192.0"
-      cidr           = 24
-      vlan_id        = 2048
-      table_id       = 220
-      table_priority = 32760
-      enable_netnum  = true
-      vips = {
-        gateway = 2
+  networks = {
+    for key, network in {
+      # Client access
+      lan = {
+        interface      = "phy-lan"
+        network        = "192.168.192.0"
+        cidr           = 24
+        vlan_id        = 2048
+        table_id       = 220
+        table_priority = 32760
+        enable_netnum  = true
+        vips = {
+          gateway = 2
+        }
       }
-    }
-    # BGP
-    node = {
-      network       = "192.168.200.0"
-      cidr          = 24
-      vlan_id       = 60
-      enable_netnum = true
-    }
-    # Kubernetes service external IP and LB
-    service = {
-      network       = "192.168.208.0"
-      cidr          = 24
-      vlan_id       = 80
-      enable_netnum = true
-    }
-    # Etcd peering
-    etcd = {
-      network       = "192.168.228.0"
-      cidr          = 26
-      vlan_id       = 70
-      enable_netnum = true
-    }
-    # Primary WAN
-    wan = {
-      vlan_id     = 30
-      enable_dhcp = true
-    }
-    # Cluster internal
-    kubernetes_service = {
-      network = "10.96.0.0"
-      cidr    = 12
-    }
-    kubernetes_pod = {
-      network = "10.244.0.0"
-      cidr    = 16
-    }
+      # BGP
+      node = {
+        interface     = "phy-node"
+        network       = "192.168.200.0"
+        cidr          = 24
+        vlan_id       = 60
+        enable_netnum = true
+      }
+      # Kubernetes service external IP and LB
+      service = {
+        interface     = "phy-service"
+        network       = "192.168.208.0"
+        cidr          = 24
+        vlan_id       = 80
+        enable_netnum = true
+      }
+      # Etcd peering
+      etcd = {
+        interface     = "phy-etcd"
+        network       = "192.168.228.0"
+        cidr          = 26
+        vlan_id       = 70
+        enable_netnum = true
+      }
+      # Primary WAN
+      wan = {
+        interface   = "phy-wan"
+        vlan_id     = 30
+        enable_dhcp = true
+      }
+      # Cluster internal
+      kubernetes_service = {
+        network = "10.96.0.0"
+        cidr    = 12
+      }
+      kubernetes_pod = {
+        network = "10.244.0.0"
+        cidr    = 16
+      }
+    } :
+    key => merge(network, {
+      key = key
+      }, contains(keys(network), "network") && contains(keys(network), "cidr") ? {
+      prefix = "${network.network}/${network.cidr}"
+    } : {})
   }
 
+  vips = merge([
+    for key, network in local.networks :
+    try({
+      for service, netnum in network.vips :
+      service => {
+        ip      = cidrhost(network.prefix, netnum)
+        network = local.networks[key]
+      }
+    }, {})
+  ]...)
+
+  # Host or hostNet container listen ports
   host_ports = {
     kea_peer           = 50060
     kea_metrics        = 58087
@@ -70,6 +94,7 @@ locals {
     crio_metrics       = 58091
   }
 
+  # Kube clusterIP or loadbalancer listen ports
   service_ports = {
     minio           = 9000
     coredns_metrics = 9153
@@ -244,26 +269,4 @@ locals {
       cluster_ip = cidrhost(local.networks.kubernetes_service.prefix, e.cluster_netnum)
     } : {})
   }
-
-  # finalized local vars #
-
-  networks = merge(local.base_networks, {
-    for network_name, network in local.base_networks :
-    network_name => merge(network, try({
-      name   = network_name
-      prefix = "${network.network}/${network.cidr}"
-    }, {}))
-  })
-
-  vips = merge([
-    for network_name, network in local.networks :
-    try({
-      for service, netnum in network.vips :
-      service => {
-        ip      = cidrhost(network.prefix, netnum)
-        network = local.networks[network_name]
-      }
-    }, {})
-    ]...
-  )
 }

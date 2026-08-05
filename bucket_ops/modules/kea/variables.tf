@@ -54,6 +54,7 @@ variable "ipxe_script_base_url" {
 variable "networks" {
   type = list(object({
     prefix                 = string
+    interface              = string
     routers                = optional(list(string), [])
     domain_name_servers    = optional(list(string), [])
     domain_search          = optional(list(string), [])

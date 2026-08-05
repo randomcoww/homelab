@@ -4,9 +4,14 @@ locals {
 
 resource "kubernetes_labels" "labels" {
   for_each = {
-    for host_key, host in local.members.kubernetes-worker :
-    host_key => lookup(host, "kubernetes_node_labels", {})
-    if length(lookup(host, "kubernetes_node_labels", {})) > 0
+    for _, key in keys(lookup(local.members, "kubernetes-worker", {})) :
+    key => merge(
+      contains(keys(lookup(local.members, "kubernetes-master", {})), key) ? {
+        "node-role.kubernetes.io/control-plane" = true
+      } : {},
+      contains(keys(lookup(local.members, "etcd", {})), key) ? {
+        "node-role.kubernetes.io/etcd" = true
+    } : {})
   }
   api_version = "v1"
   kind        = "Node"

@@ -60,9 +60,9 @@ resource "helm_release" "cilium" {
         }
       }
       devices = join(",", [
-        "phy-service", # direct
-        "phy-node",    # router (cp nodes)
-        "phy-wan",     # internet (gw nodes)
+        local.networks.service.interface, # direct
+        local.networks.node.interface,    # router (cp nodes)
+        local.networks.wan.interface,     # internet (gw nodes)
       ])
       kubeProxyReplacement = true
       k8sServiceHost       = local.endpoints.apiserver-lb.service_ip

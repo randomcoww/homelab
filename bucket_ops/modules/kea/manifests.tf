@@ -71,7 +71,10 @@ module "secret" {
           persist = true
         }
         interfaces-config = {
-          interfaces = ["*"]
+          interfaces = [
+            for _, network in var.networks :
+            network.interface
+          ]
         }
         control-socket = {
           socket-type = "unix"
@@ -79,8 +82,7 @@ module "secret" {
         }
         hooks-libraries = concat([
           {
-            library    = "${local.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
-            parameters = {}
+            library = "${local.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
           },
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
@@ -107,9 +109,9 @@ module "secret" {
               high-availability = [
                 {
                   this-server-name    = member.name
-                  trust-anchor        = "${local.kea_base_path}/kea-ca-cert.pem",
-                  cert-file           = "${local.kea_base_path}/kea-cert.pem",
-                  key-file            = "${local.kea_base_path}/kea-key.pem",
+                  trust-anchor        = "${local.kea_base_path}/kea-ca.crt",
+                  cert-file           = "${local.kea_base_path}/kea.crt",
+                  key-file            = "${local.kea_base_path}/kea.key",
                   mode                = "load-balancing"
                   max-unacked-clients = 0
                   peers = [
@@ -222,7 +224,7 @@ module "statefulset" {
     "secret.reloader.stakater.com/reload" = "${var.name}-tls"
   }
   spec = {
-    minReadySeconds = 30
+    minReadySeconds = 60
   }
   template_spec = {
     hostNetwork       = true
@@ -240,6 +242,7 @@ module "statefulset" {
       {
         name  = var.name
         image = "${var.images.kea.repository}:${var.images.kea.tag}"
+        # bind9-exporter is not used but can't be turned off
         args = [
           "sh",
           "-c",
@@ -254,11 +257,10 @@ module "statefulset" {
             --prometheus-kea-exporter-address=$(POD_IP) \
             --prometheus-kea-exporter-port=${var.ports.kea_metrics} \
             --prometheus-kea-exporter-per-subnet-stats=true \
-            --prometheus-bind9-exporter-address=127.0.0.1 \
-            --prometheus-bind9-exporter-port=0 &
+            --prometheus-bind9-exporter-address=127.0.0.1 &
 
           cd $(dirname $(which kea-dhcp4))
-          exec kea-dhcp4 -c ${local.kea_base_path}/kea-dhcp4.conf
+          exec kea-dhcp4 -d -c ${local.kea_base_path}/kea-dhcp4.conf
           EOF
         ]
         ports = [
@@ -298,18 +300,18 @@ module "statefulset" {
             subPathExpr = "kea-dhcp4-$(POD_NAME).tpl"
           },
           {
-            name        = "tls"
-            mountPath   = "${local.kea_base_path}/kea-cert.pem"
-            subPathExpr = "tls.crt"
-          },
-          {
-            name        = "tls"
-            mountPath   = "${local.kea_base_path}/kea-key.pem"
-            subPathExpr = "tls.key"
+            name      = "tls"
+            mountPath = "${local.kea_base_path}/kea.crt"
+            subPath   = "tls.crt"
           },
           {
             name      = "tls"
-            mountPath = "${local.kea_base_path}/kea-ca-cert.pem"
+            mountPath = "${local.kea_base_path}/kea.key"
+            subPath   = "tls.key"
+          },
+          {
+            name      = "tls"
+            mountPath = "${local.kea_base_path}/kea-ca.crt"
             subPath   = "ca.crt"
           },
           {

@@ -116,7 +116,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                   name = "hosts"
                   configBlock = join("\n", concat(compact([
                     for _, host in local.hosts :
-                    try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.fqdn}", "")
+                    try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.key}.${local.domains.kubernetes}", "")
                     ]), [
                     "fallthrough"
                   ]))

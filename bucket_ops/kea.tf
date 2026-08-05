@@ -26,7 +26,8 @@ module "kea" {
   ipxe_script_base_url = "https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ipxe-"
   networks = [
     {
-      prefix = local.networks.lan.prefix
+      prefix    = local.networks.lan.prefix
+      interface = local.networks.lan.interface
       routers = [
         local.vips.gateway.ip,
       ]

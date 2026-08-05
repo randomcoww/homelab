@@ -12,8 +12,8 @@ locals {
   current_host_image = local.host_images.default
 
   netboot_args = {
-    for host_key, host in local.hosts :
-    host_key => sort(concat([
+    for key, host in local.hosts :
+    key => sort(concat([
       "rd.neednet=1",
       "ip=dhcp",
       "ignition.firstboot",
@@ -30,14 +30,16 @@ locals {
     ], host.boot_args))
   }
   netboot_config = {
-    for mac, host_key in transpose({
-      for k, host in local.hosts :
-      k => host.match_macs
-    }) :
+    for mac, host in merge([
+      for key, host in local.hosts : {
+        for _, iface in lookup(host, "physical_interfaces", []) :
+        iface.match_mac => host if contains(keys(iface), "match_mac")
+      }
+    ]...) :
     mac => merge(local.current_host_image, {
-      host_key = host_key[0]
-      netboot_args = concat(local.netboot_args[host_key[0]], [
-        "digest=${sha256("${join(" ", concat([local.current_host_image.kernel], local.netboot_args[host_key[0]]))} ${data.ct_config.ignition[host_key[0]].rendered}")}",
+      key = host.key
+      netboot_args = concat(local.netboot_args[host.key], [
+        "digest=${sha256("${join(" ", concat([local.current_host_image.kernel], local.netboot_args[host.key]))} ${data.ct_config.ignition[host.key].rendered}")}",
       ])
     })
   }
@@ -59,7 +61,7 @@ data "ct_config" "ignition" {
 resource "minio_s3_object" "ignition" {
   for_each = {
     for mac, boot in local.netboot_config :
-    mac => data.ct_config.ignition[boot.host_key].rendered
+    mac => data.ct_config.ignition[boot.key].rendered
   }
 
   bucket_name  = "boot"
