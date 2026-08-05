@@ -15,7 +15,8 @@ locals {
     {
       name = "${var.name}-${i}"
       ip   = ip
-      role = try(element(["primary", "secondary"], i), "backup")
+      # role = try(element(["primary", "secondary"], i), "backup") # load-balancing
+      role = try(element(["primary", "standby"], i), "backup") # hot-standby
     }
   ]
 }
@@ -63,9 +64,7 @@ module "secret" {
     for i, member in local.members :
     "kea-dhcp4-${member.name}.tpl" => jsonencode({
       Dhcp4 = {
-        valid-lifetime = 7200
-        renew-timer    = 1800
-        rebind-timer   = 3600
+        valid-lifetime = 3600
         lease-database = {
           type    = "memfile"
           persist = true
@@ -108,12 +107,18 @@ module "secret" {
             parameters = {
               high-availability = [
                 {
-                  this-server-name    = member.name
-                  trust-anchor        = "${local.kea_base_path}/kea-ca.crt",
-                  cert-file           = "${local.kea_base_path}/kea.crt",
-                  key-file            = "${local.kea_base_path}/kea.key",
-                  mode                = "load-balancing"
-                  max-unacked-clients = 0
+                  this-server-name   = member.name
+                  trust-anchor       = "${local.kea_base_path}/kea-ca.crt",
+                  cert-file          = "${local.kea_base_path}/kea.crt",
+                  key-file           = "${local.kea_base_path}/kea.key",
+                  mode               = "hot-standby"
+                  heartbeat-delay    = 5000
+                  max-response-delay = 30000
+                  max-ack-delay      = 3000
+                  # Failover immediately so that rolling network reboot works while Kea instances get taken down #
+                  max-rejected-lease-updates = 1
+                  delayed-updates-limit      = 0
+                  max-unacked-clients        = 0
                   peers = [
                     for j, peer in local.members :
                     {
