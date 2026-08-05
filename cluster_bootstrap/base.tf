@@ -11,6 +11,9 @@ resource "kubernetes_labels" "labels" {
       } : {},
       contains(keys(lookup(local.members, "etcd", {})), key) ? {
         "node-role.kubernetes.io/etcd" = true
+      } : {},
+      contains(keys(lookup(local.members, "gateway", {})), key) ? {
+        "node-role.kubernetes.io/gateway" = true
     } : {})
   }
   api_version = "v1"
