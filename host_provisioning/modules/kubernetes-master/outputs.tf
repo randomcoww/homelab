@@ -125,8 +125,7 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-%{for host_key, netnum in var.bgp_neighbor_netnums~}
-protocol bgp ${replace(host_key, "-", "_")} {
+%{for host_key, netnum in var.bgp_neighbor_netnums}protocol bgp ${replace(host_key, "-", "_")} {
   debug all;
   local port ${var.ports.bgp} as ${var.bgp_as};
   neighbor ${cidrhost(var.bgp_prefix, netnum)} port ${var.ports.bgp} internal;

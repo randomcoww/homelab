@@ -26,11 +26,9 @@ locals {
   files = {
     "config.yaml" = yamlencode(var.extra_configs)
     ".env"        = <<-EOF
-%{~for k, v in local.config_envs~}
-${k}=${v}
-
-%{~endfor~}
-    EOF
+%{for k, v in local.config_envs}${k}=${v}
+%{endfor~}
+EOF
   }
 
   # mounts for both agent and webui
@@ -213,21 +211,20 @@ module "statefulset" {
           "bash",
           "-c",
           <<-EOF
-          set -xe
+set -xe
 
-          rm -f \
-            ${local.config_envs.HERMES_HOME}/config.yaml.bak-* \
-            ${local.config_envs.HERMES_HOME}/.env.bak-*
+rm -f \
+  ${local.config_envs.HERMES_HOME}/config.yaml.bak-* \
+  ${local.config_envs.HERMES_HOME}/.env.bak-*
 
-          cp -afL ${local.tmp_path}/. \
-            ${local.config_envs.HERMES_HOME}
+cp -afL ${local.tmp_path}/. \
+  ${local.config_envs.HERMES_HOME}
 
-          chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
-            %{~for f, _ in local.files~}
-            ${local.config_envs.HERMES_HOME}/${f} \
-            %{~endfor~}
-            ${local.config_envs.HERMES_HOME}
-          EOF
+chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
+%{for f, _ in local.files}  ${local.config_envs.HERMES_HOME}/${f} \
+%{endfor~}
+  ${local.config_envs.HERMES_HOME}
+EOF
         ]
         volumeMounts = concat([
           {

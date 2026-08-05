@@ -97,8 +97,7 @@ protocol kernel gateway_kernel {
     table ${var.bird_cache_table_name};
   };
 }
-%{for host_key, netnum in var.bgp_neighbor_netnums~}
-protocol bgp ${replace(host_key, "-", "_")} {
+%{for host_key, netnum in var.bgp_neighbor_netnums}protocol bgp ${replace(host_key, "-", "_")} {
   debug all;
   source address ${cidrhost(var.node_prefix, var.host_netnum)};
   local port ${var.bgp_port} as ${var.bgp_as_members};

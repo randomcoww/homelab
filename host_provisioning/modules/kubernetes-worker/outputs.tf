@@ -197,8 +197,7 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-%{for _, reg in var.internal_registries~}
-[[registry]]
+%{for _, reg in var.internal_registries}[[registry]]
 location = "${reg.location}"
 prefix = "${reg.prefix}"
 %{endfor~}
