@@ -59,16 +59,16 @@ output "ignition_snippet" {
           mode = 420
           contents = {
             inline = <<-EOF
-              [Match]
-              PermanentMACAddress=${iface.match_mac}
-              Driver=r8169
+[Match]
+PermanentMACAddress=${iface.match_mac}
+Driver=r8169
 
-              [Link]
-              Name=${iface.interface}
-              RxBufferSize=2048
-              TxBufferSize=2048
-              MTUBytes=${lookup(iface, "mtu", 1500)}
-              EOF
+[Link]
+Name=${iface.interface}
+RxBufferSize=2048
+TxBufferSize=2048
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+EOF
           }
         }
         ], [
@@ -78,13 +78,13 @@ output "ignition_snippet" {
           mode = 420
           contents = {
             inline = <<-EOF
-              [Match]
-              PermanentMACAddress=${iface.match_mac}
+[Match]
+PermanentMACAddress=${iface.match_mac}
 
-              [Link]
-              Name=${iface.interface}
-              MTUBytes=${lookup(iface, "mtu", 1500)}
-              EOF
+[Link]
+Name=${iface.interface}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+EOF
           }
         }
         ], [
@@ -129,15 +129,15 @@ output "ignition_snippet" {
           mode = 420
           contents = {
             inline = <<-EOF
-              [NetDev]
-              Name=${iface.interface}
-              Kind=vlan
-              MACAddress=${lookup(iface, "mac", "none")}
-              MTUBytes=${lookup(iface, "mtu", 1500)}
+[NetDev]
+Name=${iface.interface}
+Kind=vlan
+MACAddress=${lookup(iface, "mac", "none")}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
 
-              [VLAN]
-              Id=${iface.vlan_id}
-              EOF
+[VLAN]
+Id=${iface.vlan_id}
+EOF
           }
         }
         ], [
@@ -184,12 +184,12 @@ output "ignition_snippet" {
           mode = 420
           contents = {
             inline = <<-EOF
-              [NetDev]
-              Name=${iface.interface}
-              Kind=bridge
-              MACAddress=${lookup(iface, "mac", "none")}
-              MTUBytes=${lookup(iface, "mtu", 1500)}
-              EOF
+[NetDev]
+Name=${iface.interface}
+Kind=bridge
+MACAddress=${lookup(iface, "mac", "none")}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+EOF
           }
         }
         ], [
@@ -230,13 +230,14 @@ RequiredForOnline=${lookup(iface, "enable_netnum", false)}
 %{if contains(keys(iface), "metric")}RouteMetric=${iface.metric}%{endif~}
 UseDNS=${lookup(iface, "enable_dns", false)}
 UseNTP=false
+UseMTU=true
 UseHostname=false
 UseTimezone=false
 UseDomains=${lookup(iface, "enable_dns", false)}
 UseRoutes=${!lookup(iface, "enable_netnum", false) && lookup(iface, "enable_routes", true)}
+%{if contains(keys(iface), "table_id")}RouteTable=${iface.table_id}%{endif~}
 RoutesToDNS=false
 RoutesToNTP=false
-%{if contains(keys(iface), "table_id")}RouteTable=${iface.table_id}%{endif~}
 
 [Network]
 LinkLocalAddressing=false

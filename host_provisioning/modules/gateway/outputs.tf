@@ -154,7 +154,6 @@ EOF
               [DHCPv4]
               RequestBroadcast=true
               ClientIdentifier=mac
-              RouteTable=${var.wan_network_config.table_id}
               EOF
           }
         }
