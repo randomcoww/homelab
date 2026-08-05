@@ -15,8 +15,8 @@ module "minio" {
   timeout   = local.kubernetes.helm_release_timeout
   images = {
     minio = {
-      repository = "cgr.dev/chainguard/minio"
-      tag        = "latest@sha256:66d17146a8c0c4ab97ec8e0b0ae03390be0311644032830d67d580359bde5764" # renovate: datasource=docker depName=cgr.dev/chainguard/minio
+      repository = "docker.io/pgsty/minio"
+      tag        = "RELEASE.2026-08-04T00-00-00Z@sha256:b6bfe7239bfc83fb90d31612d9704d86039dd714f7904b3f1ad68f211e602372" # renovate: datasource=docker depName=docker.io/pgsty/minio
     }
   }
   service_port = local.service_ports.minio
