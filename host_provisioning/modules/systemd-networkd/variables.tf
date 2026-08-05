@@ -12,20 +12,20 @@ variable "host_netnum" {
 
 variable "physical_interfaces" {
   type    = any
-  default = {}
+  default = []
 }
 
 variable "vlan_interfaces" {
   type    = any
-  default = {}
+  default = []
 }
 
 variable "bridge_interfaces" {
   type    = any
-  default = {}
+  default = []
 }
 
-variable "networks" {
+variable "network_overrides" {
   type    = any
-  default = {}
+  default = []
 }

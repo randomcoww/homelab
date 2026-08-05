@@ -19,27 +19,46 @@ locals {
       ],
     }
   }
+
+  ignition_snippets = {
+    for key in keys(local.hosts) :
+    key => {
+      for component, m in {
+        base              = module.base
+        systemd-networkd  = module.systemd-networkd
+        upstream-dns      = module.upstream-dns
+        gateway           = module.gateway
+        disks             = module.disks
+        etcd              = module.etcd
+        kubernetes-master = module.kubernetes-master
+        kubernetes-worker = module.kubernetes-worker
+        server            = module.server
+      } :
+      component => m[key].ignition_snippet if contains(keys(m), key)
+    }
+  }
 }
+
+/*
+resource "local_file" "ignition-snippets" {
+  for_each = nonsensitive(merge([
+    for key, ignition_set in local.ignition_snippets : {
+      for component, ignition in ignition_set :
+      "${key}/${component}.yaml" => ignition
+    }
+  ]...))
+
+  content  = each.value
+  filename = "${path.module}/output/ignition/${each.key}"
+}
+*/
 
 # outputs
 
 output "ignition_snippets" {
   value = {
-    for host_key in keys(local.hosts) :
-    host_key => sort(compact([
-      for m in [
-        module.base,
-        module.systemd-networkd,
-        module.upstream-dns,
-        module.gateway,
-        module.disks,
-        module.etcd,
-        module.kubernetes-master,
-        module.kubernetes-worker,
-        module.server,
-      ] :
-      try(m[host_key].ignition_snippet, null)
-    ]))
+    for key, ignition_set in local.ignition_snippets :
+    key => values(ignition_set)
   }
   sensitive = true
 }

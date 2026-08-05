@@ -37,7 +37,7 @@ output "ignition_snippet" {
         # systemd-networkd defaults should be unmanaged=true
         # CNI may fail if systemd-networkd tries to manage the interface
         {
-          path = "/etc/systemd/network/91-default.network"
+          path = "/etc/systemd/network/91-unmanaged.network"
           mode = 420
           contents = {
             inline = <<-EOF
@@ -52,10 +52,10 @@ output "ignition_snippet" {
         ], [
 
         # Hardware interfaces
-        for name, iface in var.physical_interfaces :
+        for _, iface in var.physical_interfaces :
         # TODO: workaround for r8169 transmit queue timed out issue
         {
-          path = "/etc/systemd/network/09-${name}-r8169.link"
+          path = "/etc/systemd/network/09-${iface.interface}-r8169.link"
           mode = 420
           contents = {
             inline = <<-EOF
@@ -64,17 +64,17 @@ output "ignition_snippet" {
               Driver=r8169
 
               [Link]
-              MTUBytes=${lookup(iface, "mtu", 1500)}
-              Name=${name}
+              Name=${iface.interface}
               RxBufferSize=2048
               TxBufferSize=2048
+              MTUBytes=${lookup(iface, "mtu", 1500)}
               EOF
           }
         }
         ], [
-        for name, iface in var.physical_interfaces :
+        for _, iface in var.physical_interfaces :
         {
-          path = "/etc/systemd/network/10-${name}.link"
+          path = "/etc/systemd/network/10-${iface.interface}.link"
           mode = 420
           contents = {
             inline = <<-EOF
@@ -82,15 +82,15 @@ output "ignition_snippet" {
               PermanentMACAddress=${iface.match_mac}
 
               [Link]
+              Name=${iface.interface}
               MTUBytes=${lookup(iface, "mtu", 1500)}
-              Name=${name}
               EOF
           }
         }
         ], [
-        for name, iface in var.physical_interfaces :
+        for _, iface in var.physical_interfaces :
         {
-          path = "/etc/systemd/network/20-${name}.network"
+          path = "/etc/systemd/network/20-${iface.interface}.network"
           mode = 420
           contents = {
             inline = <<-EOF
@@ -111,28 +111,29 @@ output "ignition_snippet" {
         ], [
 
         # VLAN interfaces
-        for name, iface in var.vlan_interfaces :
+        for _, iface in var.vlan_interfaces :
         {
-          path = "/etc/systemd/network/20-${iface.source}.network.d/10-vlan-${name}.conf"
+          path = "/etc/systemd/network/20-${iface.source}.network.d/10-vlan-${iface.interface}.conf"
           mode = 420
           contents = {
             inline = <<-EOF
               [Network]
-              VLAN=${name}
+              VLAN=${iface.interface}
               EOF
           }
         }
         ], [
-        for name, iface in var.vlan_interfaces :
+        for _, iface in var.vlan_interfaces :
         {
-          path = "/etc/systemd/network/12-${name}.netdev"
+          path = "/etc/systemd/network/12-${iface.interface}.netdev"
           mode = 420
           contents = {
             inline = <<-EOF
               [NetDev]
-              Name=${name}
+              Name=${iface.interface}
               Kind=vlan
               MACAddress=${lookup(iface, "mac", "none")}
+              MTUBytes=${lookup(iface, "mtu", 1500)}
 
               [VLAN]
               Id=${iface.vlan_id}
@@ -140,14 +141,14 @@ output "ignition_snippet" {
           }
         }
         ], [
-        for name, iface in var.vlan_interfaces :
+        for _, iface in var.vlan_interfaces :
         {
-          path = "/etc/systemd/network/20-${name}.network"
+          path = "/etc/systemd/network/20-${iface.interface}.network"
           mode = 420
           contents = {
             inline = <<-EOF
               [Match]
-              Name=${name}
+              Name=${iface.interface}
 
               [Link]
               ARP=false
@@ -160,45 +161,46 @@ output "ignition_snippet" {
               EOF
           }
         }
-        ], flatten([
 
-          # Bridge interfaces
-          for name, iface in var.bridge_interfaces : [
+        # Bridge interfaces
+        ], flatten([
+          for _, iface in var.bridge_interfaces : [
             for _, source in iface.sources :
             {
-              path = "/etc/systemd/network/20-${source}.network.d/10-bridge-${name}.conf"
+              path = "/etc/systemd/network/20-${source}.network.d/10-bridge-${iface.interface}.conf"
               mode = 420
               contents = {
                 inline = <<-EOF
                 [Network]
-                Bridge=${name}
+                Bridge=${iface.interface}
                 EOF
               }
             }
           ]
         ]), [
-        for name, iface in var.bridge_interfaces :
+        for _, iface in var.bridge_interfaces :
         {
-          path = "/etc/systemd/network/12-${name}.netdev"
+          path = "/etc/systemd/network/12-${iface.interface}.netdev"
           mode = 420
           contents = {
             inline = <<-EOF
               [NetDev]
-              Name=${name}
+              Name=${iface.interface}
               Kind=bridge
               MACAddress=${lookup(iface, "mac", "none")}
+              MTUBytes=${lookup(iface, "mtu", 1500)}
               EOF
           }
         }
         ], [
-        for name, iface in var.bridge_interfaces :
+        for _, iface in var.bridge_interfaces :
         {
-          path = "/etc/systemd/network/20-${name}.network"
+          path = "/etc/systemd/network/20-${iface.interface}.network"
           mode = 420
           contents = {
             inline = <<-EOF
               [Match]
-              Name=${name}
+              Name=${iface.interface}
 
               [Link]
               ARP=false
@@ -211,63 +213,58 @@ output "ignition_snippet" {
               EOF
           }
         }
-        ], [
 
-        # Interface config for each network
-        for name, config in var.networks :
+        ], [
+        # Interface config override
+        for _, iface in var.network_overrides :
         {
-          path = "/etc/systemd/network/20-${config.interface}.network.d/20-${name}.conf"
+          path = "/etc/systemd/network/20-${iface.interface}.network.d/20-default-network.conf"
           mode = 420
           contents = {
             inline = <<-EOF
-              [Link]
-              ARP=true
-              RequiredForOnline=${lookup(config, "enable_netnum", false)}
-              MTUBytes=${lookup(config, "mtu", 1500)}
+[Link]
+ARP=true
+RequiredForOnline=${lookup(iface, "enable_netnum", false)}
 
-              [DHCPv4]
-              RouteMetric=${lookup(config, "metric", 1024)}
-              UseDNS=${lookup(config, "enable_dns", false)}
-              UseNTP=false
-              UseHostname=false
-              UseTimezone=false
-              UseDomains=${lookup(config, "enable_dns", false)}
-              UseRoutes=${!lookup(config, "enable_netnum", false) && lookup(config, "enable_routes", true)}
-              RoutesToDNS=false
-              RoutesToNTP=false
-              %{if contains(keys(config), "table_id")}
-              RouteTable=${config.table_id}
-              %{endif}
+[DHCPv4]
+%{if contains(keys(iface), "metric")}RouteMetric=${iface.metric}%{endif~}
+UseDNS=${lookup(iface, "enable_dns", false)}
+UseNTP=false
+UseHostname=false
+UseTimezone=false
+UseDomains=${lookup(iface, "enable_dns", false)}
+UseRoutes=${!lookup(iface, "enable_netnum", false) && lookup(iface, "enable_routes", true)}
+RoutesToDNS=false
+RoutesToNTP=false
+%{if contains(keys(iface), "table_id")}RouteTable=${iface.table_id}%{endif~}
 
-              [Network]
-              LinkLocalAddressing=false
-              DHCP=${lookup(config, "enable_dhcp", false)}
-              MulticastDNS=${lookup(config, "enable_mdns", false)}
-              ConfigureWithoutCarrier=true
-              %{if lookup(config, "enable_netnum", false)}
+[Network]
+LinkLocalAddressing=false
+DHCP=${lookup(iface, "enable_dhcp", false)}
+MulticastDNS=${lookup(iface, "enable_mdns", false)}
+ConfigureWithoutCarrier=true
+%{if contains(keys(iface), "enable_netnum") && contains(keys(iface), "prefix")~}
 
-              [Address]
-              Address=${cidrhost(config.prefix, var.host_netnum)}/${config.cidr}
-              AddPrefixRoute=false
+[Address]
+Address=${cidrhost(iface.prefix, var.host_netnum)}/${iface.prefix}
+AddPrefixRoute=false
 
-              [Route]
-              Protocol=kernel
-              Scope=link
-              PreferredSource=${cidrhost(config.prefix, var.host_netnum)}
-              Destination=${config.prefix}
-              Metric=${lookup(config, "metric", 1024)}
-              %{if contains(keys(config), "table_id")}
-              Table=${config.table_id}
+[Route]
+Protocol=kernel
+Scope=link
+PreferredSource=${cidrhost(iface.prefix, var.host_netnum)}
+Destination=${iface.prefix}
+%{if contains(keys(iface), "metric")}Metric=${iface.metric}%{endif~}
+%{if contains(keys(iface), "table_id")~}
+Table=${iface.table_id}
 
-              [RoutingPolicyRule]
-              Table=${config.table_id}
-              From=${config.prefix}
-              %{if contains(keys(config), "table_priority")}
-              Priority=${config.table_priority}
-              %{endif}
-              %{endif}
-              %{endif}
-              EOF
+[RoutingPolicyRule]
+Table=${iface.table_id}
+From=${iface.prefix}
+%{if contains(keys(iface), "table_priority")}Priority=${iface.table_priority}%{endif~}
+%{endif~}
+%{endif~}
+EOF
           }
         }
       ])

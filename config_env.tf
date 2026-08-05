@@ -1,6 +1,5 @@
 locals {
   timezone       = "America/Los_Angeles"
-  base_mtu       = 9000
   butane_version = "1.5.0"
 
   networks = {
@@ -14,6 +13,7 @@ locals {
         table_id       = 220
         table_priority = 32760
         enable_netnum  = true
+        vrrp_router_id = 13
         vips = {
           gateway = 2
         }
@@ -44,9 +44,12 @@ locals {
       }
       # Primary WAN
       wan = {
-        interface   = "phy-wan"
-        vlan_id     = 30
-        enable_dhcp = true
+        interface      = "phy-wan"
+        vlan_id        = 30
+        enable_dhcp    = true
+        table_id       = 250
+        table_priority = 32770
+        mac            = "52-54-00-63-6e-b3" # use same mac for VRRP WAN
       }
       # Cluster internal
       kubernetes_service = {
@@ -62,18 +65,22 @@ locals {
       key = key
       }, contains(keys(network), "network") && contains(keys(network), "cidr") ? {
       prefix = "${network.network}/${network.cidr}"
+      } : {}, contains(keys(network), "network") && contains(keys(network), "cidr") ? {
+      vips = {
+        for service, netnum in lookup(network, "vips", {}) :
+        service => cidrhost("${network.network}/${network.cidr}", netnum)
+      }
     } : {})
   }
 
   vips = merge([
-    for key, network in local.networks :
-    try({
-      for service, netnum in network.vips :
+    for key, network in local.networks : {
+      for service, ip in lookup(network, "vips", []) :
       service => {
-        ip      = cidrhost(network.prefix, netnum)
-        network = local.networks[key]
-      }
-    }, {})
+        ip      = ip
+        network = network
+      } if contains(keys(network), "prefix")
+    }
   ]...)
 
   # Host or hostNet container listen ports

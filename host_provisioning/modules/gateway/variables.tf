@@ -10,8 +10,12 @@ variable "host_netnum" {
   type = number
 }
 
-variable "wan_interface_names" {
-  type = list(string)
+variable "vrrp_network_config" {
+  type = any
+}
+
+variable "wan_network_config" {
+  type = any
 }
 
 variable "bird_path" {
@@ -20,6 +24,17 @@ variable "bird_path" {
 
 variable "bird_cache_table_name" {
   type = string
+}
+
+variable "bird_slave_default_route" {
+  type = object({
+    table_id       = number
+    table_priority = number
+  })
+  default = {
+    table_id       = 240
+    table_priority = 32780
+  }
 }
 
 variable "bgp_as" {
@@ -51,40 +66,6 @@ variable "service_prefix" {
   type = string
 }
 
-variable "master_default_route" {
-  type = object({
-    table_id       = number
-    table_priority = number
-  })
-  default = {
-    table_id       = 250
-    table_priority = 32770
-  }
-}
-
-variable "slave_default_route" {
-  type = object({
-    table_id       = number
-    table_priority = number
-  })
-  default = {
-    table_id       = 240
-    table_priority = 32780
-  }
-}
-
 variable "keepalived_path" {
   type = string
-}
-
-variable "keepalived_interface_name" {
-  type = string
-}
-
-variable "keepalived_vip" {
-  type = string
-}
-
-variable "keepalived_router_id" {
-  type = number
 }

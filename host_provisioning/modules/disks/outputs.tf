@@ -21,10 +21,10 @@ output "ignition_snippet" {
         }
       ]
       luks = [
-        for label, partition in local.partitions :
+        for _, partition in local.partitions :
         {
-          label       = label
-          name        = label
+          label       = partition.label
+          name        = partition.label
           device      = partition.part
           wipe_volume = partition.wipe
           discard     = true
@@ -33,16 +33,16 @@ output "ignition_snippet" {
             "--perf-no_write_workqueue",
           ]
           key_file = {
-            inline = random_password.luks-key[label].result
+            inline = random_password.luks-key[partition.label].result
           }
         }
       ]
       filesystems = [
-        for label, partition in local.partitions :
+        for _, partition in local.partitions :
         {
           # No need to mount this during ignition. Also skips long relabling step
           # path            = partition.mount_path
-          label           = label
+          label           = partition.label
           device          = partition.device
           format          = partition.format
           wipe_filesystem = partition.wipe
@@ -55,7 +55,7 @@ output "ignition_snippet" {
     }
     systemd = {
       units = flatten([
-        for name, disk in local.disks : [
+        for _, disk in local.disks : [
           for _, partition in disk.partitions :
           {
             name     = "${partition.mount_unit_name}.mount"

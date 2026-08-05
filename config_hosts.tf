@@ -7,28 +7,35 @@ locals {
           {
             match_mac = "b0-41-6f-16-a2-dc"
             # match_mac = "b0-41-6f-16-a2-dd"
-            interface = "phy0"
-            altnames  = [local.networks.lan.interface]
+            interface = local.networks.lan.interface
           },
         ]
         vlan_interfaces = [
-          merge(local.networks.node, {
-            source = "phy0"
-          }),
-          merge(local.networks.service, {
-            source = "phy0"
-          }),
-          merge(local.networks.etcd, {
-            source = "phy0"
-          }),
-          merge(local.networks.wan, {
-            source = "phy0"
-            mac    = "52-54-00-63-6e-b3"
-          }),
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.node.interface
+            vlan_id   = local.networks.node.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.service.interface
+            vlan_id   = local.networks.service.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.etcd.interface
+            vlan_id   = local.networks.etcd.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.wan.interface
+            vlan_id   = local.networks.wan.vlan_id
+            mac       = local.networks.wan.mac
+          },
         ]
         network_overrides = [
           merge(local.networks.lan, {
-            source = "phy0"
+            source = local.networks.lan.interface
           }),
           merge(local.networks.node, {
             source = local.networks.node.interface
@@ -71,28 +78,35 @@ locals {
           {
             match_mac = "b0-41-6f-16-f9-88"
             # match_mac = "b0-41-6f-16-f9-89"
-            interface = "phy0"
-            altnames  = [local.networks.lan.interface]
+            interface = local.networks.lan.interface
           },
         ]
         vlan_interfaces = [
-          merge(local.networks.node, {
-            source = "phy0"
-          }),
-          merge(local.networks.service, {
-            source = "phy0"
-          }),
-          merge(local.networks.etcd, {
-            source = "phy0"
-          }),
-          merge(local.networks.wan, {
-            source = "phy0"
-            mac    = "52-54-00-63-6e-b3"
-          }),
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.node.interface
+            vlan_id   = local.networks.node.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.service.interface
+            vlan_id   = local.networks.service.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.etcd.interface
+            vlan_id   = local.networks.etcd.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.wan.interface
+            vlan_id   = local.networks.wan.vlan_id
+            mac       = local.networks.wan.mac
+          },
         ]
         network_overrides = [
           merge(local.networks.lan, {
-            source = "phy0"
+            source = local.networks.lan.interface
           }),
           merge(local.networks.node, {
             source = local.networks.node.interface
@@ -135,24 +149,29 @@ locals {
           {
             match_mac = "b0-41-6f-16-9e-76"
             # match_mac = "b0-41-6f-16-9e-77"
-            interface = "phy0"
-            altnames  = [local.networks.lan.interface]
-          }
+            interface = local.networks.lan.interface
+          },
         ]
         vlan_interfaces = [
-          merge(local.networks.node, {
-            source = "phy0"
-          }),
-          merge(local.networks.service, {
-            source = "phy0"
-          }),
-          merge(local.networks.etcd, {
-            source = "phy0"
-          }),
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.node.interface
+            vlan_id   = local.networks.node.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.service.interface
+            vlan_id   = local.networks.service.vlan_id
+          },
+          {
+            source    = local.networks.lan.interface
+            interface = local.networks.etcd.interface
+            vlan_id   = local.networks.etcd.vlan_id
+          },
         ]
         network_overrides = [
           merge(local.networks.lan, {
-            source = "phy0"
+            source = local.networks.lan.interface
           }),
           merge(local.networks.node, {
             source = local.networks.node.interface
@@ -199,20 +218,27 @@ locals {
           },
         ]
         vlan_interfaces = [
-          merge(local.networks.node, {
-            source = "phy0"
-          }),
-          merge(local.networks.service, {
-            source = "phy0"
-          }),
-          merge(local.networks.etcd, {
-            source = "phy0"
-          }),
+          {
+            source    = "phy0"
+            interface = local.networks.node.interface
+            vlan_id   = local.networks.node.vlan_id
+          },
+          {
+            source    = "phy0"
+            interface = local.networks.service.interface
+            vlan_id   = local.networks.service.vlan_id
+          },
+          {
+            source    = "phy0"
+            interface = local.networks.etcd.interface
+            vlan_id   = local.networks.etcd.vlan_id
+          },
         ]
         bridge_interfaces = [
-          merge(local.networks.lan, {
-            sources = ["phy0"]
-          }),
+          {
+            sources   = ["phy0"]
+            interface = local.networks.lan.interface
+          },
         ]
         network_overrides = [
           merge(local.networks.lan, {
@@ -226,9 +252,6 @@ locals {
           }),
           merge(local.networks.etcd, {
             source = local.networks.etcd.interface
-          }),
-          merge(local.networks.wan, {
-            source = local.networks.wan.interface
           }),
         ]
         disks = [
@@ -259,8 +282,8 @@ locals {
     key => merge(config, {
       key = key
       networks = {
-        for _, network in lookup(config, "network_overrides", []) :
-        network.key => network
+        for _, config in lookup(config, "network_overrides", []) :
+        config.key => config
       }
     })
   }

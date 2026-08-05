@@ -4,7 +4,7 @@ module "base" {
 
   butane_version = local.butane_version
   hostname       = each.key
-  hosts_entry    = "${cidrhost(each.value.networks.service.prefix, each.value.netnum)} ${each.value.fqdn} ${each.key}"
+  hosts_entry    = "${cidrhost(each.value.networks.service.prefix, each.value.netnum)} ${each.key}.${local.domains.kubernetes} ${each.key}"
 }
 
 module "disks" {
@@ -29,10 +29,10 @@ module "systemd-networkd" {
   butane_version      = local.butane_version
   fw_mark             = local.fw_marks.accept
   host_netnum         = each.value.netnum
-  physical_interfaces = each.value.physical_interfaces
-  vlan_interfaces     = each.value.vlan_interfaces
-  bridge_interfaces   = each.value.bridge_interfaces
-  networks            = each.value.networks
+  physical_interfaces = lookup(each.value, "physical_interfaces", [])
+  vlan_interfaces     = lookup(each.value, "vlan_interfaces", [])
+  bridge_interfaces   = lookup(each.value, "bridge_interfaces", [])
+  network_overrides   = lookup(each.value, "network_overrides", [])
 }
 
 module "server" {
@@ -50,7 +50,7 @@ module "server" {
     if lookup(network, "enable_netnum", false)
     ], [
     each.key,
-    "${each.value.fqdn}",
+    "${each.key}.${local.domains.kubernetes}",
     "127.0.0.1",
   ]))
   ssh_ca = {
