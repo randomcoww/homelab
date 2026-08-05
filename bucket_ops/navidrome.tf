@@ -49,7 +49,7 @@ module "navidrome" {
     }
     litestream = {
       repository = "docker.io/litestream/litestream"
-      tag        = "0.5.15@sha256:f45ca298a567bef6edd23d43429b5f80721473a9a9719e467f11d7888999403e" # renovate: datasource=docker depName=docker.io/litestream/litestream
+      tag        = "0.5.16@sha256:f085f8bce71a5ad4ce8e28b28ea522de1d9e0d7dd0af3ea5c1bd626d0f341954" # renovate: datasource=docker depName=docker.io/litestream/litestream
     }
   }
   extra_configs = {

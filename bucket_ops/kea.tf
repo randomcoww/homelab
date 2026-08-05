@@ -9,7 +9,7 @@ module "kea" {
     }
     ipxe = {
       repository = "reg.cluster.internal/randomcoww/ipxe"
-      tag        = "v2.0.0.1785768315@sha256:b04ea7b599acd307f3dd88cf29c645205bd7f19a0b6d3352da6e18cf6d7930a2" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
+      tag        = "v2.0.0.1785878098@sha256:58b520538e8e48d677f22274ee85750fe45133a1804da776b7f69659e25d30f9" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
     }
   }
   service_ips = [
