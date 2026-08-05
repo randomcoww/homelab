@@ -98,7 +98,7 @@ output "manifests" {
           podMetricsEndpoints = [
             {
               path       = "/metrics"
-              portNumber = var.ports.kea_metrics
+              portNumber = var.ports.stork
             },
           ]
         }

@@ -27,10 +27,10 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    kea_peer    = number
-    kea_metrics = number
-    ipxe        = number
-    ipxe_tftp   = number
+    kea_peer  = number
+    stork     = number
+    ipxe      = number
+    ipxe_tftp = number
   })
 }
 
@@ -39,7 +39,7 @@ variable "affinity" {
   default = {}
 }
 
-variable "service_ips" {
+variable "peer_service_ips" {
   type = list(string)
 }
 
@@ -51,18 +51,10 @@ variable "ipxe_script_base_url" {
   type = string
 }
 
-variable "networks" {
+variable "dhcp_networks" {
   type = list(object({
-    prefix                 = string
-    interface              = string
-    routers                = optional(list(string), [])
-    domain_name_servers    = optional(list(string), [])
-    domain_search          = optional(list(string), [])
-    classless_static_route = optional(list(string), [])
-    mtu                    = number
+    config      = any
+    option_data = any
   }))
-}
-
-variable "timezone" {
-  type = string
+  default = []
 }

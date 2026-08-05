@@ -70,7 +70,7 @@ output "ignition_snippet" {
                 vmac_xmit_base
                 priority 100
                 virtual_ipaddress {
-                  ${var.vrrp_network_config.vips.gateway}/${var.vrrp_network_config.cidr}
+                  ${var.vrrp_network_config.vips.vrrp}/${var.vrrp_network_config.cidr}
                 }
                 virtual_rules {
                   to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}

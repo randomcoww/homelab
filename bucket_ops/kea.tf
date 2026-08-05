@@ -12,43 +12,40 @@ module "kea" {
       tag        = "v2.0.0.1785878098@sha256:58b520538e8e48d677f22274ee85750fe45133a1804da776b7f69659e25d30f9" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
     }
   }
-  service_ips = [
+  peer_service_ips = [
     local.endpoints.kea-primary.cluster_ip,
     local.endpoints.kea-secondary.cluster_ip,
   ]
   ports = {
-    kea_peer    = local.host_ports.kea_peer
-    kea_metrics = local.host_ports.kea_metrics
-    ipxe        = local.host_ports.ipxe
-    ipxe_tftp   = local.host_ports.ipxe_tftp
+    kea_peer  = local.host_ports.kea_peer
+    stork     = local.host_ports.kea_metrics
+    ipxe      = local.host_ports.ipxe
+    ipxe_tftp = local.host_ports.ipxe_tftp
   }
   ipxe_boot_file_name  = "ipxe.efi"
   ipxe_script_base_url = "https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ipxe-"
-  networks = [
+  dhcp_networks = [
     {
-      prefix    = local.networks.lan.prefix
-      interface = local.networks.lan.interface
-      routers = [
-        local.vips.gateway.ip,
-      ]
-      domain_name_servers = [
-        local.endpoints.k8s-gateway.service_ip,
-      ]
-      domain_search = [
-        local.domains.kubernetes,
-        local.domains.public,
-      ]
-      classless_static_route = [
-        for _, prefix in distinct([
-          for _, network in local.networks :
-          network.prefix if contains(keys(network), "prefix") # override tailscale exit node to allow local access
-        ]) :
-        "${prefix} - ${local.vips.gateway.ip}"
-      ]
-      mtu = lookup(local.networks.lan, "mtu", 1500)
+      config = local.networks.lan
+      option_data = {
+        tcode = local.timezone
+        domain-name-servers = join(",", sort([
+          local.endpoints.k8s-gateway.service_ip,
+        ]))
+        domain-search = join(",", sort([
+          local.domains.kubernetes,
+          local.domains.public,
+        ]))
+        classless-static-route = join(",", sort([
+          for _, prefix in distinct([
+            for _, network in local.networks :
+            network.prefix if contains(keys(network), "prefix") # override tailscale exit node to allow local access
+          ]) :
+          "${prefix} - ${local.networks.lan.vips.vrrp}"
+        ]))
+      }
     },
   ]
-  timezone = local.timezone
 }
 
 resource "minio_s3_object" "fluxcd-kea" {

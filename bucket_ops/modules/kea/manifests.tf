@@ -11,7 +11,7 @@ locals {
   # /var/lib/stork-agent/tokens/agent-token.txt
 
   members = [
-    for i, ip in var.service_ips :
+    for i, ip in var.peer_service_ips :
     {
       name = "${var.name}-${i}"
       ip   = ip
@@ -72,8 +72,8 @@ module "secret" {
         }
         interfaces-config = {
           interfaces = [
-            for _, network in var.networks :
-            network.interface
+            for _, network in var.dhcp_networks :
+            network.config.interface
           ]
         }
         control-socket = {
@@ -102,7 +102,7 @@ module "secret" {
               ]
             }
           },
-          ], length(var.service_ips) > 1 ? [
+          ], length(local.members) > 1 ? [
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_ha.so"
             parameters = {
@@ -165,43 +165,24 @@ module "secret" {
           },
         ]
         subnet4 = [
-          for k, network in var.networks :
+          for i, network in var.dhcp_networks :
           {
-            subnet = network.prefix
-            id     = k + 1
-            option-data = concat([
+            subnet = network.config.prefix
+            id     = i + 1
+            option-data = [
+              for name, data in merge(contains(keys(network.config.vips), "vrrp") ? {
+                routers = network.config.vips.vrrp
+                } : {}, contains(keys(network.config), "mtu") ? {
+                interface-mtu = tostring(network.config.mtu)
+              } : {}, network.option_data) :
               {
-                name = "interface-mtu"
-                data = tostring(network.mtu)
-              },
-              {
-                name = "tcode"
-                data = var.timezone
-              },
-              ], length(network.routers) > 0 ? [
-              {
-                name = "routers"
-                data = join(",", network.routers)
+                name = name
+                data = data
               }
-              ] : [], length(network.domain_name_servers) > 0 ? [
-              {
-                name = "domain-name-servers"
-                data = join(",", network.domain_name_servers)
-              }
-              ] : [], length(network.domain_search) > 0 ? [
-              {
-                name = "domain-search"
-                data = join(",", network.domain_search)
-              }
-              ] : [], length(network.classless_static_route) > 0 ? [
-              {
-                name = "classless-static-route"
-                data = join(",", network.classless_static_route)
-              }
-            ] : [])
+            ]
             pools = [
               {
-                pool = "${cidrhost(cidrsubnet(network.prefix, 1, 1), 0)} - ${cidrhost(network.prefix, -2)}"
+                pool = "${cidrhost(cidrsubnet(network.config.prefix, 1, 1), 0)} - ${cidrhost(network.config.prefix, -2)}"
               },
             ]
           }
@@ -255,7 +236,7 @@ module "statefulset" {
           stork-agent \
             --listen-prometheus-only \
             --prometheus-kea-exporter-address=$(POD_IP) \
-            --prometheus-kea-exporter-port=${var.ports.kea_metrics} \
+            --prometheus-kea-exporter-port=${var.ports.stork} \
             --prometheus-kea-exporter-per-subnet-stats=true \
             --prometheus-bind9-exporter-address=127.0.0.1 &
 
@@ -265,7 +246,7 @@ module "statefulset" {
         ]
         ports = [
           {
-            containerPort = var.ports.kea_metrics
+            containerPort = var.ports.stork
           },
         ]
         env = [

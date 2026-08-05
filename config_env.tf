@@ -15,7 +15,7 @@ locals {
         enable_netnum  = true
         vrrp_router_id = 13
         vips = {
-          gateway = 2
+          vrrp = 2
         }
       }
       # BGP
@@ -72,16 +72,6 @@ locals {
       }
     } : {})
   }
-
-  vips = merge([
-    for key, network in local.networks : {
-      for service, ip in lookup(network, "vips", []) :
-      service => {
-        ip      = ip
-        network = network
-      } if contains(keys(network), "prefix")
-    }
-  ]...)
 
   # Host or hostNet container listen ports
   host_ports = {
