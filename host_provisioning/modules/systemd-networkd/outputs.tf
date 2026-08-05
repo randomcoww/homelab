@@ -67,7 +67,8 @@ Driver=r8169
 Name=${iface.interface}
 RxBufferSize=2048
 TxBufferSize=2048
-%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}
+%{endif~}
 EOF
           }
         }
@@ -83,7 +84,8 @@ PermanentMACAddress=${iface.match_mac}
 
 [Link]
 Name=${iface.interface}
-%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}
+%{endif~}
 EOF
           }
         }
@@ -133,7 +135,8 @@ EOF
 Name=${iface.interface}
 Kind=vlan
 MACAddress=${lookup(iface, "mac", "none")}
-%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}
+%{endif~}
 
 [VLAN]
 Id=${iface.vlan_id}
@@ -188,7 +191,8 @@ EOF
 Name=${iface.interface}
 Kind=bridge
 MACAddress=${lookup(iface, "mac", "none")}
-%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}%{endif~}
+%{if contains(keys(iface), "mtu")}MTUBytes=${iface.mtu}
+%{endif~}
 EOF
           }
         }
@@ -227,7 +231,8 @@ ARP=true
 RequiredForOnline=${lookup(iface, "enable_netnum", false)}
 
 [DHCPv4]
-%{if contains(keys(iface), "metric")}RouteMetric=${iface.metric}%{endif~}
+%{if contains(keys(iface), "metric")}RouteMetric=${iface.metric}
+%{endif~}
 UseDNS=${lookup(iface, "enable_dns", false)}
 UseNTP=false
 UseMTU=true
@@ -235,9 +240,10 @@ UseHostname=false
 UseTimezone=false
 UseDomains=${lookup(iface, "enable_dns", false)}
 UseRoutes=${!lookup(iface, "enable_netnum", false) && lookup(iface, "enable_routes", true)}
-%{if contains(keys(iface), "table_id")}RouteTable=${iface.table_id}%{endif~}
 RoutesToDNS=false
 RoutesToNTP=false
+%{if contains(keys(iface), "table_id")}RouteTable=${iface.table_id}
+%{endif~}
 
 [Network]
 LinkLocalAddressing=false
@@ -247,7 +253,7 @@ ConfigureWithoutCarrier=true
 %{if contains(keys(iface), "enable_netnum") && contains(keys(iface), "prefix")~}
 
 [Address]
-Address=${cidrhost(iface.prefix, var.host_netnum)}/${iface.prefix}
+Address=${cidrhost(iface.prefix, var.host_netnum)}/${iface.cidr}
 AddPrefixRoute=false
 
 [Route]
@@ -255,14 +261,16 @@ Protocol=kernel
 Scope=link
 PreferredSource=${cidrhost(iface.prefix, var.host_netnum)}
 Destination=${iface.prefix}
-%{if contains(keys(iface), "metric")}Metric=${iface.metric}%{endif~}
+%{if contains(keys(iface), "metric")}Metric=${iface.metric}
+%{endif~}
 %{if contains(keys(iface), "table_id")~}
 Table=${iface.table_id}
 
 [RoutingPolicyRule]
 Table=${iface.table_id}
 From=${iface.prefix}
-%{if contains(keys(iface), "table_priority")}Priority=${iface.table_priority}%{endif~}
+%{if contains(keys(iface), "table_priority")}Priority=${iface.table_priority}
+%{endif~}
 %{endif~}
 %{endif~}
 EOF
