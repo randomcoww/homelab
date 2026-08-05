@@ -6,7 +6,7 @@ resource "helm_release" "local-path-provisioner" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "0.0.37"
+  version          = "0.0.38"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
