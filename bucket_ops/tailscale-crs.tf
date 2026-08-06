@@ -6,11 +6,11 @@ resource "minio_s3_object" "fluxcd-tailscale-crs" {
           apiVersion = "tailscale.com/v1alpha1"
           kind       = "Connector"
           metadata = {
-            name = "ts-${local.kubernetes.cluster_name}"
+            name = local.kubernetes.cluster_name
           }
           spec = {
             replicas       = 2
-            hostnamePrefix = "ts-${local.kubernetes.cluster_name}"
+            hostnamePrefix = local.kubernetes.cluster_name
             tags = [
               "tag:k8s-subnet-router",
             ]
