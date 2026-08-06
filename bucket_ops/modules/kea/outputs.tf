@@ -119,9 +119,9 @@ output "manifests" {
                   alert = "KeaDHCP4PoolUsageHigh"
                   expr  = <<-EOF
                   max by (subnet_id) (
-                    kea_dhcp4_pool_addresses_assigned_total{job="${var.name}"} /
-                    (kea_dhcp4_pool_addresses_total{job="${var.name}"} + 1)
-                  ) > 0.90
+                    kea_dhcp4_pool_addresses_assigned_total{job="${var.namespace}/${var.name}"} /
+                    (kea_dhcp4_pool_addresses_total{job="${var.namespace}/${var.name}"} + 1)
+                  ) > 0.80
                   EOF
                   for   = "10m"
                   labels = {

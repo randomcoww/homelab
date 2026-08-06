@@ -1,6 +1,6 @@
 locals {
-  kea_base_path            = "/etc/kea"
   prefix_path              = "/usr/local"
+  kea_base_path            = "${local.prefix_path}/etc/kea"
   kea_socket_path          = "${local.prefix_path}/var/run/kea/kea-dhcp4-ctrl.sock"
   kea_hooks_libraries_path = "${local.prefix_path}/lib/kea/hooks" # path in image
   # These paths are not configurable
@@ -85,6 +85,9 @@ module "secret" {
           },
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
+          },
+          {
+            library = "${local.kea_hooks_libraries_path}/libdhcp_host_cmds.so"
           },
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_subnet_cmds.so"
@@ -235,7 +238,7 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          chmod 750 ${dirname(local.kea_socket_path)}
+          mkdir -p ${dirname(local.kea_socket_path)}
           cat ${local.kea_base_path}/kea-dhcp4.tpl | envsubst > ${local.kea_base_path}/kea-dhcp4.conf
 
           stork-agent \
@@ -300,10 +303,6 @@ module "statefulset" {
             mountPath = "${local.kea_base_path}/kea-ca.crt"
             subPath   = "ca.crt"
           },
-          {
-            name      = "socket-path"
-            mountPath = dirname(local.kea_socket_path)
-          },
         ]
       },
       {
@@ -360,12 +359,6 @@ module "statefulset" {
       },
     ]
     volumes = [
-      {
-        name = "socket-path"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
       {
         name = "config"
         secret = {
