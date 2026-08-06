@@ -32,6 +32,12 @@ locals {
               tlsConfig = {
                 serverName         = var.service_hostname
                 insecureSkipVerify = false
+                ca = {
+                  secret = {
+                    name = module.cert-issuer-secret.name
+                    key  = "tls.crt"
+                  }
+                }
               }
             },
           ]
