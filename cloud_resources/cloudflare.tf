@@ -153,10 +153,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel.id
   config = {
     ingress = concat([
-      for _, e in local.endpoints :
+      for _, route in local.httproutes :
       {
-        hostname = e.ingress
-        service  = "https://${e.ingress}"
+        hostname = route.hostname
+        service  = "https://${route.hostname}"
         path     = "/"
         # need to remove default params from terrafrom
         origin_request = {
@@ -169,7 +169,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
           keep_alive_timeout     = 0
           keep_alive_connections = 0
         }
-      } if lookup(e, "tunnel", false)
+      } if lookup(route, "tunnel", false)
       ], [
       {
         service = "http_status:404"
@@ -180,8 +180,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
 
 resource "cloudflare_dns_record" "record" {
   for_each = {
-    for k, e in local.endpoints :
-    k => e.ingress if lookup(e, "tunnel", false)
+    for k, route in local.httproutes :
+    k => route.hostname if lookup(route, "tunnel", false)
   }
 
   zone_id = local.cloudflare_zone_id

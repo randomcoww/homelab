@@ -6,6 +6,10 @@ variable "namespace" {
   type = string
 }
 
+variable "service_domain" {
+  type = string
+}
+
 variable "release" {
   type    = string
   default = "0.1.0"
@@ -35,10 +39,6 @@ variable "service_port" {
 }
 
 variable "ca_issuer_name" {
-  type = string
-}
-
-variable "service_hostname" {
   type = string
 }
 

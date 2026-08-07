@@ -40,8 +40,8 @@ resource "minio_iam_user_policy_attachment" "stump" {
 
 module "stump" {
   source    = "./modules/stump"
-  name      = local.endpoints.stump.name
-  namespace = local.endpoints.stump.namespace
+  name      = "stump"
+  namespace = "default"
   replicas  = 1
   images = {
     stump = {
@@ -54,12 +54,12 @@ module "stump" {
     }
   }
   extra_configs = {
-    STUMP_OIDC_ISSUER_URL    = "https://${local.endpoints.authelia.ingress}"
+    STUMP_OIDC_ISSUER_URL    = "https://${local.httproutes.authelia.hostname}"
     STUMP_OIDC_CLIENT_ID     = local.authelia_oidc_clients.stump.client_id
     STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret
     STUMP_OIDC_SCOPES        = join(",", local.authelia_oidc_clients.stump.scopes)
   }
-  ingress_hostname = local.endpoints.stump.ingress
+  ingress_hostname = local.httproutes.stump.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

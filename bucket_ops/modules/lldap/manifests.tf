@@ -1,8 +1,3 @@
-
-locals {
-  domain_regex = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
-}
-
 resource "random_bytes" "jwt-secret" {
   length = 256
 }
@@ -18,7 +13,6 @@ locals {
     LLDAP_VERBOSE                  = true
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
-    LLDAP_LDAPS_OPTIONS__PORT      = var.service_port
     LLDAP_LDAPS_OPTIONS__CERT_FILE = "${local.base_path}/tls.crt"
     LLDAP_LDAPS_OPTIONS__KEY_FILE  = "${local.base_path}/tls.key"
     LLDAP_KEY_FILE                 = "${local.base_path}/private_key"
@@ -27,7 +21,7 @@ locals {
     LLDAP_HTTP_HOST                = "0.0.0.0"
     LLDAP_LDAP_HOST                = "0.0.0.0"
     LLDAP_HTTP_URL                 = "https://${var.ingress_hostname}"
-    LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", split(".", regex(local.domain_regex, var.service_hostname).domain))}"
+    LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", split(".", "${var.namespace}.svc.${var.service_domain}"))}"
     LLDAP_LDAPS_OPTIONS__ENABLED   = true
   })
 }

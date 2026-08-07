@@ -1,16 +1,16 @@
 locals {
-  redis_port     = 6379
-  base_path      = "/etc/valkey"
-  initial_master = "${var.name}-0"
+  service_hostname = "${var.name}.${var.namespace}.svc.${var.service_domain}"
+  redis_port       = 6379
+  base_path        = "/etc/valkey"
+  initial_master   = "${var.name}-0"
   members = [
     for i, _ in range(var.replicas) :
     {
       name = "${var.name}-${i}"
     }
   ]
-  domain_regex          = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
   headless_service      = "${var.name}-svc"
-  headless_service_fqdn = "${local.headless_service}.${regex(local.domain_regex, var.service_hostname).domain}"
+  headless_service_fqdn = "${local.headless_service}.${var.namespace}.svc.${var.service_domain}"
 
   valkey_configs = {
     for _, member in local.members :
@@ -373,7 +373,7 @@ module "statefulset" {
             "csi.cert-manager.io/dns-names" = join(",", [
               "$${POD_NAME}.${local.headless_service}",
               "$${POD_NAME}.${local.headless_service_fqdn}",
-              var.service_hostname,
+              local.service_hostname,
             ])
             "csi.cert-manager.io/key-algorithm" = "RSA"
             "csi.cert-manager.io/key-size"      = "4096"

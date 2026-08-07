@@ -30,10 +30,6 @@ variable "replicas" {
   default = 1
 }
 
-variable "ca_issuer_name" {
-  type = string
-}
-
 variable "config" {
   type    = any
   default = {}
@@ -48,6 +44,10 @@ variable "service_ip" {
 }
 
 variable "service_hostname" {
+  type = string
+}
+
+variable "ca_issuer_name" {
   type = string
 }
 

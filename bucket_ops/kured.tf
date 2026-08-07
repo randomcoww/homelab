@@ -54,7 +54,7 @@ resource "minio_s3_object" "fluxcd-kured" {
               # manifest #
 
               configuration = {
-                prometheusUrl = "http://${local.endpoints.victoria-metrics.service}:${local.service_ports.vmalert}"
+                prometheusUrl = "http://vmalert-${local.victoria-metrics_name}-victoria-metrics-k8s-stack.${local.victoria-metrics_namespace}:${local.victoria-metrics_alerts_port}"
                 period        = "2m"
                 forceReboot   = true
                 drainTimeout  = "6m"

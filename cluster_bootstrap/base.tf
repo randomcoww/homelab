@@ -169,8 +169,8 @@ data "http" "cert-manager-crds-yaml" {
 
 resource "helm_release" "cert-manager-crds" {
   chart            = "../helm-wrapper"
-  name             = "${local.endpoints.cert-manager.name}-crds"
-  namespace        = local.endpoints.cert-manager.namespace
+  name             = "${local.services.cert-manager.name}-crds"
+  namespace        = local.services.cert-manager.namespace
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
@@ -186,8 +186,8 @@ resource "helm_release" "cert-manager-crds" {
 }
 
 resource "helm_release" "prometheus-operator-crds" {
-  name             = "${local.endpoints.prometheus.name}-crds"
-  namespace        = local.endpoints.prometheus.namespace
+  name             = "${local.services.prometheus.name}-crds"
+  namespace        = local.services.prometheus.namespace
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus-operator-crds"
   create_namespace = true

@@ -41,8 +41,8 @@ resource "minio_iam_user_policy_attachment" "prometheus" {
 # prometheus (CRDs created in cluster_bootstrap)
 module "prometheus" {
   source    = "./modules/prometheus"
-  name      = local.endpoints.prometheus.name
-  namespace = local.endpoints.prometheus.namespace
+  name      = local.services.prometheus.name
+  namespace = local.services.prometheus.namespace
   images = {
     thanos = {
       registry   = "quay.io/thanos"
@@ -123,7 +123,7 @@ module "prometheus" {
       ]
     },
   ]
-  ingress_hostname = local.endpoints.prometheus.ingress
+  ingress_hostname = local.httproutes.prometheus.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

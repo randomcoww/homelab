@@ -51,7 +51,7 @@ module "kubernetes-master" {
   ports = {
     apiserver          = local.host_ports.apiserver
     apiserver_backend  = local.host_ports.apiserver_backend
-    controller_manager = local.host_ports.controller_manager
+    controller_manager = local.host_ports.controller-manager
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
     etcd_metrics       = local.host_ports.etcd_metrics

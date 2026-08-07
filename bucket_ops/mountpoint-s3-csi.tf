@@ -32,8 +32,8 @@ resource "minio_iam_user_policy_attachment" "mountpoint-s3-csi" {
 
 module "mountpoint-s3-csi" {
   source    = "./modules/mountpoint-s3-csi"
-  name      = local.endpoints.mountpoint-s3-csi.name
-  namespace = local.endpoints.mountpoint-s3-csi.namespace
+  name      = "s3-csi"
+  namespace = "s3-csi"
   images = {
     mountpoint-s3-csi = {
       repository = "reg.cluster.internal/randomcoww/mountpoint-s3-csi"

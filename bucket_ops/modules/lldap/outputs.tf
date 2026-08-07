@@ -58,7 +58,7 @@ output "manifests" {
           ]
           dnsNames = [
             var.name,
-            var.service_hostname,
+            "${var.name}.${var.namespace}.svc.${var.service_domain}",
           ]
           issuerRef = {
             name = var.ca_issuer_name

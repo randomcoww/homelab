@@ -40,8 +40,8 @@ resource "minio_iam_user_policy_attachment" "navidrome" {
 
 module "navidrome" {
   source    = "./modules/navidrome"
-  name      = local.endpoints.navidrome.name
-  namespace = local.endpoints.navidrome.namespace
+  name      = "navidrome"
+  namespace = "default"
   images = {
     navidrome = {
       repository = "ghcr.io/navidrome/navidrome"
@@ -59,14 +59,14 @@ module "navidrome" {
     ])
     TZ = local.timezone
   }
-  ingress_hostname = local.endpoints.navidrome.ingress
+  ingress_hostname = local.httproutes.navidrome.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
   auth_backend_ref = {
-    name      = local.endpoints.authelia.name
-    namespace = local.endpoints.authelia.namespace
+    name      = local.authelia_name
+    namespace = local.authelia_namespace
     port      = 80
   }
   minio_endpoint    = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"

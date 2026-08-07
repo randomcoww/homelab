@@ -105,10 +105,10 @@ module "hostapd" {
   }
 }
 
-module "qrcode-hostapd" {
+module "hostapd-qrcode" {
   source    = "./modules/qrcode"
-  name      = local.endpoints.qrcode-hostapd.name
-  namespace = local.endpoints.qrcode-hostapd.namespace
+  name      = "hostapd-qrcode"
+  namespace = "default"
   replicas  = 2
   images = {
     qrcode = {
@@ -117,21 +117,21 @@ module "qrcode-hostapd" {
     }
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
-  ingress_hostname = local.endpoints.qrcode-hostapd.ingress
+  ingress_hostname = local.httproutes.hostapd-qrcode.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
   auth_backend_ref = {
-    name      = local.endpoints.authelia.name
-    namespace = local.endpoints.authelia.namespace
+    name      = local.authelia_name
+    namespace = local.authelia_namespace
     port      = 80
   }
 }
 
 resource "minio_s3_object" "fluxcd-hostapd" {
   for_each = {
-    "manifest.yaml" = join("\n---\n", distinct(concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)))
+    "manifest.yaml" = join("\n---\n", distinct(concat(module.hostapd.manifests, module.hostapd-qrcode.manifests)))
     "kustomization.yaml" = yamlencode({
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"

@@ -1,4 +1,8 @@
 locals {
+  authelia_name        = "authelia"
+  authelia_namespace   = "auth"
+  authelia-valkey_port = 26379
+
   # OIDC clients
   authelia_oidc_clients_base = {
     stump = {
@@ -11,7 +15,7 @@ locals {
       require_pkce          = false
       pkce_challenge_method = ""
       redirect_uris = [
-        "https://${local.endpoints.stump.ingress}/api/v2/auth/oidc/callback",
+        "https://${local.httproutes.stump.hostname}/api/v2/auth/oidc/callback",
       ]
       claims_policy = "stump_policy" # defined and used under oidc_claims_policies
       consent_mode  = "implicit"
@@ -26,7 +30,7 @@ locals {
       require_pkce          = false
       pkce_challenge_method = ""
       redirect_uris = [
-        "https://${local.endpoints.hermes-agent.ingress}/auth/callback",
+        "https://${local.httproutes.hermes-agent.hostname}/auth/callback",
       ]
       consent_mode = "implicit"
     }
@@ -57,24 +61,24 @@ resource "random_password" "authelia-oidc-client-secret" {
 }
 
 module "authelia-valkey" {
-  source    = "./modules/valkey"
-  name      = local.endpoints.authelia-valkey.name
-  namespace = local.endpoints.authelia-valkey.namespace
+  source         = "./modules/valkey"
+  name           = "${local.authelia_name}-valkey"
+  namespace      = local.authelia_namespace
+  service_domain = local.domains.kubernetes # needs fqdn
   images = {
     valkey = {
       repository = "ghcr.io/valkey-io/valkey"
       tag        = "9.1-alpine@sha256:ee91f7a174ac4d6a6b0685b3a60e321f0a9dbbb691f9b0e285be2ba1d1be8328" # renovate: datasource=docker depName=ghcr.io/valkey-io/valkey
     }
   }
-  service_port     = local.service_ports.redis_sentinel
-  service_hostname = local.endpoints.authelia-valkey.service_fqdn
-  ca_issuer_name   = local.cert_issuers.ca_internal
+  service_port   = local.authelia-valkey_port
+  ca_issuer_name = local.cert_issuers.ca_internal
 }
 
 module "authelia" {
   source    = "./modules/authelia"
-  name      = local.endpoints.authelia.name
-  namespace = local.endpoints.authelia.namespace
+  name      = local.authelia_name
+  namespace = local.authelia_namespace
   images = {
     authelia = {
       registry   = "ghcr.io/authelia"
@@ -83,11 +87,11 @@ module "authelia" {
     }
   }
   ca_issuer_name = local.cert_issuers.ca_internal
-  ldap_endpoint  = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
+  ldap_endpoint  = "${local.lldap_name}.${local.lldap_namespace}.svc.${local.domains.kubernetes}:${local.lldap_port}" # needs fqdn
   redis_sentinel_endpoint = {
-    host        = local.endpoints.authelia-valkey.service_fqdn
-    port        = local.service_ports.redis_sentinel
-    master_name = local.endpoints.authelia-valkey.name
+    host        = "${local.authelia_name}-valkey.${local.authelia_namespace}.svc.${local.domains.kubernetes}" # needs fqdn
+    port        = local.authelia-valkey_port
+    master_name = "${local.authelia_name}-valkey"
   }
   smtp = {
     host     = var.smtp_host
@@ -109,7 +113,7 @@ module "authelia" {
     }
   }
 
-  ingress_hostname = local.endpoints.authelia.ingress
+  ingress_hostname = local.httproutes.authelia.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

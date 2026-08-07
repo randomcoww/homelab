@@ -1,3 +1,9 @@
+locals {
+  victoria-metrics_name        = "vm"
+  victoria-metrics_namespace   = "monitoring"
+  victoria-metrics_alerts_port = 8080
+}
+
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
@@ -6,8 +12,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = local.endpoints.victoria-metrics.name
-            namespace = local.endpoints.victoria-metrics.namespace
+            name      = local.victoria-metrics_name
+            namespace = local.victoria-metrics_namespace
           }
           spec = {
             interval = "15m"
@@ -18,8 +24,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.endpoints.victoria-metrics.name
-            namespace = local.endpoints.victoria-metrics.namespace
+            name      = local.victoria-metrics_name
+            namespace = local.victoria-metrics_namespace
           }
           spec = {
             interval = "15m"
@@ -30,12 +36,12 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 version = "0.90.0" # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = local.endpoints.victoria-metrics.name
+                  name = local.victoria-metrics_name
                 }
                 interval = "5m"
               }
             }
-            releaseName = local.endpoints.victoria-metrics.name
+            releaseName = local.victoria-metrics_name
             install = {
               createNamespace = true
               remediation = {
@@ -107,7 +113,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   select = {
                     enabled = true
                     hostnames = [
-                      local.endpoints.victoria-metrics.ingress,
+                      local.httproutes.victoria-metrics.hostname,
                     ]
                     parentRefs = [
                       {
@@ -125,7 +131,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vmalert = {
                 enabled = true
                 spec = {
-                  port = tostring(local.service_ports.vmalert)
+                  port = tostring(local.victoria-metrics_alerts_port)
                   extraArgs = {
                     "notifier.blackhole" = "true"
                   }

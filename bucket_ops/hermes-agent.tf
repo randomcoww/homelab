@@ -45,8 +45,8 @@ resource "random_password" "hermes-agent-auth-token" {
 
 module "hermes-agent" {
   source    = "./modules/hermes-agent"
-  name      = local.endpoints.hermes-agent.name
-  namespace = local.endpoints.hermes-agent.namespace
+  name      = "hermes-agent"
+  namespace = "default"
   images = {
     hermes-agent = {
       repository = "reg.cluster.internal/randomcoww/hermes-mnemosyne"
@@ -159,7 +159,7 @@ module "hermes-agent" {
     CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
     HERMES_TIMEZONE                     = local.timezone
     GITHUB_TOKEN                        = var.github_token
-    API_SERVER_MODEL_NAME               = local.endpoints.hermes-agent.name
+    API_SERVER_MODEL_NAME               = "hermes-agent"
     API_SERVER_KEY                      = random_password.hermes-agent-auth-token.result
     SLACK_BOT_TOKEN                     = var.slack_bot_token
     SLACK_APP_TOKEN                     = var.slack_app_token
@@ -169,8 +169,8 @@ module "hermes-agent" {
     AUXILIARY_VISION_PROVIDER           = "auto"
     HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
-    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.ingress}"
-    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.ingress}"
+    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
+    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.httproutes.hermes-agent.hostname}"
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
     GROQ_BASE_URL  = "http://${local.llama-cpp_name}.${local.llama-cpp_namespace}:${local.llama-cpp_port}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
@@ -183,7 +183,7 @@ module "hermes-agent" {
     "TZ" = local.timezone
   }
   ca_issuer_name   = local.cert_issuers.ca_internal
-  ingress_hostname = local.endpoints.hermes-agent.ingress
+  ingress_hostname = local.httproutes.hermes-agent.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
@@ -219,7 +219,7 @@ resource "minio_s3_object" "fluxcd-hermes-agent" {
 
 output "hermes-agent" {
   value = {
-    base_url = "https://${local.endpoints.hermes-agent.ingress}/v1"
+    base_url = "https://${local.httproutes.hermes-agent.hostname}/v1"
     api_key  = random_password.hermes-agent-auth-token.result
   }
   sensitive = true

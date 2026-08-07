@@ -38,8 +38,8 @@ resource "minio_iam_user_policy_attachment" "registry" {
 
 module "registry" {
   source    = "./modules/registry"
-  name      = local.endpoints.registry.name
-  namespace = local.endpoints.registry.namespace
+  name      = "registry"
+  namespace = "registry"
   replicas  = 2
   images = {
     registry = {
@@ -47,14 +47,14 @@ module "registry" {
       tag        = "3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8" # renovate: datasource=docker depName=ghcr.io/distribution/distribution
     }
   }
-  ca_issuer_name      = local.cert_issuers.ca_internal
   minio_endpoint      = "${local.networks.service.vips.minio}:${local.service_ports.minio}" # needs to be reachable and resolvable from host
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_user          = minio_iam_user.registry
   service_port        = local.service_ports.registry
-  service_hostname    = local.endpoints.registry.service
   service_ip          = local.networks.service.vips.registry
+  service_hostname    = local.httproutes.registry.hostname
+  ca_issuer_name      = local.cert_issuers.ca_internal
 }
 
 resource "minio_s3_object" "fluxcd-registry" {

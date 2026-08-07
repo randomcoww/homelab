@@ -68,7 +68,7 @@ locals {
 module "cert-manager-issuer-acme-prod-secret" {
   source    = "../modules/secret"
   name      = local.cert_issuers.acme_prod
-  namespace = local.endpoints.cert-manager.namespace
+  namespace = local.services.cert-manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
   data = merge({
@@ -80,7 +80,7 @@ module "cert-manager-issuer-acme-prod-secret" {
 module "cert-manager-issuer-ca-internal-secret" {
   source    = "../modules/secret"
   name      = local.cert_issuers.ca_internal
-  namespace = local.endpoints.cert-manager.namespace
+  namespace = local.services.cert-manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
   data = merge({

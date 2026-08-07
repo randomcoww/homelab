@@ -13,8 +13,8 @@ module "kea" {
     }
   }
   peer_service_ips = [
-    local.networks.kubernetes_service.vips.kea-primary,
-    local.networks.kubernetes_service.vips.kea-secondary,
+    local.networks.kubernetes_service.vips.kea_primary,
+    local.networks.kubernetes_service.vips.kea_secondary,
   ]
   ports = {
     kea_peer  = local.host_ports.kea_peer
