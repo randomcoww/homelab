@@ -150,12 +150,26 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     },
                   ]
                 }
+                rbac = {
+                  namespaced = false
+                  rules = [
+                    {
+                      nonResourceURLs = ["/metrics", "/metrics/resources", "/metrics/slis"]
+                      verbs           = ["get"]
+                    },
+                  ]
+                }
               }
               grafana = {
                 enabled = false
               }
               kubeControllerManager = {
-                enabled = false
+                enabled = true
+                service = {
+                  enabled    = true
+                  port       = local.host_ports.controller-manager
+                  targetPort = local.host_ports.controller-manager
+                }
               }
               coreDns = {
                 enabled = true
@@ -174,28 +188,25 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   enabled    = true
                   port       = local.host_ports.etcd_metrics
                   targetPort = local.host_ports.etcd_metrics
-                  selector = {
-                    component = null
-                    k8s-app   = local.services.etcd.name
-                  }
                 }
                 vmScrape = {
                   spec = {
-                    jobLabel = "app.kubernetes.io/component"
-                    namespaceSelector = {
-                      matchNames = []
-                    }
                     endpoints = [
                       {
                         port   = "http-metrics"
-                        scheme = "http"
+                        scheme = "http" # hit insecure dedicated metrics port
                       },
                     ]
                   }
                 }
               }
               kubeScheduler = {
-                enabled = false
+                enabled = true
+                service = {
+                  enabled    = true
+                  port       = local.host_ports.scheduler
+                  targetPort = local.host_ports.scheduler
+                }
               }
               kubeProxy = {
                 enabled = false # using cilium to replace kubeProxy
@@ -220,17 +231,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               defaultRules = {
                 enabled = true
                 groups = {
-                  kubernetes-system-controller-manager = {
-                    enabled = false
-                  }
-                  kubernetes-system-scheduler = {
-                    enabled = false
-                  }
                   kube-state-metrics = {
                     enabled = false # requires kube-state-metrics selfMonitor
-                  }
-                  "kube-scheduler.rules" = {
-                    enabled = false
                   }
                   "kube-prometheus-general.rules" = {
                     enabled = false # fails with count:up0 getting no data
