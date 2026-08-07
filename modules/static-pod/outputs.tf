@@ -6,9 +6,9 @@ output "manifest" {
       name        = var.name
       namespace   = var.namespace
       annotations = var.annotations
-      labels = {
-        k8s-app = var.name
-      }
+      labels = merge({
+        component = var.name
+      }, var.labels)
     }
     spec = merge({
       priority          = 2000001000

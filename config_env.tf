@@ -126,7 +126,7 @@ locals {
 
   services = {
     apiserver = {
-      name      = "kube-apiserver"
+      name      = "apiserver"
       namespace = "kube-system"
     }
     etcd = {
@@ -196,8 +196,8 @@ locals {
     ipxe               = 58090
     apiserver          = 58181
     apiserver_backend  = 58081 # apiserver behind haproxy
-    controller-manager = 50252
-    scheduler          = 50251
+    controller-manager = 10257
+    scheduler          = 10259
     kubelet            = 10250
     etcd_client        = 58082
     etcd_peer          = 58083

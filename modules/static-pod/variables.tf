@@ -16,3 +16,8 @@ variable "spec" {
   type    = any
   default = {}
 }
+
+variable "labels" {
+  type    = any
+  default = {}
+}
