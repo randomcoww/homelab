@@ -34,10 +34,6 @@ variable "ca_issuer_name" {
   type = string
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "service_port" {
   type = number
 }

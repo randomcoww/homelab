@@ -79,7 +79,7 @@ module "hermes-agent" {
     }
     mcp_servers = {
       kubernetes = {
-        url = "https://${local.endpoints.kubernetes-mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
+        url = "https://${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}:${local.kubernetes-mcp_port}/mcp"
         client_cert = [
           "$${INTERNAL_CLIENT_CERT_PATH}",
           "$${INTERNAL_CLIENT_KEY_PATH}",
@@ -152,10 +152,10 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL                     = "https://${local.endpoints.llama-cpp.ingress}/v1"
+    OPENAI_BASE_URL                     = "http://${local.llama-cpp_name}.${local.llama-cpp_namespace}:${local.llama-cpp_port}/v1"
     OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
-    SEARXNG_URL                         = "https://${local.endpoints.searxng.ingress}"
-    CAMOFOX_URL                         = "https://${local.endpoints.camofox-browser.ingress}"
+    SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
+    CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
     CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
     HERMES_TIMEZONE                     = local.timezone
     GITHUB_TOKEN                        = var.github_token
@@ -172,7 +172,7 @@ module "hermes-agent" {
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.ingress}"
     HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.ingress}"
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "https://${local.endpoints.llama-cpp.ingress}/v1"
+    GROQ_BASE_URL  = "http://${local.llama-cpp_name}.${local.llama-cpp_namespace}:${local.llama-cpp_port}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
     GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
     # custom vars #

@@ -1,6 +1,5 @@
 locals {
   extra_envs = merge(var.extra_configs, {
-    CAMOFOX_PORT                       = 9377
     MAX_OLD_SPACE_SIZE                 = 2048
     MOZ_DISABLE_CONTENT_SANDBOX        = 1
     MOZ_DISABLE_SOCKET_PROCESS_SANDBOX = 1
@@ -37,42 +36,6 @@ module "service" {
         port       = local.extra_envs.CAMOFOX_PORT
         protocol   = "TCP"
         targetPort = local.extra_envs.CAMOFOX_PORT
-      },
-    ]
-  }
-}
-
-module "httproute" {
-  source    = "../../../modules/httproute"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  spec = {
-    parentRefs = [
-      merge({
-        kind = "Gateway"
-      }, var.gateway_ref),
-    ]
-    hostnames = [
-      var.ingress_hostname,
-    ]
-    rules = [
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/"
-            }
-          },
-        ]
-        backendRefs = [
-          {
-            name = module.service.name
-            port = local.extra_envs.CAMOFOX_PORT
-          },
-        ]
       },
     ]
   }

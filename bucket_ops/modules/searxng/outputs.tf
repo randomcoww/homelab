@@ -3,7 +3,6 @@ output "manifests" {
     module.deployment.manifest,
     module.secret.manifest,
     module.service.manifest,
-    module.httproute.manifest,
     ], [
     for _, m in [
       {

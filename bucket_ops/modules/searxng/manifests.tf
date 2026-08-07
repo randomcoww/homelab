@@ -6,7 +6,6 @@ locals {
     SEARXNG_PUBLIC_INSTANCE = false
     SEARXNG_IMAGE_PROXY     = false
     SEARXNG_BIND_ADDRESS    = "0.0.0.0"
-    SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
   })
 }
@@ -44,42 +43,6 @@ module "service" {
         port       = local.extra_envs.SEARXNG_PORT
         protocol   = "TCP"
         targetPort = local.extra_envs.SEARXNG_PORT
-      },
-    ]
-  }
-}
-
-module "httproute" {
-  source    = "../../../modules/httproute"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  spec = {
-    parentRefs = [
-      merge({
-        kind = "Gateway"
-      }, var.gateway_ref),
-    ]
-    hostnames = [
-      var.ingress_hostname,
-    ]
-    rules = [
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/"
-            }
-          },
-        ]
-        backendRefs = [
-          {
-            name = module.service.name
-            port = local.extra_envs.SEARXNG_PORT
-          },
-        ]
       },
     ]
   }

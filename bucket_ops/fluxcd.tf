@@ -1,10 +1,15 @@
+locals {
+  fluxcd_name      = "fluxcd"
+  fluxcd_namespace = "flux-system"
+}
+
 resource "minio_iam_user" "fluxcd" {
-  name          = "fluxcd"
+  name          = local.fluxcd_name
   force_destroy = true
 }
 
 resource "minio_iam_policy" "fluxcd" {
-  name = "fluxcd"
+  name = local.fluxcd_name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -30,9 +35,9 @@ resource "minio_iam_user_policy_attachment" "fluxcd" {
 
 module "minio-user-secret-fluxcd" {
   source    = "../modules/secret"
-  name      = "${local.endpoints.fluxcd.name}-minio-user-secret"
-  namespace = local.endpoints.fluxcd.namespace
-  app       = local.endpoints.fluxcd.name
+  name      = "${local.fluxcd_name}-minio-user-secret"
+  namespace = local.fluxcd_namespace
+  app       = local.fluxcd_name
   release   = "0.1.0"
   data = merge({
     accesskey = minio_iam_user.fluxcd.id
@@ -41,8 +46,8 @@ module "minio-user-secret-fluxcd" {
 }
 
 resource "helm_release" "fluxcd" {
-  name             = local.endpoints.fluxcd.name
-  namespace        = local.endpoints.fluxcd.namespace
+  name             = local.fluxcd_name
+  namespace        = local.fluxcd_namespace
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2"
   create_namespace = true
@@ -69,8 +74,8 @@ resource "helm_release" "fluxcd" {
 
 resource "helm_release" "fluxcd-bucket" {
   chart            = "../helm-wrapper"
-  name             = "${local.endpoints.fluxcd.name}-bucket"
-  namespace        = local.endpoints.fluxcd.namespace
+  name             = "${local.fluxcd_name}-bucket"
+  namespace        = local.fluxcd_namespace
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
@@ -87,7 +92,7 @@ resource "helm_release" "fluxcd-bucket" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "Bucket"
           metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket"
+            name = "${local.fluxcd_name}-bucket"
           }
           spec = {
             interval = "10s"
@@ -147,7 +152,7 @@ resource "helm_release" "fluxcd-bucket" {
             interval = "1m"
             sourceRef = {
               kind = "Bucket"
-              name = "${local.endpoints.fluxcd.name}-bucket"
+              name = "${local.fluxcd_name}-bucket"
             }
             dependsOn = [
               for _, dep in dependencies :

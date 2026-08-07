@@ -1,3 +1,9 @@
+locals {
+  camofox-browser_name      = "camofox"
+  camofox-browser_namespace = "default"
+  camofox-browser_port      = 9377
+}
+
 resource "random_password" "camofox-browser-auth-token" {
   length           = 32
   override_special = "-_"
@@ -5,8 +11,8 @@ resource "random_password" "camofox-browser-auth-token" {
 
 module "camofox-browser" {
   source    = "./modules/camofox-browser"
-  name      = local.endpoints.camofox-browser.name
-  namespace = local.endpoints.camofox-browser.namespace
+  name      = local.camofox-browser_name
+  namespace = local.camofox-browser_namespace
   images = {
     camofox-browser = {
       repository = "ghcr.io/jo-inc/camofox-browser"
@@ -19,11 +25,7 @@ module "camofox-browser" {
     PROXY_USERNAME     = var.scrape_proxy_username
     PROXY_PASSWORD     = var.scrape_proxy_password
     CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
-  }
-  ingress_hostname = local.endpoints.camofox-browser.ingress
-  gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    CAMOFOX_PORT       = local.camofox-browser_port
   }
 }
 

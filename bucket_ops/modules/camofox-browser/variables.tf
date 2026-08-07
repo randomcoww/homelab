@@ -34,11 +34,3 @@ variable "extra_configs" {
   type    = map(any)
   default = {}
 }
-
-variable "ingress_hostname" {
-  type = string
-}
-
-variable "gateway_ref" {
-  type = any
-}

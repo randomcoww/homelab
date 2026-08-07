@@ -80,10 +80,10 @@ locals {
     ipxe_tftp          = 69 # not configurable
     ipxe               = 58090
     apiserver          = 58181
-    apiserver_backend  = 58081
+    apiserver_backend  = 58081 # apiserver behind haproxy
     controller_manager = 50252
     scheduler          = 50251
-    kubelet            = 10250 # prometheus operator assumes this port and is not configurable
+    kubelet            = 10250
     etcd_client        = 58082
     etcd_peer          = 58083
     etcd_metrics       = 58086
@@ -98,7 +98,6 @@ locals {
     registry        = 443 # not configurable
     ldaps           = 6360
     redis_sentinel  = 26379
-    kubernetes_mcp  = 8080
     vmalert         = 8080
   }
 
@@ -180,10 +179,6 @@ locals {
         namespace      = "minio"
         service_netnum = 34
       }
-      fluxcd = {
-        name      = "fluxcd"
-        namespace = "flux-system"
-      }
       cert-manager = {
         name      = "cert-manager"
         namespace = "cert-manager"
@@ -233,18 +228,9 @@ locals {
       }
 
       ## client services
-      kubernetes-mcp = {
-        name = "kubernetes-mcp"
-      }
-      searxng = {
-        name = "searxng"
-      }
       qrcode-hostapd = {
         name    = "qrcode-hostapd"
         ingress = "hostapd.${local.domains.public}"
-      }
-      llama-cpp = {
-        name = "llama-cpp"
       }
       navidrome = {
         name   = "navidrome"
@@ -253,9 +239,6 @@ locals {
       stump = {
         name   = "stump"
         tunnel = true
-      }
-      camofox-browser = {
-        name = "camofox"
       }
       hermes-agent = {
         name = "hermes-agent"
