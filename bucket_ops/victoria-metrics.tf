@@ -149,6 +149,41 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       regex  = "(feature_node_kubernetes_io_.*|beta_amd_com_.*|amd_com_.*|nvidia_com_.*)" # drop excessive labels from NFD
                     },
                   ]
+                  # https://docs.victoriametrics.com/operator/api/#vmagentspec-inlinescrapeconfig
+                  inlineScrapeConfig = yamlencode([
+                    {
+                      job_name = "cri-o"
+                      scheme   = "https"
+                      tls_config = {
+                        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+                      }
+                      bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+                      kubernetes_sd_configs = [
+                        {
+                          role = "node"
+                        },
+                      ]
+                      relabel_configs = [
+                        {
+                          source_labels = ["__meta_kubernetes_node_address_InternalIP"]
+                          regex         = "(.+)"
+                          target_label  = "__address__"
+                          replacement   = "$1:${local.host_ports.crio_metrics}"
+                        },
+                        {
+                          source_labels = ["__meta_kubernetes_node_address_InternalIP"]
+                          regex         = "(.+)"
+                          target_label  = "instance"
+                          replacement   = "$1:${local.host_ports.crio_metrics}"
+                        },
+                        {
+                          source_labels = ["__meta_kubernetes_node_address_Hostname"]
+                          action        = "replace"
+                          target_label  = "node"
+                        },
+                      ]
+                    },
+                  ])
                 }
                 rbac = {
                   namespaced = false
