@@ -4,8 +4,8 @@ module "etcd" {
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
-  name           = local.endpoints.etcd.name
-  namespace      = local.endpoints.etcd.namespace
+  name           = local.services.etcd.name
+  namespace      = local.services.etcd.namespace
   host_key       = each.key
   cluster_token  = local.kubernetes.cluster_name
   ca = {

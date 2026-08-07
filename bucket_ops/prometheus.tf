@@ -81,7 +81,7 @@ module "prometheus" {
         port       = local.host_ports.etcd_metrics
         targetPort = local.host_ports.etcd_metrics
         selector = {
-          k8s-app = local.endpoints.etcd.name
+          k8s-app = local.services.etcd.name
         }
       }
     }
@@ -125,10 +125,10 @@ module "prometheus" {
   ]
   ingress_hostname = local.endpoints.prometheus.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
-  minio_endpoint = "${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_endpoint = "${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_bucket   = "prometheus"
   minio_user     = minio_iam_user.prometheus
 }

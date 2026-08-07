@@ -185,10 +185,10 @@ module "hermes-agent" {
   ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes-agent.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
-  minio_endpoint = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_endpoint = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_bucket   = "hermes-agent"
   minio_user     = minio_iam_user.hermes-agent
 }

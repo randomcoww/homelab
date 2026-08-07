@@ -34,8 +34,8 @@ module "lldap" {
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
 }
 

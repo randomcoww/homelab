@@ -61,15 +61,15 @@ module "navidrome" {
   }
   ingress_hostname = local.endpoints.navidrome.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
   auth_backend_ref = {
     name      = local.endpoints.authelia.name
     namespace = local.endpoints.authelia.namespace
     port      = 80
   }
-  minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_endpoint    = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_data_bucket = "music"
   minio_bucket      = "navidrome"
   minio_user        = minio_iam_user.navidrome

@@ -61,10 +61,10 @@ module "stump" {
   }
   ingress_hostname = local.endpoints.stump.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
-  minio_endpoint    = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_endpoint    = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_data_bucket = "ebooks"
   minio_bucket      = "stump"
   minio_user        = minio_iam_user.stump

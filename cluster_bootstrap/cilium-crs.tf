@@ -26,8 +26,8 @@ module "apiserver-lb-service" {
 
 resource "helm_release" "cilium-crs" {
   chart            = "../helm-wrapper"
-  name             = "${local.endpoints.cilium.name}-crs"
-  namespace        = local.endpoints.cilium.namespace
+  name             = "${local.services.cilium.name}-crs"
+  namespace        = local.services.cilium.namespace
   create_namespace = true
   wait             = true
   wait_for_jobs    = false

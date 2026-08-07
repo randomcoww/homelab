@@ -30,7 +30,7 @@ locals {
               port   = "https"
               scheme = "https"
               tlsConfig = {
-                serverName         = var.service_hostname
+                serverName         = "${var.name}.${var.namespace}"
                 insecureSkipVerify = false
                 ca = {
                   secret = {
@@ -556,7 +556,7 @@ module "statefulset" {
             "csi.cert-manager.io/issuer-kind" = "Issuer"
             "csi.cert-manager.io/dns-names" = join(",", [
               "$${POD_NAME}.${local.headless_service}.${var.namespace}",
-              var.service_hostname,
+              "${var.name}.${var.namespace}",
             ])
             "csi.cert-manager.io/ip-sans" = join(",", [
               var.service_ip,

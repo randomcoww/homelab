@@ -111,8 +111,8 @@ module "authelia" {
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
 
   reference_grant_namespaces = [

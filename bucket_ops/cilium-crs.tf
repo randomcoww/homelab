@@ -23,8 +23,8 @@ resource "minio_s3_object" "fluxcd-cilium-crs" {
           apiVersion = "gateway.networking.k8s.io/v1"
           kind       = "Gateway"
           metadata = {
-            name      = local.endpoints.cilium.name
-            namespace = local.endpoints.cilium.namespace
+            name      = local.services.cilium.name
+            namespace = local.services.cilium.namespace
             annotations = {
               "cert-manager.io/cluster-issuer" = local.cert_issuers.acme_prod
             }

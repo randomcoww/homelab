@@ -119,8 +119,8 @@ module "qrcode-hostapd" {
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
   ingress_hostname = local.endpoints.qrcode-hostapd.ingress
   gateway_ref = {
-    name      = local.endpoints.cilium.name
-    namespace = local.endpoints.cilium.namespace
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
   auth_backend_ref = {
     name      = local.endpoints.authelia.name

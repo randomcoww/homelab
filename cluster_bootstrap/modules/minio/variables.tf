@@ -53,10 +53,6 @@ variable "service_port" {
   type = number
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "service_ip" {
   type = string
 }

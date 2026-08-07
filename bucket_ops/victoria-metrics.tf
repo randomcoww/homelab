@@ -111,8 +111,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     ]
                     parentRefs = [
                       {
-                        name      = local.endpoints.cilium.name
-                        namespace = local.endpoints.cilium.namespace
+                        name      = local.services.cilium.name
+                        namespace = local.services.cilium.namespace
                       },
                     ]
                     # UI at /select/0/vmui
@@ -170,7 +170,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   targetPort = local.host_ports.etcd_metrics
                   selector = {
                     component = null
-                    k8s-app   = local.endpoints.etcd.name
+                    k8s-app   = local.services.etcd.name
                   }
                 }
                 vmScrape = {

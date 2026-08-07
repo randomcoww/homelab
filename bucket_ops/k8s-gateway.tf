@@ -1,3 +1,8 @@
+locals {
+  k8s-gateway_name      = "k8s-gateway"
+  k8s-gateway_namespace = "kube-system"
+}
+
 resource "minio_s3_object" "fluxcd-k8s-gateway" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
@@ -6,8 +11,8 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = local.endpoints.k8s-gateway.name
-            namespace = local.endpoints.k8s-gateway.namespace
+            name      = local.k8s-gateway_name
+            namespace = local.k8s-gateway_namespace
           }
           spec = {
             interval = "15m"
@@ -18,8 +23,8 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.endpoints.k8s-gateway.name
-            namespace = local.endpoints.k8s-gateway.namespace
+            name      = local.k8s-gateway_name
+            namespace = local.k8s-gateway_namespace
           }
           spec = {
             interval = "15m"
@@ -30,12 +35,12 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                 version = "3.7.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = local.endpoints.k8s-gateway.name
+                  name = local.k8s-gateway_name
                 }
                 interval = "5m"
               }
             }
-            releaseName = local.endpoints.k8s-gateway.name
+            releaseName = local.k8s-gateway_name
             install = {
               createNamespace = true
               remediation = {
@@ -70,7 +75,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
               service = {
                 type = "LoadBalancer"
                 labels = {
-                  app = local.endpoints.k8s-gateway.name
+                  app = local.k8s-gateway_name
                 }
                 annotations = {
                   "lbipam.cilium.io/ips" = local.networks.service.vips.k8s-gateway
@@ -87,7 +92,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                             key      = "app.kubernetes.io/instance"
                             operator = "In"
                             values = [
-                              local.endpoints.k8s-gateway.name,
+                              local.k8s-gateway_name,
                             ]
                           },
                         ]
@@ -170,7 +175,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           apiVersion = "cilium.io/v2"
           kind       = "CiliumLoadBalancerIPPool"
           metadata = {
-            name = "${local.endpoints.k8s-gateway.namespace}-${local.endpoints.k8s-gateway.name}"
+            name = "${local.k8s-gateway_namespace}-${local.k8s-gateway_name}"
           }
           spec = {
             blocks = [
@@ -180,8 +185,8 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
             ]
             serviceSelector = {
               matchLabels = {
-                "io.kubernetes.service.namespace" = local.endpoints.k8s-gateway.namespace
-                "io.kubernetes.service.name"      = local.endpoints.k8s-gateway.name
+                "io.kubernetes.service.namespace" = local.k8s-gateway_namespace
+                "io.kubernetes.service.name"      = local.k8s-gateway_name
               }
             }
           }

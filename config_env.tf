@@ -157,30 +157,25 @@ locals {
       name      = "kube-apiserver"
       namespace = "kube-system"
     }
+    etcd = {
+      name      = "etcd"
+      namespace = "kube-system"
+    }
+    cilium = {
+      name      = "cilium"
+      namespace = "kube-system"
+    }
+    minio = {
+      name      = "minio"
+      namespace = "minio"
+    }
   }
 
   endpoints = {
     for name, e in {
 
-      ## system
-      etcd = {
-        name      = "etcd"
-        namespace = "kube-system"
-      }
-      cilium = {
-        name      = "cilium"
-        namespace = "kube-system"
-      }
-      k8s-gateway = {
-        name      = "k8s-gateway"
-        namespace = "kube-system"
-      }
-
       ## infra
-      minio = {
-        name      = "minio"
-        namespace = "minio"
-      }
+
       cert-manager = {
         name      = "cert-manager"
         namespace = "cert-manager"

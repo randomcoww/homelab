@@ -97,7 +97,7 @@ resource "helm_release" "fluxcd-bucket" {
           spec = {
             interval = "10s"
             provider = "generic"
-            endpoint = "${local.endpoints.minio.service}:${local.service_ports.minio}"
+            endpoint = "${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
             secretRef = {
               name = module.minio-user-secret-fluxcd.name
             }

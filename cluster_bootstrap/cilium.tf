@@ -1,6 +1,6 @@
 resource "helm_release" "cilium" {
-  name             = local.endpoints.cilium.name
-  namespace        = local.endpoints.cilium.namespace
+  name             = local.services.cilium.name
+  namespace        = local.services.cilium.namespace
   repository       = "https://helm.cilium.io"
   chart            = "cilium"
   create_namespace = true
