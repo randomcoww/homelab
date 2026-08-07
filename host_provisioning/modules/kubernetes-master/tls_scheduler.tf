@@ -7,8 +7,16 @@ resource "tls_cert_request" "scheduler" {
   private_key_pem = tls_private_key.scheduler.private_key_pem
 
   subject {
-    common_name = var.scheduler_user
+    common_name = "scheduler"
   }
+
+  ip_addresses = concat([
+    "127.0.0.1",
+  ], var.node_ips)
+  dns_names = [
+    for i, _ in split(".", var.cluster_apiserver_endpoint) :
+    join(".", slice(split(".", var.cluster_apiserver_endpoint), 0, i + 1))
+  ]
 }
 
 resource "tls_locally_signed_cert" "scheduler" {
@@ -22,6 +30,6 @@ resource "tls_locally_signed_cert" "scheduler" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "client_auth",
+    "server_auth",
   ]
 }

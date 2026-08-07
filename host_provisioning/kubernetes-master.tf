@@ -67,7 +67,7 @@ module "kubernetes-master" {
   ])
   apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
   apiserver_ip             = local.networks.service.vips.apiserver
-  apiserver_label          = local.services.apiserver.name
+  apiserver_service_label  = local.services.apiserver.name
   cluster_apiserver_ip     = local.networks.kubernetes_service.vips.apiserver
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates

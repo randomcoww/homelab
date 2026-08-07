@@ -83,8 +83,10 @@ output "ignition_snippet" {
               EOF
             }
           },
-          # haproxy
-          # failover apiserver from local to cluster
+
+          # local haproxy for apiserver
+          # on node drain, apiserver static pod will often go down early breaking further pods from coordinating with apiserver to drain. 
+          # allow local apiserver endpoint to keep working
           {
             path = "${var.haproxy_path}/${var.name}.cfg"
             mode = 420

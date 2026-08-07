@@ -27,7 +27,7 @@ locals {
           leaderElect = true
         }
       })
-      "apiserver-encryption.config" = yamlencode({
+      "encryption.config" = yamlencode({
         apiVersion = "apiserver.config.k8s.io/v1"
         kind       = "EncryptionConfiguration"
         resources = [
@@ -68,16 +68,20 @@ locals {
     for key, f in {
       "kubernetes-ca.crt"         = var.kubernetes_ca.cert_pem
       "kubernetes-ca.key"         = var.kubernetes_ca.private_key_pem
-      "apiserver.crt"             = tls_locally_signed_cert.kube-apiserver.cert_pem
-      "apiserver.key"             = tls_private_key.kube-apiserver.private_key_pem
-      "kubelet-client.crt"        = tls_locally_signed_cert.kube-apiserver-kubelet-client.cert_pem
-      "kubelet-client.key"        = tls_private_key.kube-apiserver-kubelet-client.private_key_pem
+      "apiserver.crt"             = tls_locally_signed_cert.apiserver.cert_pem
+      "apiserver.key"             = tls_private_key.apiserver.private_key_pem
+      "controller-manager.crt"    = tls_locally_signed_cert.controller-manager.cert_pem
+      "controller-manager.key"    = tls_private_key.controller-manager.private_key_pem
+      "scheduler.crt"             = tls_locally_signed_cert.scheduler.cert_pem
+      "scheduler.key"             = tls_private_key.scheduler.private_key_pem
+      "kubelet-client.crt"        = tls_locally_signed_cert.kubelet-client.cert_pem
+      "kubelet-client.key"        = tls_private_key.kubelet-client.private_key_pem
       "front-proxy-client-ca.crt" = var.front_proxy_ca.cert_pem
       "front-proxy-client.crt"    = tls_locally_signed_cert.front-proxy-client.cert_pem
       "front-proxy-client.key"    = tls_private_key.front-proxy-client.private_key_pem
       "etcd-ca.crt"               = var.etcd_ca.cert_pem
-      "etcd-client.crt"           = tls_locally_signed_cert.kube-apiserver-etcd-client.cert_pem
-      "etcd-client.key"           = tls_private_key.kube-apiserver-etcd-client.private_key_pem
+      "etcd-client.crt"           = tls_locally_signed_cert.etcd-client.cert_pem
+      "etcd-client.key"           = tls_private_key.etcd-client.private_key_pem
       "service-account.crt"       = var.service_account.public_key_pem
       "service-account.key"       = var.service_account.private_key_pem
     } :
@@ -97,8 +101,8 @@ module "controller-manager-kubeconfig" {
   user               = var.controller_manager_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
-  client_cert_pem    = tls_locally_signed_cert.controller-manager.cert_pem
-  client_key_pem     = tls_private_key.controller-manager.private_key_pem
+  client_cert_pem    = tls_locally_signed_cert.controller-manager-client.cert_pem
+  client_key_pem     = tls_private_key.controller-manager-client.private_key_pem
 }
 
 module "scheduler-kubeconfig" {
@@ -107,13 +111,13 @@ module "scheduler-kubeconfig" {
   user               = var.scheduler_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
-  client_cert_pem    = tls_locally_signed_cert.scheduler.cert_pem
-  client_key_pem     = tls_private_key.scheduler.private_key_pem
+  client_cert_pem    = tls_locally_signed_cert.scheduler-client.cert_pem
+  client_key_pem     = tls_private_key.scheduler-client.private_key_pem
 }
 
 module "apiserver" {
   source = "../../../modules/static-pod"
-  name   = var.apiserver_label
+  name   = var.apiserver_service_label
   spec = {
     # kube-vip with local kube-proxy
     hostAliases = [
@@ -164,7 +168,7 @@ module "apiserver" {
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
           "--tls-cert-file=${local.pki_files["apiserver.crt"].path}",
           "--tls-private-key-file=${local.pki_files["apiserver.key"].path}",
-          "--encryption-provider-config=${local.config_files["apiserver-encryption.config"].path}",
+          "--encryption-provider-config=${local.config_files["encryption.config"].path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [
@@ -240,7 +244,7 @@ module "apiserver" {
 
 module "controller-manager" {
   source = "../../../modules/static-pod"
-  name   = "kube-contoller-manager"
+  name   = "kube-controller-manager"
   spec = {
     containers = [
       {
@@ -249,7 +253,7 @@ module "controller-manager" {
         command = compact(concat([
           "kube-controller-manager",
           "--allocate-node-cidrs=true",
-          "--bind-address=127.0.0.1",
+          "--bind-address=0.0.0.0",
           "--cluster-cidr=${var.kubernetes_pod_prefix}",
           "--cluster-name=${var.cluster_name}",
           "--cluster-signing-cert-file=${local.pki_files["kubernetes-ca.crt"].path}",
@@ -262,6 +266,8 @@ module "controller-manager" {
           "--use-service-account-credentials=true",
           "--secure-port=${var.ports.controller_manager}",
           "--terminated-pod-gc-threshold=1",
+          "--tls-cert-file=${local.pki_files["controller-manager.crt"].path}",
+          "--tls-private-key-file=${local.pki_files["controller-manager.key"].path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [
@@ -337,7 +343,9 @@ module "scheduler" {
           "kube-scheduler",
           "--config=${local.config_files["scheduler.config"].path}",
           "--secure-port=${var.ports.scheduler}",
-          "--bind-address=127.0.0.1",
+          "--bind-address=0.0.0.0",
+          "--tls-cert-file=${local.pki_files["scheduler.crt"].path}",
+          "--tls-private-key-file=${local.pki_files["scheduler.key"].path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [

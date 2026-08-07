@@ -127,7 +127,7 @@ variable "apiserver_ip" {
   type = string
 }
 
-variable "apiserver_label" {
+variable "apiserver_service_label" {
   type = string
 }
 

@@ -1,18 +1,18 @@
-resource "tls_private_key" "kubelet-client" {
+resource "tls_private_key" "scheduler-client" {
   algorithm   = var.kubernetes_ca.algorithm
   ecdsa_curve = "P521"
 }
 
-resource "tls_cert_request" "kubelet-client" {
-  private_key_pem = tls_private_key.kubelet-client.private_key_pem
+resource "tls_cert_request" "scheduler-client" {
+  private_key_pem = tls_private_key.scheduler-client.private_key_pem
 
   subject {
-    common_name = var.kubelet_client_user
+    common_name = var.scheduler_user
   }
 }
 
-resource "tls_locally_signed_cert" "kubelet-client" {
-  cert_request_pem   = tls_cert_request.kubelet-client.cert_request_pem
+resource "tls_locally_signed_cert" "scheduler-client" {
+  cert_request_pem   = tls_cert_request.scheduler-client.cert_request_pem
   ca_private_key_pem = var.kubernetes_ca.private_key_pem
   ca_cert_pem        = var.kubernetes_ca.cert_pem
 
