@@ -48,13 +48,13 @@ module "registry" {
     }
   }
   ca_issuer_name      = local.cert_issuers.ca_internal
-  minio_endpoint      = "${local.endpoints.minio.service_ip}:${local.service_ports.minio}" # needs to be reachable and resolvable from host
+  minio_endpoint      = "${local.networks.service.vips.minio}:${local.service_ports.minio}" # needs to be reachable and resolvable from host
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_user          = minio_iam_user.registry
   service_port        = local.service_ports.registry
   service_hostname    = local.endpoints.registry.service
-  service_ip          = local.endpoints.registry.service_ip
+  service_ip          = local.networks.service.vips.registry
 }
 
 resource "minio_s3_object" "fluxcd-registry" {

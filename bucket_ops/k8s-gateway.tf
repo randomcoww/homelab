@@ -73,7 +73,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                   app = local.endpoints.k8s-gateway.name
                 }
                 annotations = {
-                  "lbipam.cilium.io/ips" = local.endpoints.k8s-gateway.service_ip
+                  "lbipam.cilium.io/ips" = local.networks.service.vips.k8s-gateway
                 }
                 useTcp = true
               }
@@ -175,7 +175,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           spec = {
             blocks = [
               {
-                cidr = "${local.endpoints.k8s-gateway.service_ip}/32"
+                cidr = "${local.networks.service.vips.k8s-gateway}/32"
               },
             ]
             serviceSelector = {

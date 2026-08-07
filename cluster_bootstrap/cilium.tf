@@ -65,7 +65,7 @@ resource "helm_release" "cilium" {
         local.networks.wan.interface,     # internet (gw nodes)
       ])
       kubeProxyReplacement = true
-      k8sServiceHost       = local.endpoints.apiserver-lb.service_ip
+      k8sServiceHost       = local.networks.service.vips.apiserver
       k8sServicePort       = local.host_ports.apiserver
       ipam = {
         mode = "kubernetes"

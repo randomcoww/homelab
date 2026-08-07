@@ -18,10 +18,10 @@ module "kubernetes-worker" {
   }
   host_netnum             = each.value.netnum
   cluster_domain          = local.domains.kubernetes
-  apiserver_endpoint      = "https://${local.endpoints.apiserver-lb.service_ip}:${local.host_ports.apiserver}"
+  apiserver_endpoint      = "https://${local.networks.service.vips.apiserver}:${local.host_ports.apiserver}"
   kubernetes_pod_prefix   = local.networks.kubernetes_pod.prefix
   node_prefix             = each.value.networks.service.prefix
-  cluster_dns_ip          = local.endpoints.kube-dns.cluster_ip
+  cluster_dns_ip          = local.networks.kubernetes_service.vips.kube-dns
   kubelet_root_path       = local.kubernetes.kubelet_root_path
   static_pod_path         = local.kubernetes.static_pod_manifest_path
   feature_gates           = local.kubernetes.feature_gates
@@ -37,7 +37,7 @@ module "kubernetes-worker" {
   internal_registries = [
     {
       prefix   = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
-      location = local.service_ports.registry == 443 ? local.endpoints.registry.service_ip : "${local.endpoints.registry.service_ip}:${local.service_ports.registry}"
+      location = local.service_ports.registry == 443 ? local.networks.service.vips.registry : "${local.networks.service.vips.registry}:${local.service_ports.registry}"
     },
   ]
 }

@@ -13,8 +13,8 @@ module "kea" {
     }
   }
   peer_service_ips = [
-    local.endpoints.kea-primary.cluster_ip,
-    local.endpoints.kea-secondary.cluster_ip,
+    local.networks.kubernetes_service.vips.kea-primary,
+    local.networks.kubernetes_service.vips.kea-secondary,
   ]
   ports = {
     kea_peer  = local.host_ports.kea_peer
@@ -23,14 +23,14 @@ module "kea" {
     ipxe_tftp = local.host_ports.ipxe_tftp
   }
   ipxe_boot_file_name  = "ipxe.efi"
-  ipxe_script_base_url = "https://${local.endpoints.minio.service_ip}:${local.service_ports.minio}/boot/ipxe-"
+  ipxe_script_base_url = "https://${local.networks.service.vips.minio}:${local.service_ports.minio}/boot/ipxe-"
   dhcp_networks = [
     {
       config = local.networks.lan
       option_data = {
         tcode = local.timezone
         domain-name-servers = join(",", sort([
-          local.endpoints.k8s-gateway.service_ip,
+          local.networks.service.vips.k8s-gateway,
         ]))
         domain-search = join(",", sort([
           local.domains.kubernetes,

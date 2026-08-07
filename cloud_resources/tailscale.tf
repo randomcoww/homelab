@@ -54,7 +54,7 @@ resource "tailscale_dns_configuration" "cluster" {
     content {
       domain = split_dns.value
       nameservers {
-        address            = local.endpoints.k8s-gateway.service_ip
+        address            = local.networks.service.vips.k8s-gateway
         use_with_exit_node = true
       }
     }

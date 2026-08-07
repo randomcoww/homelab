@@ -58,7 +58,7 @@ module "kubernetes-master" {
     bgp                = local.host_ports.bgp
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
-  cluster_apiserver_endpoint = local.endpoints.apiserver.service_fqdn
+  cluster_apiserver_endpoint = "kubernetes.default.svc.${local.domains.kubernetes}"
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   node_ips = compact([
@@ -66,9 +66,9 @@ module "kubernetes-master" {
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
   apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
-  apiserver_ip             = local.endpoints.apiserver-lb.service_ip
-  apiserver_label          = local.endpoints.apiserver-lb.name
-  cluster_apiserver_ip     = local.endpoints.apiserver.cluster_ip
+  apiserver_ip             = local.networks.service.vips.apiserver
+  apiserver_label          = local.services.apiserver.name
+  cluster_apiserver_ip     = local.networks.kubernetes_service.vips.apiserver
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates
   bird_path                = local.bird_config_path

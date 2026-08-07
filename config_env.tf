@@ -33,6 +33,12 @@ locals {
         cidr          = 24
         vlan_id       = 80
         enable_netnum = true
+        vips = {
+          apiserver   = 2
+          k8s-gateway = 33
+          minio       = 34
+          registry    = 35
+        }
       }
       # Etcd peering
       etcd = {
@@ -55,6 +61,12 @@ locals {
       kubernetes_service = {
         network = "10.96.0.0"
         cidr    = 12
+        vips = {
+          apiserver     = 1
+          kube-dns      = 10
+          kea-primary   = 12 # kea needs a known IP for each peer
+          kea-secondary = 13 # kea needs a known IP for each peer
+        }
       }
       kubernetes_pod = {
         network = "10.244.0.0"
@@ -140,20 +152,17 @@ locals {
     }
   }
 
+  services = {
+    apiserver = {
+      name      = "kube-apiserver"
+      namespace = "kube-system"
+    }
+  }
+
   endpoints = {
     for name, e in {
 
       ## system
-      apiserver = {
-        name           = "kubernetes"
-        namespace      = "default"
-        cluster_netnum = 1
-      }
-      apiserver-lb = {
-        name           = "kube-apiserver"
-        namespace      = "kube-system"
-        service_netnum = 2
-      }
       etcd = {
         name      = "etcd"
         namespace = "kube-system"
@@ -162,39 +171,24 @@ locals {
         name      = "cilium"
         namespace = "kube-system"
       }
-      kube-dns = {
-        name           = "kube-dns"
-        namespace      = "kube-system"
-        cluster_netnum = 10
-      }
       k8s-gateway = {
-        name           = "k8s-gateway"
-        namespace      = "kube-system"
-        service_netnum = 33
+        name      = "k8s-gateway"
+        namespace = "kube-system"
       }
 
       ## infra
       minio = {
-        name           = "minio"
-        namespace      = "minio"
-        service_netnum = 34
+        name      = "minio"
+        namespace = "minio"
       }
       cert-manager = {
         name      = "cert-manager"
         namespace = "cert-manager"
       }
       registry = {
-        name           = "registry"
-        namespace      = "registry"
-        service        = "reg.${local.domains.kubernetes}"
-        service_netnum = 35
-      }
-      # - kea needs a known IP for each peer -
-      kea-primary = {
-        cluster_netnum = 12
-      }
-      kea-secondary = {
-        cluster_netnum = 13
+        name      = "registry"
+        namespace = "registry"
+        service   = "reg.${local.domains.kubernetes}"
       }
       prometheus = {
         name      = "prometheus"

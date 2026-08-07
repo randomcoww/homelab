@@ -26,7 +26,7 @@ module "minio" {
   }
   ca               = data.terraform_remote_state.host.outputs.internal_ca
   service_hostname = local.endpoints.minio.service
-  service_ip       = local.endpoints.minio.service_ip
+  service_ip       = local.networks.service.vips.minio
 
   depends_on = [
     kubernetes_labels.labels,

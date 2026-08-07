@@ -1,6 +1,6 @@
 resource "helm_release" "kube-dns" {
-  name             = local.endpoints.kube-dns.name
-  namespace        = local.endpoints.kube-dns.namespace
+  name             = "kube-dns"
+  namespace        = "kube-system"
   repository       = "https://coredns.github.io/helm"
   chart            = "coredns"
   create_namespace = true
@@ -28,7 +28,7 @@ resource "helm_release" "kube-dns" {
         }
       }
       service = {
-        clusterIP = local.endpoints.kube-dns.cluster_ip
+        clusterIP = local.networks.kubernetes_service.vips.kube-dns
       }
       affinity = {
         podAntiAffinity = {
@@ -40,7 +40,7 @@ resource "helm_release" "kube-dns" {
                     key      = "app.kubernetes.io/instance"
                     operator = "In"
                     values = [
-                      local.endpoints.kube-dns.name,
+                      "kube-dns",
                     ]
                   },
                 ]
@@ -91,11 +91,11 @@ resource "helm_release" "kube-dns" {
             },
             {
               name       = "forward"
-              parameters = "${local.domains.public} ${local.endpoints.k8s-gateway.service_ip}"
+              parameters = "${local.domains.public} ${local.networks.service.vips.k8s-gateway}"
             },
             {
               name       = "forward"
-              parameters = "${local.domains.kubernetes} ${local.endpoints.k8s-gateway.service_ip}"
+              parameters = "${local.domains.kubernetes} ${local.networks.service.vips.k8s-gateway}"
             },
             ], [
             for tlshostname, ips in merge({
