@@ -259,6 +259,8 @@ module "controller-manager" {
           "--cluster-signing-cert-file=${local.pki_files["kubernetes-ca.crt"].path}",
           "--cluster-signing-key-file=${local.pki_files["kubernetes-ca.key"].path}",
           "--kubeconfig=${local.kubeconfig_files["controller-manager.kubeconfig"].path}",
+          "--authentication-kubeconfig=${local.kubeconfig_files["controller-manager.kubeconfig"].path}",
+          "--authorization-kubeconfig=${local.kubeconfig_files["controller-manager.kubeconfig"].path}",
           "--leader-elect=true",
           "--root-ca-file=${local.pki_files["kubernetes-ca.crt"].path}",
           "--service-account-private-key-file=${local.pki_files["service-account.key"].path}",
@@ -342,6 +344,8 @@ module "scheduler" {
         command = compact(concat([
           "kube-scheduler",
           "--config=${local.config_files["scheduler.config"].path}",
+          "--authentication-kubeconfig=${local.kubeconfig_files["scheduler.kubeconfig"].path}",
+          "--authorization-kubeconfig=${local.kubeconfig_files["scheduler.kubeconfig"].path}",
           "--secure-port=${var.ports.scheduler}",
           "--bind-address=0.0.0.0",
           "--tls-cert-file=${local.pki_files["scheduler.crt"].path}",
