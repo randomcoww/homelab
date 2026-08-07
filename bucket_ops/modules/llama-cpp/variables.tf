@@ -43,11 +43,8 @@ variable "api_keys" {
 }
 
 variable "extra_envs" {
-  type = list(object({
-    name  = string
-    value = any
-  }))
-  default = []
+  type    = any
+  default = {}
 }
 
 variable "service_port" {

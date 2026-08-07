@@ -9,7 +9,7 @@ resource "random_password" "storage-secret" {
 
 locals {
   base_path = "/var/lib/lldap"
-  extra_envs = merge(var.extra_configs, {
+  envs = merge(var.extra_envs, {
     LLDAP_VERBOSE                  = true
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
@@ -35,7 +35,7 @@ module "secret" {
   data = merge({
     "storage-secret" = random_password.storage-secret.result
     }, {
-    for k, v in local.extra_envs :
+    for k, v in local.envs :
     tostring(k) => tostring(v)
   })
 }
@@ -51,15 +51,15 @@ module "service" {
     ports = [
       {
         name       = "ldaps"
-        port       = local.extra_envs.LLDAP_LDAPS_OPTIONS__PORT
+        port       = local.envs.LLDAP_LDAPS_OPTIONS__PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.LLDAP_LDAPS_OPTIONS__PORT
+        targetPort = local.envs.LLDAP_LDAPS_OPTIONS__PORT
       },
       {
         name       = "http"
-        port       = local.extra_envs.LLDAP_HTTP_PORT
+        port       = local.envs.LLDAP_HTTP_PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.LLDAP_HTTP_PORT
+        targetPort = local.envs.LLDAP_HTTP_PORT
       },
     ]
   }
@@ -93,7 +93,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_envs.LLDAP_HTTP_PORT
+            port = local.envs.LLDAP_HTTP_PORT
           },
         ]
       },
@@ -136,7 +136,7 @@ module "deployment" {
           "/dev/null",
         ]
         env = concat([
-          for k, v in local.extra_envs :
+          for k, v in local.envs :
           {
             name = tostring(k)
             valueFrom = {
@@ -160,26 +160,26 @@ module "deployment" {
         volumeMounts = [
           {
             name      = "secret"
-            mountPath = local.extra_envs.LLDAP_KEY_FILE
+            mountPath = local.envs.LLDAP_KEY_FILE
             subPath   = "storage-secret"
           },
           {
             name      = "lldap-cert"
-            mountPath = local.extra_envs.LLDAP_LDAPS_OPTIONS__CERT_FILE
+            mountPath = local.envs.LLDAP_LDAPS_OPTIONS__CERT_FILE
             subPath   = "tls.crt"
           },
           {
             name      = "lldap-cert"
-            mountPath = local.extra_envs.LLDAP_LDAPS_OPTIONS__KEY_FILE
+            mountPath = local.envs.LLDAP_LDAPS_OPTIONS__KEY_FILE
             subPath   = "tls.key"
           },
         ]
         ports = [
           {
-            containerPort = local.extra_envs.LLDAP_HTTP_PORT
+            containerPort = local.envs.LLDAP_HTTP_PORT
           },
           {
-            containerPort = local.extra_envs.LLDAP_LDAPS_OPTIONS__PORT
+            containerPort = local.envs.LLDAP_LDAPS_OPTIONS__PORT
           },
         ]
         livenessProbe = {

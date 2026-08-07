@@ -1,5 +1,5 @@
 locals {
-  extra_envs = merge(var.extra_configs, {
+  envs = merge(var.extra_envs, {
     STUMP_CONFIG_DIR              = "/stump/config"
     STUMP_DB_PATH                 = "/stump/data"
     STUMP_PORT                    = 8000
@@ -15,9 +15,9 @@ locals {
     STUMP_VERBOSITY               = 0 # disable internal log file
     STUMP_ALLOWED_ORIGINS         = "https://${var.ingress_hostname}"
   })
-  db_file         = "${local.extra_envs.STUMP_DB_PATH}/stump.db" # non-configurable
+  db_file         = "${local.envs.STUMP_DB_PATH}/stump.db" # non-configurable
   data_path       = "/data"
-  thumbnails_path = "${local.extra_envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
+  thumbnails_path = "${local.envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
   # juicefs for thumbnails
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_username = "juicefs"
@@ -35,7 +35,7 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = {
-    for k, v in local.extra_envs :
+    for k, v in local.envs :
     tostring(k) => tostring(v)
   }
 }
@@ -76,9 +76,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.extra_envs.STUMP_PORT
+        port       = local.envs.STUMP_PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.STUMP_PORT
+        targetPort = local.envs.STUMP_PORT
       },
     ]
   }
@@ -112,7 +112,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_envs.STUMP_PORT
+            port = local.envs.STUMP_PORT
           },
         ]
       },
@@ -163,7 +163,7 @@ module "litestream-overlay" {
         image = "${var.images.stump.repository}:${var.images.stump.tag}"
         ports = [
           {
-            containerPort = local.extra_envs.STUMP_PORT
+            containerPort = local.envs.STUMP_PORT
           },
         ]
         envFrom = [
@@ -185,7 +185,7 @@ module "litestream-overlay" {
         ]
         livenessProbe = {
           httpGet = {
-            port = local.extra_envs.STUMP_PORT
+            port = local.envs.STUMP_PORT
             path = "/api/v2/ping"
           }
           timeoutSeconds   = 4
@@ -193,7 +193,7 @@ module "litestream-overlay" {
         }
         readinessProbe = {
           httpGet = {
-            port = local.extra_envs.STUMP_PORT
+            port = local.envs.STUMP_PORT
             path = "/api/v2/ping"
           }
           timeoutSeconds = 4

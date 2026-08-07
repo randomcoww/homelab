@@ -19,7 +19,7 @@ module "camofox-browser" {
       tag        = "1.13.0@sha256:64b30ffdbbc4ae0e28200a66dfbd6f55ac4188229eb34ef769afcf7be40faa6e" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
     }
   }
-  extra_configs = {
+  extra_envs = {
     PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname
     PROXY_PORT         = regex(local.domain_regex, var.scrape_proxy_server).port
     PROXY_USERNAME     = var.scrape_proxy_username

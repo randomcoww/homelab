@@ -79,8 +79,8 @@ output "manifests" {
           }
           endpoints = [
             {
-              path       = local.extra_envs.ND_PROMETHEUS_METRICSPATH
-              targetPort = local.extra_envs.ND_PORT
+              path       = local.envs.ND_PROMETHEUS_METRICSPATH
+              targetPort = local.envs.ND_PORT
             },
           ]
         }

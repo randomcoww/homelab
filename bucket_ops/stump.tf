@@ -53,7 +53,7 @@ module "stump" {
       tag        = "0.5.16@sha256:f085f8bce71a5ad4ce8e28b28ea522de1d9e0d7dd0af3ea5c1bd626d0f341954" # renovate: datasource=docker depName=docker.io/litestream/litestream
     }
   }
-  extra_configs = {
+  extra_envs = {
     STUMP_OIDC_ISSUER_URL    = "https://${local.httproutes.authelia.hostname}"
     STUMP_OIDC_CLIENT_ID     = local.authelia_oidc_clients.stump.client_id
     STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret

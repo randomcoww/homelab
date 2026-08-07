@@ -46,7 +46,7 @@ variable "gateway_ref" {
   type = any
 }
 
-variable "extra_configs" {
-  type    = map(any)
+variable "extra_envs" {
+  type    = any
   default = {}
 }

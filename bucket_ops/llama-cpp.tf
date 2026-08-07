@@ -149,20 +149,11 @@ module "llama-cpp" {
     }
   }
   service_port = local.llama-cpp_port
-  extra_envs = [
-    {
-      name  = "ROCBLAS_USE_HIPBLASLT"
-      value = 1
-    },
-    {
-      name  = "AMD_VULKAN_ICD"
-      value = "RADV"
-    },
-    {
-      name  = "RADV_PERFTEST"
-      value = "sam"
-    },
-  ]
+  extra_envs = {
+    "ROCBLAS_USE_HIPBLASLT" = 1
+    "AMD_VULKAN_ICD"        = "RADV"
+    "RADV_PERFTEST"         = "sam"
+  }
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {

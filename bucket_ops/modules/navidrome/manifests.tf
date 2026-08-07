@@ -1,6 +1,6 @@
 
 locals {
-  extra_envs = merge(var.extra_configs, {
+  envs = merge(var.extra_envs, {
     ND_MUSICFOLDER             = "/navidrome/library/mnt"
     ND_DATAFOLDER              = "/navidrome/data"
     ND_CACHEFOLDER             = "/navidrome/cache"
@@ -22,7 +22,7 @@ locals {
     ND_SCANNER_PURGEMISSING    = "always"
     ND_SESSIONTIMEOUT          = "24h"
   })
-  db_file = "${local.extra_envs.ND_DATAFOLDER}/navidrome.db" # db name not configurable
+  db_file = "${local.envs.ND_DATAFOLDER}/navidrome.db" # db name not configurable
 }
 
 module "service" {
@@ -36,9 +36,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.extra_envs.ND_PORT
+        port       = local.envs.ND_PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.ND_PORT
+        targetPort = local.envs.ND_PORT
       },
     ]
   }
@@ -98,7 +98,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_envs.ND_PORT
+            port = local.envs.ND_PORT
           },
         ]
       },
@@ -150,11 +150,11 @@ module "litestream-overlay" {
         image = "${var.images.navidrome.repository}:${var.images.navidrome.tag}"
         ports = [
           {
-            containerPort = local.extra_envs.ND_PORT
+            containerPort = local.envs.ND_PORT
           },
         ]
         env = [
-          for k, v in local.extra_envs :
+          for k, v in local.envs :
           {
             name  = tostring(k)
             value = tostring(v)
@@ -163,17 +163,17 @@ module "litestream-overlay" {
         volumeMounts = [
           {
             name      = "cache"
-            mountPath = local.extra_envs.ND_CACHEFOLDER
+            mountPath = local.envs.ND_CACHEFOLDER
           },
           {
             name      = "data"
-            mountPath = local.extra_envs.ND_MUSICFOLDER
+            mountPath = local.envs.ND_MUSICFOLDER
           },
         ]
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.extra_envs.ND_PORT
+            port   = local.envs.ND_PORT
             path   = "/"
           }
           initialDelaySeconds = 10
@@ -182,7 +182,7 @@ module "litestream-overlay" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.extra_envs.ND_PORT
+            port   = local.envs.ND_PORT
             path   = "/"
           }
         }

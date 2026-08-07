@@ -52,7 +52,7 @@ module "navidrome" {
       tag        = "0.5.16@sha256:f085f8bce71a5ad4ce8e28b28ea522de1d9e0d7dd0af3ea5c1bd626d0f341954" # renovate: datasource=docker depName=docker.io/litestream/litestream
     }
   }
-  extra_configs = {
+  extra_envs = {
     ND_EXTAUTH_USERHEADER = "Remote-User"
     ND_EXTAUTH_TRUSTEDSOURCES = join(",", [
       local.networks.kubernetes_pod.prefix,

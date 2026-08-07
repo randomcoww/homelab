@@ -34,7 +34,7 @@ variable "images" {
   })
 }
 
-variable "extra_configs" {
+variable "extra_envs" {
   type    = any
   default = {}
 }

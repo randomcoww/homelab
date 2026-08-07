@@ -110,10 +110,10 @@ module "statefulset" {
           }
         ])
         env = concat([
-          for _, e in var.extra_envs :
+          for k, v in var.extra_envs :
           {
-            name  = e.name
-            value = tostring(e.value)
+            name  = tostring(k)
+            value = tostring(v)
           }
           ], [
           for i, _ in var.api_keys :

@@ -30,7 +30,7 @@ variable "images" {
   })
 }
 
-variable "extra_configs" {
-  type    = map(any)
+variable "extra_envs" {
+  type    = any
   default = {}
 }

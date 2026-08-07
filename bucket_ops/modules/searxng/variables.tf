@@ -35,7 +35,7 @@ variable "searxng_settings" {
   default = {}
 }
 
-variable "extra_configs" {
-  type    = map(string)
+variable "extra_envs" {
+  type    = any
   default = {}
 }

@@ -25,7 +25,7 @@ module "lldap" {
       tag        = "v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284" # renovate: datasource=docker depName=ghcr.io/lldap/lldap
     }
   }
-  extra_configs = {
+  extra_envs = {
     LLDAP_LDAPS_OPTIONS__PORT                 = local.lldap_port
     LLDAP_VERBOSE                             = true
     LLDAP_LDAP_USER_DN                        = random_password.lldap-user.result
