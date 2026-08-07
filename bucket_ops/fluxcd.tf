@@ -119,7 +119,7 @@ resource "helm_release" "fluxcd-bucket" {
           device-plugin          = []
           kured                  = []
           reloader               = []
-          prometheus             = []
+          victoria-metrics       = []
           registry               = []
           kea                    = []
           juicefs-csi-driver     = ["cloudnative-pg"]
