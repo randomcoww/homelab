@@ -8,7 +8,7 @@ module "apiserver-lb-service" {
     "lbipam.cilium.io/ips" = local.networks.service.vips.apiserver
   }
   selector = {
-    k8s-app = local.services.apiserver.name
+    component = local.services.apiserver.name
   }
   spec = {
     type                  = "LoadBalancer"
