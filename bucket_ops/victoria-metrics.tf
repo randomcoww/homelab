@@ -92,7 +92,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   }
                   vmselect = {
                     extraArgs = {
-                      "dedup.minScrapeInterval" = "30s"
+                      "dedup.minScrapeInterval"    = "30s"
+                      enableMultitenancyViaHeaders = "true"
                     }
                     resources = {
                       limits = {
@@ -102,7 +103,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   }
                   vminsert = {
                     extraArgs = {
-                      maxLabelsPerTimeseries = "200"
+                      maxLabelsPerTimeseries       = "200"
+                      enableMultitenancyViaHeaders = "true"
                     }
                     resources = {
                       limits = {
@@ -114,8 +116,8 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 route = {
                   select = {
                     enabled = true
-                    # UI at /select/0/vmui
-                    # query at /select/0/prometheus/api/*
+                    # UI at /select/vmui
+                    # query at /select/prometheus/api/*
                     hostnames = [
                       local.httproutes.victoria-metrics.hostname,
                     ]
