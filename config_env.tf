@@ -15,6 +15,7 @@ locals {
         enable_netnum  = true
         vrrp_router_id = 13
         vips = {
+          # do not overlap with host netnums!
           vrrp = 2
         }
       }
@@ -34,6 +35,7 @@ locals {
         vlan_id       = 80
         enable_netnum = true
         vips = {
+          # do not overlap with host netnums!
           apiserver   = 2
           k8s-gateway = 33
           minio       = 34
@@ -124,6 +126,7 @@ locals {
     }
   }
 
+  # Service names referenced globally #
   services = {
     apiserver = {
       name      = "apiserver"
@@ -145,12 +148,9 @@ locals {
       name      = "cert-manager"
       namespace = "cert-manager"
     }
-    victoria-metrics = {
-      name      = "vm"
-      namespace = "monitoring"
-    }
   }
 
+  # All HTTPRoute resource entries #
   httproutes = {
     registry = {
       hostname = "reg.${local.domains.kubernetes}"
@@ -184,7 +184,7 @@ locals {
     }
   }
 
-  # Host or hostNet container listen ports
+  # All host exposed ports - do not overlap! #
   host_ports = {
     kea_peer           = 50060
     kea_metrics        = 58087
@@ -202,7 +202,7 @@ locals {
     crio_metrics       = 58091
   }
 
-  # Kube clusterIP or loadbalancer listen ports
+  # Loadbalancer or externalIP service ports referenced globally #
   service_ports = {
     minio           = 9000
     coredns_metrics = 9153
