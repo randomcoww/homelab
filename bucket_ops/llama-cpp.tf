@@ -1,9 +1,3 @@
-locals {
-  llama-cpp_name      = "llama-cpp"
-  llama-cpp_namespace = "default"
-  llama-cpp_port      = 8080
-}
-
 resource "random_password" "llama-cpp-auth-token" {
   length           = 32
   override_special = "-_"
@@ -11,8 +5,8 @@ resource "random_password" "llama-cpp-auth-token" {
 
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
-  name      = local.llama-cpp_name
-  namespace = local.llama-cpp_namespace
+  name      = "llama-cpp"
+  namespace = "default"
   images = {
     llama-swap = {
       repository = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
@@ -148,7 +142,6 @@ module "llama-cpp" {
       }
     }
   }
-  service_port = local.llama-cpp_port
   extra_envs = {
     "ROCBLAS_USE_HIPBLASLT" = 1
     "AMD_VULKAN_ICD"        = "RADV"
@@ -172,6 +165,11 @@ module "llama-cpp" {
         ]
       }
     }
+  }
+  ingress_hostname = local.httproutes.llama-cpp.hostname
+  gateway_ref = {
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
   }
   resources = {
     requests = {
@@ -206,7 +204,8 @@ resource "minio_s3_object" "fluxcd-llama-cpp" {
 
 output "llama-cpp" {
   value = {
-    api_key = random_password.llama-cpp-auth-token.result
+    base_url = "https://${local.httproutes.llama-cpp.hostname}/v1"
+    api_key  = random_password.llama-cpp-auth-token.result
   }
   sensitive = true
 }

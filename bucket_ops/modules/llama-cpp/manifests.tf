@@ -1,6 +1,7 @@
 locals {
-  models_path = "/models"
-  config_file = "/var/lib/llama-cpp/config.yaml"
+  service_port = 8080
+  models_path  = "/models"
+  config_file  = "/var/lib/llama-cpp/config.yaml"
   models = [
     for k, image in var.models :
     {
@@ -43,6 +44,42 @@ module "secret" {
   })
 }
 
+module "httproute" {
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.service_port
+          },
+        ]
+      },
+    ]
+  }
+}
+
 module "service" {
   source    = "../../../modules/service"
   name      = var.name
@@ -54,9 +91,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = var.service_port
+        port       = local.service_port
         protocol   = "TCP"
-        targetPort = var.service_port
+        targetPort = local.service_port
       },
     ]
   }
@@ -89,7 +126,7 @@ module "statefulset" {
           "--config",
           "${local.config_file}",
           "--listen",
-          "0.0.0.0:${var.service_port}",
+          "0.0.0.0:${local.service_port}",
         ]
         volumeMounts = concat([
           {
@@ -137,12 +174,12 @@ module "statefulset" {
         }
         ports = [
           {
-            containerPort = var.service_port
+            containerPort = local.service_port
           },
         ]
         livenessProbe = {
           httpGet = {
-            port = var.service_port
+            port = local.service_port
             path = "/health"
           }
           initialDelaySeconds = 10
@@ -150,7 +187,7 @@ module "statefulset" {
         }
         readinessProbe = {
           httpGet = {
-            port = var.service_port
+            port = local.service_port
             path = "/health"
           }
         }

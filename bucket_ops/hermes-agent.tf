@@ -152,7 +152,7 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL                     = "http://${local.llama-cpp_name}.${local.llama-cpp_namespace}:${local.llama-cpp_port}/v1"
+    OPENAI_BASE_URL                     = "https://${local.httproutes.llama-cpp.hostname}/v1"
     OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
     CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
@@ -172,7 +172,7 @@ module "hermes-agent" {
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
     HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.httproutes.hermes-agent.hostname}"
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "http://${local.llama-cpp_name}.${local.llama-cpp_namespace}:${local.llama-cpp_port}/v1"
+    GROQ_BASE_URL  = "https://${local.httproutes.llama-cpp.hostname}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
     GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
     # custom vars #

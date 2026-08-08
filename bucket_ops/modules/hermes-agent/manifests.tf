@@ -223,15 +223,11 @@ cp -afL ${local.tmp_path}/. \
 chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
 %{for f, _ in local.files}  ${local.config_envs.HERMES_HOME}/${f} \
 %{endfor~}
-  ${local.config_envs.HERMES_HOME}
+  ${local.config_envs.HERMES_HOME} \
+  ${local.config_envs.HERMES_HOME}/logs
 EOF
         ]
-        volumeMounts = concat([
-          {
-            name      = "data"
-            mountPath = local.config_envs.HERMES_HOME
-          },
-          ], [
+        volumeMounts = concat(local.common_volume_mounts, [
           for f, _ in local.files :
           {
             name      = "config"
@@ -256,8 +252,7 @@ EOF
             value = tostring(v)
           }
         ]
-        volumeMounts = concat(local.common_volume_mounts, [
-        ])
+        volumeMounts = local.common_volume_mounts
         ports = [
           {
             containerPort = local.config_envs.API_SERVER_PORT

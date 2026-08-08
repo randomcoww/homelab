@@ -47,11 +47,15 @@ variable "extra_envs" {
   default = {}
 }
 
-variable "service_port" {
-  type = number
-}
-
 variable "resources" {
   type    = any
   default = {}
+}
+
+variable "ingress_hostname" {
+  type = string
+}
+
+variable "gateway_ref" {
+  type = any
 }
