@@ -145,10 +145,6 @@ locals {
       name      = "cert-manager"
       namespace = "cert-manager"
     }
-    prometheus = {
-      name      = "prometheus"
-      namespace = "monitoring"
-    }
     victoria-metrics = {
       name      = "vm"
       namespace = "monitoring"
@@ -179,9 +175,6 @@ locals {
     }
     hermes-agent = {
       hostname = "hermes-agent.${local.domains.public}"
-    }
-    prometheus = {
-      hostname = "prometheus.${local.domains.public}"
     }
   }
 
