@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             chart = {
               spec = {
                 chart   = "victoria-metrics-k8s-stack"
-                version = "0.90.0" # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
+                version = "0.90.1" # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.victoria-metrics_name
