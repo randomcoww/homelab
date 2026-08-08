@@ -235,13 +235,6 @@ regctl tag ls reg.cluster.internal/${REPO}
 regctl tag delete reg.cluster.internal/${REPO}:${TAG}
 ```
 
-Force a rolling reboot of hosts:
-
-```bash
-tofu -chdir=rolling_reboot init -upgrade && \
-tofu -chdir=rolling_reboot apply
-```
-
 ## Notes
 
 ### Renovate local test
