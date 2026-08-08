@@ -134,7 +134,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 enabled = true
                 spec = {
                   extraArgs = {
-                    "notifier.blackhole" = "true"
+                    "notifier.blackhole" = "true" # needed when not using alertmanager
                   }
                   replicaCount = 2
                 }
