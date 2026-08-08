@@ -176,6 +176,9 @@ locals {
     hermes-agent = {
       hostname = "hermes-agent.${local.domains.public}"
     }
+    alertmanager = {
+      hostname = "alertmanager.${local.domains.public}"
+    }
   }
 
   # Host or hostNet container listen ports

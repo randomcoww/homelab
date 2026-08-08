@@ -111,14 +111,23 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 }
               }
               alertmanager = {
-                enabled = false
+                enabled = true
+                route = {
+                  enabled = true
+                  hostnames = [
+                    local.httproutes.alertmanager.hostname,
+                  ]
+                  parentRefs = [
+                    {
+                      name      = local.services.cilium.name
+                      namespace = local.services.cilium.namespace
+                    },
+                  ]
+                }
               }
               vmalert = {
                 enabled = true
                 spec = {
-                  extraArgs = {
-                    "notifier.blackhole" = "true"
-                  }
                   replicaCount = 2
                 }
               }
