@@ -183,9 +183,6 @@ locals {
     prometheus = {
       hostname = "prometheus.${local.domains.public}"
     }
-    victoria-metrics = {
-      hostname = "vm.${local.domains.public}"
-    }
   }
 
   # Host or hostNet container listen ports

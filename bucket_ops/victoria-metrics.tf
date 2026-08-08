@@ -1,7 +1,7 @@
 locals {
-  victoria-metrics_name        = "vm"
-  victoria-metrics_namespace   = "monitoring"
-  victoria-metrics_alerts_port = 8080
+  victoria-metrics_name      = "vm"
+  victoria-metrics_namespace = "monitoring"
+  victoria-metrics_port      = 8427
 }
 
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
@@ -109,21 +109,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                   }
                 }
-                route = {
-                  select = {
-                    enabled = true
-                    hostnames = [
-                      local.httproutes.victoria-metrics.hostname,
-                    ]
-                    parentRefs = [
-                      {
-                        name      = local.services.cilium.name
-                        namespace = local.services.cilium.namespace
-                      },
-                    ]
-                    # UI at /select/0/vmui
-                  }
-                }
               }
               alertmanager = {
                 enabled = false
@@ -131,10 +116,16 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vmalert = {
                 enabled = true
                 spec = {
-                  port = tostring(local.victoria-metrics_alerts_port)
                   extraArgs = {
                     "notifier.blackhole" = "true"
                   }
+                  replicaCount = 2
+                }
+              }
+              vmauth = {
+                enabled = true
+                spec = {
+                  port         = tostring(local.victoria-metrics_port)
                   replicaCount = 2
                 }
               }
@@ -268,9 +259,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 groups = {
                   kube-state-metrics = {
                     enabled = false # requires kube-state-metrics selfMonitor
-                  }
-                  "kube-prometheus-general.rules" = {
-                    enabled = false # fails with count:up0 getting no data
                   }
                 }
               }

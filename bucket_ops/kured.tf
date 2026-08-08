@@ -54,14 +54,18 @@ resource "minio_s3_object" "fluxcd-kured" {
               # manifest #
 
               configuration = {
-                prometheusUrl = "http://vmalert-${local.victoria-metrics_name}-victoria-metrics-k8s-stack.${local.victoria-metrics_namespace}:${local.victoria-metrics_alerts_port}"
+                prometheusUrl = "http://vmauth-${local.victoria-metrics_name}-victoria-metrics-k8s-stack.${local.victoria-metrics_namespace}:${local.victoria-metrics_port}/select/0/prometheus"
                 period        = "2m"
                 forceReboot   = true
                 drainTimeout  = "6m"
                 alertFilterRegexp = "^(${join("|", sort([
-                  "Watchdog",                              # always on
-                  "PrometheusNotConnectedToAlertmanagers", # not using alert manager
-                  "NodeDiskIOSaturation",                  # triggers too often
+                  "Watchdog", # always on
+                  # - victoria-metrics errors -
+                  "InfoInhibitor",
+                  "RecordingRulesNoData", # can fail if no pods have cycled for some time
+                  "RequestErrorsToAPI",   # triggers too often
+                  "TooManyLogs",          # triggers too often
+                  "TooManyScrapeErrors",  # triggers too often
                 ]))})$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
