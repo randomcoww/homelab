@@ -86,7 +86,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                     resources = {
                       limits = {
-                        memory = "1Gi"
+                        memory = "2Gi"
                       }
                     }
                   }
@@ -137,6 +137,11 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     "notifier.blackhole" = "true" # needed when not using alertmanager
                   }
                   replicaCount = 2
+                  resources = {
+                    limits = {
+                      memory = "128Mi"
+                    }
+                  }
                 }
               }
               vmagent = {
@@ -185,6 +190,11 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       ]
                     },
                   ])
+                  resources = {
+                    limits = {
+                      memory = "256Mi"
+                    }
+                  }
                 }
                 rbac = {
                   namespaced = false
@@ -247,6 +257,14 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               kubeProxy = {
                 enabled = false # using cilium to replace kubeProxy
               }
+              prometheus-node-exporter = {
+                enabled = true
+                resources = {
+                  limits = {
+                    memory = "32Mi"
+                  }
+                }
+              }
               kube-state-metrics = {
                 enabled  = true
                 replicas = 2
@@ -260,6 +278,11 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   enabled = true
                 }
                 */
+                resources = {
+                  limits = {
+                    memory = "128Mi"
+                  }
+                }
               }
               kubelet = {
                 enabled = true
