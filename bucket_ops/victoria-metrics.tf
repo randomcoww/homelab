@@ -1,7 +1,6 @@
 locals {
   victoria-metrics_name      = "vm"
   victoria-metrics_namespace = "monitoring"
-  victoria-metrics_port      = 8427
 }
 
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
@@ -74,6 +73,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vmsingle = {
                 enabled = false
               }
+              alertmanager = {
+                enabled = false
+              }
               vmcluster = {
                 enabled = true
                 spec = {
@@ -109,32 +111,29 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                   }
                 }
-              }
-              alertmanager = {
-                enabled = true
                 route = {
-                  enabled = true
-                  hostnames = [
-                    local.httproutes.alertmanager.hostname,
-                  ]
-                  parentRefs = [
-                    {
-                      name      = local.services.cilium.name
-                      namespace = local.services.cilium.namespace
-                    },
-                  ]
+                  select = {
+                    enabled = true
+                    # UI at /select/0/vmui
+                    # query at /select/0/prometheus/api/*
+                    hostnames = [
+                      local.httproutes.victoria-metrics.hostname,
+                    ]
+                    parentRefs = [
+                      {
+                        name      = local.services.cilium.name
+                        namespace = local.services.cilium.namespace
+                      },
+                    ]
+                  }
                 }
               }
               vmalert = {
                 enabled = true
                 spec = {
-                  replicaCount = 2
-                }
-              }
-              vmauth = {
-                enabled = true
-                spec = {
-                  port         = tostring(local.victoria-metrics_port)
+                  extraArgs = {
+                    "notifier.blackhole" = "true"
+                  }
                   replicaCount = 2
                 }
               }

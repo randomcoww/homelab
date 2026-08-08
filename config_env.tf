@@ -176,8 +176,8 @@ locals {
     hermes-agent = {
       hostname = "hermes-agent.${local.domains.public}"
     }
-    alertmanager = {
-      hostname = "alertmanager.${local.domains.public}"
+    victoria-metrics = {
+      hostname = "vm.${local.domains.public}"
     }
   }
 
