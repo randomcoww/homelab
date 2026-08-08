@@ -120,6 +120,6 @@ resource "helm_release" "kube-dns" {
   ]
   depends_on = [
     kubernetes_labels.labels,
-    helm_release.prometheus-operator-crds,
+    helm_release.prometheus-crds,
   ]
 }

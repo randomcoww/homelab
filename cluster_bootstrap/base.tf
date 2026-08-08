@@ -186,7 +186,7 @@ resource "helm_release" "cert-manager-crds" {
 }
 
 # VictoriaMetrics is used, but keep this to allow many helm to deploy ServiceMonitor CRDs
-resource "helm_release" "prometheus-operator-crds" {
+resource "helm_release" "prometheus-crds" {
   name             = "prometheus-crds"
   namespace        = "monitoring"
   repository       = "https://prometheus-community.github.io/helm-charts"
