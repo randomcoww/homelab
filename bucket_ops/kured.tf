@@ -59,13 +59,9 @@ resource "minio_s3_object" "fluxcd-kured" {
                 forceReboot   = true
                 drainTimeout  = "6m"
                 alertFilterRegexp = "^(${join("|", sort([
-                  "Watchdog", # always on
-                  # - victoria-metrics errors -
-                  "InfoInhibitor",
-                  "RecordingRulesNoData", # can fail if no pods have cycled for some time
-                  "RequestErrorsToAPI",   # triggers too often
-                  "TooManyLogs",          # triggers too often
-                  "TooManyScrapeErrors",  # triggers too often
+                  "Watchdog",             # always on, severity: none
+                  "InfoInhibitor",        # severity: none
+                  "RecordingRulesNoData", # can fail if no pods have cycled for some time (i.e. healthy)
                 ]))})$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
