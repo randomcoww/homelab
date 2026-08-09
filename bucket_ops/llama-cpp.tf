@@ -129,6 +129,7 @@ module "llama-cpp" {
         exclusive = true
         members = [
           "qwen-3-6-27b",
+          "gemma-4-31b",
           "whisper-large-v3-turbo",
         ]
       }
@@ -136,8 +137,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "qwen-3-6-27b",
-          "whisper-large-v3-turbo",
+          "gemma-4-31b",
         ]
       }
     }
