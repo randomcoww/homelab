@@ -124,12 +124,11 @@ module "llama-cpp" {
       }
     }
     groups = {
-      agent-concurrent = {
-        swap      = false
-        exclusive = true
+      persist = {
+        swap       = false
+        exclusive  = false
+        persistent = true
         members = [
-          "qwen-3-6-27b",
-          "gemma-4-31b",
           "whisper-large-v3-turbo",
         ]
       }
@@ -137,6 +136,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
+          "whisper-large-v3-turbo",
           "gemma-4-31b",
         ]
       }
