@@ -16,20 +16,20 @@ module "llama-cpp" {
   models = merge([
     for _, image in [
       {
-        repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16"
-        tag        = "v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
+        repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl"
+        tag        = "v1786227437@sha256:0a7fd449edcfc5f62bc1096d2331978c39646513a98df14f7d7808eac7499a9f" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
         files = {
-          qwen-3-6-27b        = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
-          qwen-3-6-27b-mmproj = "Qwen3.6-27B-mmproj-BF16.gguf"
+          qwen-3-6-27b        = "Qwen3.6-27B-UD-Q8_K_XL.gguf"
+          qwen-3-6-27b-mmproj = "mmproj-BF16.gguf"
         }
       },
       {
-        repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16"
-        tag        = "v1783493322@sha256:0df8bc92746e34aefffc89708257c576743abc2577d4454d176e9af044a54e60" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
+        repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-ud-q8-k-xl"
+        tag        = "v1786229956@sha256:14303a31ada95bfb2d1856e0f3e722784474bdbba524740c8ffad0d8b7aecde9" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
         files = {
-          gemma-4-31b        = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
-          gemma-4-31b-mtp    = "gemma-4-31B-it-BF16-MTP.gguf"
-          gemma-4-31b-mmproj = "gemma-4-31B-it-mmproj-BF16.gguf"
+          gemma-4-31b        = "gemma-4-31B-it-UD-Q8_K_XL.gguf"
+          gemma-4-31b-mtp    = "mtp-gemma-4-31B-it.gguf"
+          gemma-4-31b-mmproj = "mmproj-BF16.gguf"
         }
       },
       {
@@ -64,8 +64,8 @@ module "llama-cpp" {
           --min-p 0.00 \
           --spec-type draft-mtp \
           --spec-draft-n-max 2 \
-          --cache-type-k bf16 \
-          --cache-type-v bf16 \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
           --mmproj $${qwen-3-6-27b-mmproj}
         EOF
         filters = {
@@ -91,8 +91,8 @@ module "llama-cpp" {
           --model-draft $${gemma-4-31b-mtp} \
           --spec-type draft-mtp \
           --spec-draft-n-max 4 \
-          --cache-type-k bf16 \
-          --cache-type-v bf16 \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
           --mmproj $${gemma-4-31b-mmproj} \
         EOF
         filters = {
