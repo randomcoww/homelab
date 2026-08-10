@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-reloader" {
             chart = {
               spec = {
                 chart   = "reloader"
-                version = "2.2.15" # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
+                version = "2.2.16" # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "reloader"

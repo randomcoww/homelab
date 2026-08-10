@@ -5,11 +5,11 @@ module "kea" {
   images = {
     kea = {
       repository = "reg.cluster.internal/randomcoww/kea"
-      tag        = "v3.3.0.1785767553@sha256:6aedd5610fe281e68412106cf1a057c93467544e345c68c4533526a8d7e7a842" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/kea
+      tag        = "v3.3.0.1786366857@sha256:99b067d1d302f8711a5c7e8b726802cf7c64931a344d57b65425d094bcd5290d" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/kea
     }
     ipxe = {
       repository = "reg.cluster.internal/randomcoww/ipxe"
-      tag        = "v2.0.0.1785878098@sha256:58b520538e8e48d677f22274ee85750fe45133a1804da776b7f69659e25d30f9" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
+      tag        = "v2.0.0.1786367655@sha256:695138c6590c293b77482bb5e22dbbe3b62bb9e549b53063a3204958c0080142" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
     }
   }
   peer_service_ips = [

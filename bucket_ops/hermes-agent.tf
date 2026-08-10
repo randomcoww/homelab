@@ -50,7 +50,7 @@ module "hermes-agent" {
   images = {
     hermes-agent = {
       repository = "reg.cluster.internal/randomcoww/hermes-mnemosyne"
-      tag        = "v2026.8.3.1785964257@sha256:e76689bfde8765b027ef277322b07767d04e1699d1e945daf3ac07596ae5b00d" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hermes-mnemosyne
+      tag        = "v2026.8.3.1786365724@sha256:7c051fef293f2aff2ff66bac7231b50294afcdffbce733e1cc1a87955a58d07b" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hermes-mnemosyne
     }
   }
   # TODO: investigate apptainer and podman for agent terminal
