@@ -15,7 +15,7 @@ module "hostapd" {
   images = {
     hostapd = {
       repository = "reg.cluster.internal/randomcoww/hostapd"
-      tag        = "v2.11.1785766888@sha256:b19d0e9c1de8914742f76c8014dc38e40c8805bcea21bc79ae7b02591de6472e" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hostapd
+      tag        = "v2.12.1786366288@sha256:733eedcdf48c9441695b05dc218c68ed9e13ff22b27f4200b53c9742102069ac" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hostapd
     }
   }
   affinity = {
