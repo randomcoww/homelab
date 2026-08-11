@@ -24,12 +24,11 @@ module "llama-cpp" {
         }
       },
       {
-        repository = "reg.cluster.internal/randomcoww/gemma-4-31b-it-ud-q8-k-xl"
-        tag        = "v1786229956@sha256:14303a31ada95bfb2d1856e0f3e722784474bdbba524740c8ffad0d8b7aecde9" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/gemma-4-31b-it-bf16
+        repository = "reg.cluster.internal/randomcoww/muse-glimmer-30b-ud-q8-k-xl"
+        tag        = "v1786426571@sha256:88acda0846a6bac50ab95556fd925ea26e7cd9ed85f8039360a1b35915235a66" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/muse-glimmer-30b-it-bf16
         files = {
-          gemma-4-31b        = "gemma-4-31B-it-UD-Q8_K_XL.gguf"
-          gemma-4-31b-mtp    = "mtp-gemma-4-31B-it.gguf"
-          gemma-4-31b-mmproj = "mmproj-BF16.gguf"
+          muse-glimmer-30b        = "Muse-Glimmer-30B-UD-Q8_K_XL.gguf"
+          muse-glimmer-30b-mmproj = "mmproj-Muse-Glimmer-30B-BF16.gguf"
         }
       },
       {
@@ -80,20 +79,17 @@ module "llama-cpp" {
           }
         }
       }
-      gemma-4-31b = {
+      muse-glimmer-30b = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${gemma-4-31b} \
+          --model $${muse-glimmer-30b} \
           --ctx-size 262144 \
           --jinja \
           --top-p 0.95 \
           --top-k 64 \
-          --model-draft $${gemma-4-31b-mtp} \
-          --spec-type draft-mtp \
-          --spec-draft-n-max 4 \
           --cache-type-k q8_0 \
           --cache-type-v q8_0 \
-          --mmproj $${gemma-4-31b-mmproj} \
+          --mmproj $${muse-glimmer-30b-mmproj} \
         EOF
         filters = {
           stripParams = "temperature"
@@ -137,7 +133,7 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "whisper-large-v3-turbo",
-          "gemma-4-31b",
+          "muse-glimmer-30b",
         ]
       }
     }

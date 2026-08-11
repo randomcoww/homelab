@@ -64,7 +64,7 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default        = "gemma-4-31b"
+      default        = "muse-glimmer-30b"
       provider       = "custom"
       base_url       = "$${OPENAI_BASE_URL}"
       api_key        = "$${OPENAI_API_KEY}"
