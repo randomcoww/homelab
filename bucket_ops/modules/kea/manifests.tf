@@ -253,6 +253,9 @@ module "statefulset" {
         ]
         ports = [
           {
+            containerPort = var.ports.kea_peer
+          },
+          {
             containerPort = var.ports.stork # needed for podmonitor scrape
           },
         ]
