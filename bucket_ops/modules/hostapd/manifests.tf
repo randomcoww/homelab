@@ -73,6 +73,11 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
+  spec = {
+    updateStrategy = {
+      type = "OnDelete"
+    }
+  }
   template_spec = {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
