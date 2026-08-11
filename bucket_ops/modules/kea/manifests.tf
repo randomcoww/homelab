@@ -15,8 +15,7 @@ locals {
     {
       name = "${var.name}-${i}"
       ip   = ip
-      # role = try(element(["primary", "secondary"], i), "backup") # load-balancing
-      role = try(element(["primary", "standby"], i), "backup") # hot-standby
+      role = try(element(["primary", "secondary"], i), "backup") # load-balancing
     }
   ]
 }
@@ -111,10 +110,10 @@ module "secret" {
               high-availability = [
                 {
                   this-server-name   = member.name
-                  trust-anchor       = "${local.kea_base_path}/kea-ca.crt",
-                  cert-file          = "${local.kea_base_path}/kea.crt",
-                  key-file           = "${local.kea_base_path}/kea.key",
-                  mode               = "hot-standby"
+                  trust-anchor       = "${local.kea_base_path}/tls/ca.crt",
+                  cert-file          = "${local.kea_base_path}/tls/tls.crt",
+                  key-file           = "${local.kea_base_path}/tls/tls.key",
+                  mode               = "load-balancing"
                   heartbeat-delay    = 5000
                   max-response-delay = 30000
                   max-ack-delay      = 3000
@@ -252,11 +251,6 @@ module "statefulset" {
           exec kea-dhcp4 -d -c ${local.kea_base_path}/kea-dhcp4.conf
           EOF
         ]
-        ports = [
-          {
-            containerPort = var.ports.stork
-          },
-        ]
         env = [
           {
             name = "POD_NAME"
@@ -290,18 +284,7 @@ module "statefulset" {
           },
           {
             name      = "tls"
-            mountPath = "${local.kea_base_path}/kea.crt"
-            subPath   = "tls.crt"
-          },
-          {
-            name      = "tls"
-            mountPath = "${local.kea_base_path}/kea.key"
-            subPath   = "tls.key"
-          },
-          {
-            name      = "tls"
-            mountPath = "${local.kea_base_path}/kea-ca.crt"
-            subPath   = "ca.crt"
+            mountPath = "${local.kea_base_path}/tls"
           },
         ]
       },
