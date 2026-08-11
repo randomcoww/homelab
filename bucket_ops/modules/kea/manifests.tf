@@ -251,6 +251,11 @@ module "statefulset" {
           exec kea-dhcp4 -d -c ${local.kea_base_path}/kea-dhcp4.conf
           EOF
         ]
+        ports = [
+          {
+            containerPort = var.ports.stork # needed for podmonitor scrape
+          },
+        ]
         env = [
           {
             name = "POD_NAME"
