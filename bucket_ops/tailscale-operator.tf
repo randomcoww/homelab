@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
             chart = {
               spec = {
                 chart   = "tailscale-operator"
-                version = "1.98.9" # renovate: datasource=helm depName=tailscale-operator registryUrl=https://pkgs.tailscale.com/helmcharts
+                version = "1.102.2" # renovate: datasource=helm depName=tailscale-operator registryUrl=https://pkgs.tailscale.com/helmcharts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "tailscale-operator"
