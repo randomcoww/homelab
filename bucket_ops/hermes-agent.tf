@@ -161,42 +161,40 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL           = "https://${local.httproutes.llama-cpp.hostname}/v1"
-    OPENAI_API_KEY            = random_password.llama-cpp-auth-token.result
-    SEARXNG_URL               = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
-    CAMOFOX_URL               = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
-    CAMOFOX_API_KEY           = random_password.camofox-browser-auth-token.result
-    HERMES_TIMEZONE           = local.timezone
-    GITHUB_TOKEN              = var.github_token
-    API_SERVER_MODEL_NAME     = "hermes-agent"
-    API_SERVER_KEY            = random_password.hermes-agent-auth-token.result
-    SLACK_BOT_TOKEN           = var.slack_bot_token
-    SLACK_APP_TOKEN           = var.slack_app_token
-    SLACK_ALLOWED_USERS       = var.slack_allowed_users
-    SLACK_HOME_CHANNEL        = var.slack_home_channel
-    SLACK_HOME_CHANNEL_NAME   = "bot"
-    AUXILIARY_VISION_PROVIDER = "auto"
-    # OIDC for hermes dashboard
-    HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
-    HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
-    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
-    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.httproutes.hermes-agent.hostname}"
-    # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "https://${local.httproutes.llama-cpp.hostname}/v1"
-    STT_GROQ_MODEL = "whisper-large-v3-turbo"
-    GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
+    OPENAI_BASE_URL                     = "https://${local.httproutes.llama-cpp.hostname}/v1"
+    OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
+    SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
+    CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
+    CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
+    HERMES_TIMEZONE                     = local.timezone
+    GITHUB_TOKEN                        = var.github_token
+    API_SERVER_MODEL_NAME               = "hermes-agent"
+    API_SERVER_KEY                      = random_password.hermes-agent-auth-token.result
+    SLACK_BOT_TOKEN                     = var.slack_bot_token
+    SLACK_APP_TOKEN                     = var.slack_app_token
+    SLACK_ALLOWED_USERS                 = var.slack_allowed_users
+    SLACK_HOME_CHANNEL                  = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME             = "bot"
+    AUXILIARY_VISION_PROVIDER           = "auto"
+    HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id     # only used if HERMES_DASHBOARD=true
+    HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret # only used if HERMES_DASHBOARD=true
+    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"            # only used if HERMES_DASHBOARD=true
+    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.httproutes.hermes-agent.hostname}"        # only used if HERMES_DASHBOARD=true
+    GROQ_BASE_URL                       = "https://${local.httproutes.llama-cpp.hostname}/v1"        # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
+    GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
+    STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
     # custom vars #
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
   }
   extra_webui_envs = {
+    HERMES_WEBUI_GATEWAY_API_KEY = random_password.hermes-agent-auth-token.result
     # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
     # HERMES_WEBUI_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
     # HERMES_WEBUI_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
     # HERMES_WEBUI_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
     # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
     # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
-    # HERMES_WEBUI_GATEWAY_API_KEY    = random_password.hermes-agent-auth-token.result
   }
 
   extra_agent_envs = {
