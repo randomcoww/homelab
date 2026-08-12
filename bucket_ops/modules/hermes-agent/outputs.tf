@@ -2,6 +2,7 @@ output "manifests" {
   value = concat([
     module.statefulset.manifest,
     module.secret.manifest,
+    module.env-secret.manifest,
     module.juicefs-secret.manifest,
     module.service.manifest,
     module.httproute.manifest,

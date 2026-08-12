@@ -52,6 +52,10 @@ module "hermes-agent" {
       repository = "reg.cluster.internal/randomcoww/hermes-mnemosyne"
       tag        = "v2026.8.3.1786365724@sha256:7c051fef293f2aff2ff66bac7231b50294afcdffbce733e1cc1a87955a58d07b" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hermes-mnemosyne
     }
+    hermes-webui = {
+      repository = "ghcr.io/nesquena/hermes-webui"
+      tag        = "0.52.202@sha256:9991be2f8e8e8a128b81f9c9dac83c6ba73178ba14efdf2dee5e680a1b0bb2fa" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
+    }
   }
   # TODO: investigate apptainer and podman for agent terminal
   extra_configs = {
@@ -157,21 +161,22 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL                     = "https://${local.httproutes.llama-cpp.hostname}/v1"
-    OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
-    SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
-    CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
-    CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
-    HERMES_TIMEZONE                     = local.timezone
-    GITHUB_TOKEN                        = var.github_token
-    API_SERVER_MODEL_NAME               = "hermes-agent"
-    API_SERVER_KEY                      = random_password.hermes-agent-auth-token.result
-    SLACK_BOT_TOKEN                     = var.slack_bot_token
-    SLACK_APP_TOKEN                     = var.slack_app_token
-    SLACK_ALLOWED_USERS                 = var.slack_allowed_users
-    SLACK_HOME_CHANNEL                  = var.slack_home_channel
-    SLACK_HOME_CHANNEL_NAME             = "bot"
-    AUXILIARY_VISION_PROVIDER           = "auto"
+    OPENAI_BASE_URL           = "https://${local.httproutes.llama-cpp.hostname}/v1"
+    OPENAI_API_KEY            = random_password.llama-cpp-auth-token.result
+    SEARXNG_URL               = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
+    CAMOFOX_URL               = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
+    CAMOFOX_API_KEY           = random_password.camofox-browser-auth-token.result
+    HERMES_TIMEZONE           = local.timezone
+    GITHUB_TOKEN              = var.github_token
+    API_SERVER_MODEL_NAME     = "hermes-agent"
+    API_SERVER_KEY            = random_password.hermes-agent-auth-token.result
+    SLACK_BOT_TOKEN           = var.slack_bot_token
+    SLACK_APP_TOKEN           = var.slack_app_token
+    SLACK_ALLOWED_USERS       = var.slack_allowed_users
+    SLACK_HOME_CHANNEL        = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME   = "bot"
+    AUXILIARY_VISION_PROVIDER = "auto"
+    # OIDC for hermes dashboard
     HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
@@ -184,6 +189,16 @@ module "hermes-agent" {
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
   }
+  extra_webui_envs = {
+    # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
+    # HERMES_WEBUI_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
+    # HERMES_WEBUI_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
+    # HERMES_WEBUI_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
+    # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
+    # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
+    # HERMES_WEBUI_GATEWAY_API_KEY    = random_password.hermes-agent-auth-token.result
+  }
+
   extra_agent_envs = {
     "TZ" = local.timezone
   }

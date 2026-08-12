@@ -28,6 +28,10 @@ variable "images" {
       repository = string
       tag        = string
     })
+    hermes-webui = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 
