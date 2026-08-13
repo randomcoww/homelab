@@ -1,7 +1,3 @@
-locals {
-  cert_manager_version = "1.21.1" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-}
-
 resource "kubernetes_labels" "labels" {
   for_each = {
     for _, key in keys(lookup(local.members, "kubernetes-worker", {})) :
@@ -161,7 +157,14 @@ resource "helm_release" "bootstrap" {
 }
 
 data "http" "cert-manager-crds-yaml" {
-  url = "https://github.com/cert-manager/cert-manager/releases/download/v${local.cert_manager_version}/cert-manager.crds.yaml"
+  url = join("", [
+    "https://github.com/cert-manager/cert-manager/releases/download/v",
+    trim(
+      "1.21.1", # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+      "v"
+    ),
+    "/cert-manager.crds.yaml",
+  ])
   request_headers = {
     Accept = "application/yaml"
   }

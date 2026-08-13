@@ -14,7 +14,7 @@
         "/\\.tf$/"
       ],
       "matchStrings": [
-        "\"(?<currentValue>[^\"]+?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: depType=(?<depType>[^\\s]+?))?\\s"
+        "\"(?<currentValue>[^\"]+?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\"[^\"]* # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: depType=(?<depType>[^\\s]+?))?\\s"
       ],
       "versioningTemplate": "docker"
     }
