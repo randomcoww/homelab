@@ -141,7 +141,10 @@ module "litestream-overlay" {
   template_spec = {
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "128Mi"
+      }
+      limits = {
+        memory = "256Mi"
       }
     }
     containers = [

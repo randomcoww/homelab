@@ -65,6 +65,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics-mcp" {
                 port = local.victoria-metrics-mcp_port
               }
               resources = {
+                requests = {
+                  memory = "512Mi"
+                }
                 limits = {
                   memory = "1Gi"
                 }

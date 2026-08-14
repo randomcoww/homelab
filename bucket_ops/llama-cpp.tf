@@ -168,7 +168,7 @@ module "llama-cpp" {
   }
   resources = {
     requests = {
-      memory = "96Gi"
+      memory = "64Gi"
     }
   }
 }

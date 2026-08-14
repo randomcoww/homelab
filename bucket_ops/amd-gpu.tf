@@ -60,10 +60,10 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
               dp = {
                 resources = {
                   requests = {
-                    memory = "64Mi"
+                    memory = "16Mi"
                   }
                   limits = {
-                    memory = "64Mi"
+                    memory = "32Mi"
                   }
                 }
               }

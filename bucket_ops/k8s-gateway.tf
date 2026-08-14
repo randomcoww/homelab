@@ -69,7 +69,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                   memory = "128Mi"
                 }
                 limits = {
-                  memory = "128Mi"
+                  memory = "256Mi"
                 }
               }
               service = {

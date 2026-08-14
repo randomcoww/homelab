@@ -223,7 +223,10 @@ module "statefulset" {
   template_spec = {
     resources = {
       requests = {
-        memory = "4Gi"
+        memory = "1Gi"
+      }
+      limits = {
+        memory = "2Gi"
       }
     }
     # do not use fsGroup with juicefs

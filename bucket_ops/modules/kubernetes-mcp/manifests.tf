@@ -37,6 +37,9 @@ module "deployment" {
     serviceAccountName = var.name
     resources = {
       requests = {
+        memory = "128Mi"
+      }
+      limits = {
         memory = "256Mi"
       }
     }

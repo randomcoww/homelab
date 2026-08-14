@@ -56,6 +56,9 @@ module "deployment" {
   template_spec = {
     resources = {
       requests = {
+        memory = "1Gi"
+      }
+      limits = {
         memory = "2Gi"
       }
     }

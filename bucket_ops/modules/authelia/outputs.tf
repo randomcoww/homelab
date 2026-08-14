@@ -24,6 +24,9 @@ output "manifests" {
           }
           resources = {
             requests = {
+              memory = "128Mi"
+            }
+            limits = {
               memory = "256Mi"
             }
           }

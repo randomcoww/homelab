@@ -85,6 +85,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       "dedup.minScrapeInterval" = "30s"
                     }
                     resources = {
+                      requests = {
+                        memory = "1Gi"
+                      }
                       limits = {
                         memory = "2Gi"
                       }
@@ -96,6 +99,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       enableMultitenancyViaHeaders = "true"
                     }
                     resources = {
+                      requests = {
+                        memory = "256Mi"
+                      }
                       limits = {
                         memory = "256Mi"
                       }
@@ -107,6 +113,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       enableMultitenancyViaHeaders = "true"
                     }
                     resources = {
+                      requests = {
+                        memory = "256Mi"
+                      }
                       limits = {
                         memory = "256Mi"
                       }
@@ -138,6 +147,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   }
                   replicaCount = 2
                   resources = {
+                    requests = {
+                      memory = "64Mi"
+                    }
                     limits = {
                       memory = "128Mi"
                     }
@@ -191,6 +203,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     },
                   ])
                   resources = {
+                    requests = {
+                      memory = "256Mi"
+                    }
                     limits = {
                       memory = "256Mi"
                     }
@@ -260,8 +275,11 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               prometheus-node-exporter = {
                 enabled = true
                 resources = {
-                  limits = {
+                  requests = {
                     memory = "32Mi"
+                  }
+                  limits = {
+                    memory = "64Mi"
                   }
                 }
               }

@@ -64,10 +64,10 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
               }
               resources = {
                 requests = {
-                  memory = "200Mi"
+                  memory = "128Mi"
                 }
                 limits = {
-                  memory = "200Mi"
+                  memory = "128Mi"
                 }
               }
               affinity = {

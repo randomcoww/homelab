@@ -181,7 +181,7 @@ module "apiserver" {
             memory = "3Gi"
           }
           limits = {
-            memory = "3Gi"
+            memory = "4Gi"
           }
         }
         env = [
@@ -279,7 +279,7 @@ module "controller-manager" {
         ] : []))
         resources = {
           requests = {
-            memory = "512Mi"
+            memory = "256Mi"
           }
           limits = {
             memory = "512Mi"
@@ -359,7 +359,7 @@ module "scheduler" {
         ] : []))
         resources = {
           requests = {
-            memory = "256Mi"
+            memory = "128Mi"
           }
           limits = {
             memory = "256Mi"

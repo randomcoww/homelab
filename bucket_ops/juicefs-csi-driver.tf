@@ -89,6 +89,9 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                   {
                     resources = {
                       requests = {
+                        memory = "256Mi"
+                      }
+                      limits = {
                         memory = "512Mi"
                       }
                     }

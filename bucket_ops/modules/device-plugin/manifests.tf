@@ -12,7 +12,7 @@ module "daemonset" {
     priorityClassName = "system-node-critical"
     resources = {
       requests = {
-        memory = "64Mi"
+        memory = "32Mi"
       }
       limits = {
         memory = "64Mi"

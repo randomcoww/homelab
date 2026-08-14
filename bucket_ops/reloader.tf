@@ -60,6 +60,9 @@ resource "minio_s3_object" "fluxcd-reloader" {
                   replicas = 2
                   resources = {
                     requests = {
+                      memory = "64Mi"
+                    }
+                    limits = {
                       memory = "128Mi"
                     }
                   }

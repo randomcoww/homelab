@@ -32,7 +32,7 @@ resource "helm_release" "cert-manager" {
         replicaCount = 2
         resources = {
           requests = {
-            memory = "256Mi"
+            memory = "128Mi"
           }
           limits = {
             memory = "256Mi"
@@ -41,7 +41,7 @@ resource "helm_release" "cert-manager" {
       }
       resources = {
         requests = {
-          memory = "256Mi"
+          memory = "128Mi"
         }
         limits = {
           memory = "256Mi"
@@ -52,10 +52,10 @@ resource "helm_release" "cert-manager" {
         replicaCount = 2
         resources = {
           requests = {
-            memory = "256Mi"
+            memory = "128Mi"
           }
           limits = {
-            memory = "256Mi"
+            memory = "128Mi"
           }
         }
       }
@@ -101,6 +101,14 @@ resource "helm_release" "cert-manager-csi-driver" {
         enabled = true
         podmonitor = {
           enabled = true
+        }
+      }
+      resources = {
+        requests = {
+          memory = "64Mi"
+        }
+        limits = {
+          memory = "128Mi"
         }
       }
     }),

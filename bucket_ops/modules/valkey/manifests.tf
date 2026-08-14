@@ -146,7 +146,7 @@ module "statefulset" {
   template_spec = {
     resources = merge({
       requests = {
-        memory = "64Mi"
+        memory = "32Mi"
       }
       limits = {
         memory = "64Mi"

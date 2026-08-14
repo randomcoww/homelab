@@ -113,7 +113,7 @@ module "statefulset" {
   template_spec = {
     resources = merge({
       requests = {
-        memory = "8Gi"
+        memory = "16Gi"
       }
     }, var.resources)
     containers = [

@@ -419,7 +419,7 @@ module "statefulset" {
   template_spec = {
     resources = merge({
       requests = {
-        memory = "4Gi"
+        memory = "2Gi"
       }
       limits = {
         memory = "4Gi"

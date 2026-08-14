@@ -29,7 +29,7 @@ resource "helm_release" "local-path-provisioner" {
       ]
       resources = {
         requests = {
-          memory = "128Mi"
+          memory = "64Mi"
         }
         limits = {
           memory = "128Mi"

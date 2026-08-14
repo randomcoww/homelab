@@ -150,6 +150,9 @@ output "manifests" {
             requests = {
               memory = "256Mi"
             }
+            limits = {
+              memory = "256Mi"
+            }
           }
         }
       },
