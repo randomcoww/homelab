@@ -16,11 +16,11 @@ module "llama-cpp" {
   models = merge([
     for _, image in [
       {
-        repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl"
-        tag        = "v1786227437@sha256:0a7fd449edcfc5f62bc1096d2331978c39646513a98df14f7d7808eac7499a9f" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl
+        repository = "reg.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
+        tag        = "v1786728652@sha256:76c5cbf6ac40d6b5edf9c1e9cb9f35c12810e743b34011d27e8757b18963af77" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl
         files = {
-          qwen-3-6-27b        = "Qwen3.6-27B-UD-Q8_K_XL.gguf"
-          qwen-3-6-27b-mmproj = "mmproj-BF16.gguf"
+          qwen-3-8-27b        = "Qwen3.8-27B-UD-Q8_K_XL.gguf"
+          qwen-3-8-27b-mmproj = "mmproj-BF16.gguf"
         }
       },
       {
@@ -52,20 +52,20 @@ module "llama-cpp" {
   llama_swap_config = {
     includeAliasesInList = true
     models = {
-      qwen-3-6-27b = {
+      qwen-3-8-27b = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${qwen-3-6-27b} \
+          --model $${qwen-3-8-27b} \
           --ctx-size 262144 \
           --jinja \
           --top-p 0.95 \
           --top-k 20 \
-          --min-p 0.00 \
+          --min-p 0.0 \
+          --presence-penalty 0.0 \
+          --repeat-penalty 1.0 \
           --spec-type draft-mtp \
           --spec-draft-n-max 2 \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
-          --mmproj $${qwen-3-6-27b-mmproj}
+          --mmproj $${qwen-3-8-27b-mmproj}
         EOF
         filters = {
           stripParams = "temperature"
@@ -87,8 +87,6 @@ module "llama-cpp" {
           --jinja \
           --top-p 0.95 \
           --top-k 64 \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
           --mmproj $${muse-glimmer-30b-mmproj} \
         EOF
         filters = {
@@ -133,7 +131,7 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "whisper-large-v3-turbo",
-          "muse-glimmer-30b",
+          "qwen-3-8-27b",
         ]
       }
     }
