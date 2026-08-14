@@ -26,8 +26,7 @@ module "secret" {
           llama-server \
           --port $${PORT} \
           --flash-attn on \
-          --context-shift \
-          --no-mmap
+          --load-mode none
         EOF
         }, {
         for _, v in local.models :

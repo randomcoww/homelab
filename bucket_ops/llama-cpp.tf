@@ -65,6 +65,7 @@ module "llama-cpp" {
           --repeat-penalty 1.0 \
           --spec-type draft-mtp \
           --spec-draft-n-max 2 \
+          --reasoning-preserve \
           --mmproj $${qwen-3-8-27b-mmproj}
         EOF
         filters = {
