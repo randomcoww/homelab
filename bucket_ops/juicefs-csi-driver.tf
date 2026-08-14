@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             chart = {
               spec = {
                 chart   = "juicefs-csi-driver"
-                version = "0.32.2" # renovate: datasource=helm depName=juicefs-csi-driver registryUrl=https://juicedata.github.io/charts
+                version = "0.32.3" # renovate: datasource=helm depName=juicefs-csi-driver registryUrl=https://juicedata.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "juicefs-csi-driver"
@@ -69,7 +69,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                   {
                     ceMountImage = join(":", [
                       "reg.cluster.internal/randomcoww/juicefs",
-                      "ce-v1.4.0.1785197482@sha256:82cf285b6b0e5d37361df9fa48d27b12763721ff7c3cad1c70941f7e1f99cbde", # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/juicefs
+                      "ce-v1.4.1.1786367431@sha256:6fd4e50823823ca71546920cbafb7c5b566bf4626227e5884db76672d10d872d", # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/juicefs
                     ])
                   },
                   {
