@@ -161,7 +161,7 @@ data "http" "cert-manager-crds-yaml" {
     "https://github.com/cert-manager/cert-manager/releases/download/v",
     trim(
       "1.21.1", # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-      "v"
+      "v",
     ),
     "/cert-manager.crds.yaml",
   ])

@@ -17,7 +17,7 @@ module "llama-cpp" {
     for _, image in [
       {
         repository = "reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl"
-        tag        = "v1786227437@sha256:0a7fd449edcfc5f62bc1096d2331978c39646513a98df14f7d7808eac7499a9f" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-bf16
+        tag        = "v1786227437@sha256:0a7fd449edcfc5f62bc1096d2331978c39646513a98df14f7d7808eac7499a9f" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.6-27b-ud-q8-k-xl
         files = {
           qwen-3-6-27b        = "Qwen3.6-27B-UD-Q8_K_XL.gguf"
           qwen-3-6-27b-mmproj = "mmproj-BF16.gguf"
@@ -25,7 +25,7 @@ module "llama-cpp" {
       },
       {
         repository = "reg.cluster.internal/randomcoww/muse-glimmer-30b-ud-q8-k-xl"
-        tag        = "v1786426571@sha256:88acda0846a6bac50ab95556fd925ea26e7cd9ed85f8039360a1b35915235a66" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/muse-glimmer-30b-it-bf16
+        tag        = "v1786426571@sha256:88acda0846a6bac50ab95556fd925ea26e7cd9ed85f8039360a1b35915235a66" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/muse-glimmer-30b-ud-q8-k-xl
         files = {
           muse-glimmer-30b        = "Muse-Glimmer-30B-UD-Q8_K_XL.gguf"
           muse-glimmer-30b-mmproj = "mmproj-Muse-Glimmer-30B-BF16.gguf"
