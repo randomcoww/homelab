@@ -101,6 +101,18 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             }
           }
         },
+
+        # NS
+        {
+          apiVersion = "v1"
+          kind       = "Namespace"
+          metadata = {
+            name = "juicefs"
+            annotations = {
+              "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ])

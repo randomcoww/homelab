@@ -55,6 +55,18 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
             }
           }
         },
+
+        # NS
+        {
+          apiVersion = "v1"
+          kind       = "Namespace"
+          metadata = {
+            name = "cnpg-system"
+            annotations = {
+              "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ])

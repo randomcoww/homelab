@@ -58,6 +58,18 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
             }
           }
         },
+
+        # NS
+        {
+          apiVersion = "v1"
+          kind       = "Namespace"
+          metadata = {
+            name = "tailscale"
+            annotations = {
+              "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ])

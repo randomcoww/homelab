@@ -185,6 +185,18 @@ output "manifests" {
           ]
         }
       },
+
+      # NS
+      {
+        apiVersion = "v1"
+        kind       = "Namespace"
+        metadata = {
+          name = "kube-amd-gpu"
+          annotations = {
+            "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+          }
+        }
+      },
     ] :
     yamlencode(m)
   ])

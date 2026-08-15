@@ -75,6 +75,18 @@ resource "minio_s3_object" "fluxcd-victoria-metrics-mcp" {
             }
           }
         },
+
+        # NS
+        {
+          apiVersion = "v1"
+          kind       = "Namespace"
+          metadata = {
+            name = local.victoria-metrics-mcp_namespace
+            annotations = {
+              "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ])

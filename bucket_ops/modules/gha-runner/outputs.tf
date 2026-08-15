@@ -236,6 +236,28 @@ output "manifests" {
           }
         }
       },
+
+      # NS
+      {
+        apiVersion = "v1"
+        kind       = "Namespace"
+        metadata = {
+          name = var.namespace
+          annotations = {
+            "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+          }
+        }
+      },
+      {
+        apiVersion = "v1"
+        kind       = "Namespace"
+        metadata = {
+          name = var.controller_namespace
+          annotations = {
+            "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+          }
+        }
+      },
     ]) :
     yamlencode(m)
   ])
