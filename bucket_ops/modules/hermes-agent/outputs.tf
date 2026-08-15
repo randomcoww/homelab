@@ -97,6 +97,26 @@ output "manifests" {
           }
         }
       },
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "PodMonitor"
+        metadata = {
+          name      = "${var.name}-juicefs-pg"
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              "cnpg.io/cluster" = "${var.name}-juicefs-pg"
+            }
+          }
+          podMetricsEndpoints = [
+            {
+              port = "metrics"
+            },
+          ]
+        }
+      },
 
       # NS
       {

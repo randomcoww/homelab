@@ -35,6 +35,26 @@ output "manifests" {
           }
         }
       },
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "PodMonitor"
+        metadata = {
+          name      = "${var.name}-pg"
+          namespace = var.namespace
+        }
+        spec = {
+          selector = {
+            matchLabels = {
+              "cnpg.io/cluster" = "${var.name}-pg"
+            }
+          }
+          podMetricsEndpoints = [
+            {
+              port = "metrics"
+            },
+          ]
+        }
+      },
 
       # server cert
       {
