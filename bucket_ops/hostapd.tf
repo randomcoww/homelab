@@ -25,7 +25,7 @@ module "hostapd" {
           {
             matchExpressions = [
               {
-                key      = "feature.node.kubernetes.io/hostapd-compat"
+                key      = "feature.node.kubernetes.io/wireless-ap"
                 operator = "In"
                 values = [
                   "true",

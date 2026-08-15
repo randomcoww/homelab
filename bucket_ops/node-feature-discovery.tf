@@ -59,9 +59,9 @@ resource "minio_s3_object" "fluxcd-node-feature-discovery" {
                   sources = {
                     custom = [
                       {
-                        name = "hostapd-compat"
+                        name = "wireless-ap"
                         labels = {
-                          hostapd-compat = true
+                          wireless-ap = true
                         }
                         matchFeatures = [
                           {
