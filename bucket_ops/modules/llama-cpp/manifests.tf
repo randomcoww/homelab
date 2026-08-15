@@ -111,6 +111,12 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    resourceClaims = [
+      {
+        name              = "gpu"
+        resourceClaimName = var.gpu_resource_claim
+      },
+    ]
     resources = merge({
       requests = {
         memory = "16Gi"
@@ -164,12 +170,11 @@ module "statefulset" {
           }
         ])
         resources = {
-          requests = {
-            "amd.com/gpu" = 1
-          }
-          limits = {
-            "amd.com/gpu" = 1
-          }
+          claims = [
+            {
+              name = "gpu"
+            },
+          ]
         }
         ports = [
           {

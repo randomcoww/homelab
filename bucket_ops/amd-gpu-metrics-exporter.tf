@@ -1,41 +1,42 @@
-resource "minio_s3_object" "fluxcd-amd-gpu" {
+resource "minio_s3_object" "fluxcd-amd-gpu-metrics-exporter" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
       for _, m in [
+        # GPU metrics exporter
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = "amd-gpu"
-            namespace = "amd"
+            name      = "amd-gpu-metrics-exporter"
+            namespace = "kube-amd-gpu"
           }
           spec = {
             interval = "15m"
-            url      = "https://rocm.github.io/k8s-device-plugin"
+            url      = "https://rocm.github.io/device-metrics-exporter"
           }
         },
         {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = "amd-gpu"
-            namespace = "amd"
+            name      = "amd-gpu-metrics-exporter"
+            namespace = "kube-amd-gpu"
           }
           spec = {
             interval = "15m"
             timeout  = "5m"
             chart = {
               spec = {
-                chart   = "amd-gpu"
-                version = "0.21.0" # renovate: datasource=helm depName=amd-gpu registryUrl=https://rocm.github.io/k8s-device-plugin
+                chart   = "device-metrics-exporter-charts"
+                version = "v1.5.1" # renovate: datasource=helm depName=device-metrics-exporter-charts registryUrl=https://rocm.github.io/device-metrics-exporter
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = "amd-gpu"
+                  name = "amd-gpu-metrics-exporter"
                 }
                 interval = "5m"
               }
             }
-            releaseName = "amd-gpu"
+            releaseName = "amd-gpu-metrics-exporter"
             install = {
               createNamespace = true
               remediation = {
@@ -51,40 +52,19 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
               enable = false
             }
             values = {
-              nfd = {
-                enabled = false
-              }
-              labeller = {
+              serviceMonitor = {
                 enabled = true
-              }
-              dp = {
-                resources = {
-                  requests = {
-                    memory = "16Mi"
-                  }
-                  limits = {
-                    memory = "32Mi"
-                  }
-                }
-              }
-              lbl = {
-                resources = {
-                  requests = {
-                    memory = "64Mi"
-                  }
-                  limits = {
-                    memory = "64Mi"
-                  }
-                }
               }
             }
           }
         },
+
+        # NS
         {
           apiVersion = "v1"
           kind       = "Namespace"
           metadata = {
-            name = "amd"
+            name = "kube-amd-gpu"
             annotations = {
               "kustomize.toolkit.fluxcd.io/prune" = "disabled"
             }
@@ -103,7 +83,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
   }
 
   bucket_name  = "fluxcd"
-  object_name  = "amd-gpu/${each.key}"
+  object_name  = "amd-gpu-metrics-exporter/${each.key}"
   content_type = "application/yaml"
   content      = each.value
 

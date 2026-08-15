@@ -171,6 +171,7 @@ module "llama-cpp" {
       memory = "64Gi"
     }
   }
+  gpu_resource_claim = local.resource_claims.amd-gpu-gfx1151
 }
 
 resource "minio_s3_object" "fluxcd-llama-cpp" {

@@ -52,6 +52,10 @@ variable "resources" {
   default = {}
 }
 
+variable "gpu_resource_claim" {
+  type = string
+}
+
 variable "ingress_hostname" {
   type = string
 }
