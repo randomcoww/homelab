@@ -72,7 +72,7 @@ module "hermes-agent" {
       provider       = "custom"
       base_url       = "$${OPENAI_BASE_URL}"
       api_key        = "$${OPENAI_API_KEY}"
-      context_length = 262144
+      context_length = 1048576
     }
     web = {
       search_backend  = "searxng"

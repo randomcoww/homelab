@@ -56,7 +56,7 @@ module "llama-cpp" {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${qwen-3-8-27b} \
-          --ctx-size 262144 \
+          --ctx-size 1048576 \
           --jinja \
           --top-p 0.95 \
           --top-k 20 \
@@ -66,6 +66,8 @@ module "llama-cpp" {
           --spec-type draft-mtp \
           --spec-draft-n-max 2 \
           --reasoning-preserve \
+          --rope-scaling yarn \
+          --rope-scale 4 \
           --mmproj $${qwen-3-8-27b-mmproj}
         EOF
         filters = {
