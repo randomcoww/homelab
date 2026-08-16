@@ -161,7 +161,7 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = {
-    OPENAI_BASE_URL                     = "https://${local.httproutes.llama-cpp.hostname}/v1"
+    OPENAI_BASE_URL                     = "https://${local.endpoints.llama-cpp.hostname}/v1"
     OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
     CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
@@ -178,9 +178,9 @@ module "hermes-agent" {
     AUXILIARY_VISION_PROVIDER           = "auto"
     HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id     # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret # only used if HERMES_DASHBOARD=true
-    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"            # only used if HERMES_DASHBOARD=true
-    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.httproutes.hermes-agent.hostname}"        # only used if HERMES_DASHBOARD=true
-    GROQ_BASE_URL                       = "https://${local.httproutes.llama-cpp.hostname}/v1"        # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
+    HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"             # only used if HERMES_DASHBOARD=true
+    HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.hostname}"         # only used if HERMES_DASHBOARD=true
+    GROQ_BASE_URL                       = "https://${local.endpoints.llama-cpp.hostname}/v1"         # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
     GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
     STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
     # custom vars #
@@ -192,7 +192,7 @@ module "hermes-agent" {
     # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
     # HERMES_WEBUI_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
     # HERMES_WEBUI_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
-    # HERMES_WEBUI_OIDC_ISSUER        = "https://${local.httproutes.authelia.hostname}"
+    # HERMES_WEBUI_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"
     # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
     # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
   }
@@ -201,7 +201,7 @@ module "hermes-agent" {
     "TZ" = local.timezone
   }
   ca_issuer_name   = local.cert_issuers.ca_internal
-  ingress_hostname = local.httproutes.hermes-agent.hostname
+  ingress_hostname = local.endpoints.hermes-agent.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
@@ -237,7 +237,7 @@ resource "minio_s3_object" "fluxcd-hermes-agent" {
 
 output "hermes-agent" {
   value = {
-    base_url = "https://${local.httproutes.hermes-agent.hostname}/v1"
+    base_url = "https://${local.endpoints.hermes-agent.hostname}/v1"
     api_key  = random_password.hermes-agent-auth-token.result
   }
   sensitive = true

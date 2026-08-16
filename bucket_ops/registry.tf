@@ -53,7 +53,7 @@ module "registry" {
   minio_user          = minio_iam_user.registry
   service_port        = local.service_ports.registry
   service_ip          = local.networks.service.vips.registry
-  service_hostname    = local.httproutes.registry.hostname
+  service_hostname    = local.endpoints.registry.hostname
   ca_issuer_name      = local.cert_issuers.ca_internal
 }
 

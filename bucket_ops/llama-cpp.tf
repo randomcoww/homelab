@@ -163,7 +163,7 @@ module "llama-cpp" {
       }
     }
   }
-  ingress_hostname = local.httproutes.llama-cpp.hostname
+  ingress_hostname = local.endpoints.llama-cpp.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
@@ -202,7 +202,7 @@ resource "minio_s3_object" "fluxcd-llama-cpp" {
 
 output "llama-cpp" {
   value = {
-    base_url = "https://${local.httproutes.llama-cpp.hostname}/v1"
+    base_url = "https://${local.endpoints.llama-cpp.hostname}/v1"
     api_key  = random_password.llama-cpp-auth-token.result
   }
   sensitive = true

@@ -8,7 +8,7 @@ resource "tls_cert_request" "registry-client" {
   private_key_pem = tls_private_key.registry-client.private_key_pem
 
   subject {
-    common_name = local.httproutes.registry.hostname
+    common_name = local.endpoints.registry.hostname
   }
 }
 

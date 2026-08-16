@@ -59,7 +59,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics-mcp" {
             values = {
               vm = {
                 type       = "cluster"
-                entrypoint = "https://${local.httproutes.victoria-metrics.hostname}"
+                entrypoint = "https://${local.endpoints.victoria-metrics.hostname}"
               }
               service = {
                 port = local.victoria-metrics-mcp_port

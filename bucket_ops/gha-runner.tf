@@ -47,7 +47,7 @@ module "gha-runner" {
     token    = var.github_token
   }
   ca_issuer_name    = local.cert_issuers.ca_internal
-  registry_endpoint = "${local.httproutes.registry.hostname}:${local.service_ports.registry}"
+  registry_endpoint = "${local.endpoints.registry.hostname}:${local.service_ports.registry}"
   minio_endpoint    = "${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_user        = minio_iam_user.gha-runner
 }

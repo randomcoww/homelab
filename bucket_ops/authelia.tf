@@ -15,7 +15,7 @@ locals {
       require_pkce          = false
       pkce_challenge_method = ""
       redirect_uris = [
-        "https://${local.httproutes.stump.hostname}/api/v2/auth/oidc/callback",
+        "https://${local.endpoints.stump.hostname}/api/v2/auth/oidc/callback",
       ]
       claims_policy = "stump_policy" # defined and used under oidc_claims_policies
       consent_mode  = "implicit"
@@ -30,7 +30,7 @@ locals {
       require_pkce          = false
       pkce_challenge_method = ""
       redirect_uris = [
-        "https://${local.httproutes.hermes-agent.hostname}/auth/callback",
+        "https://${local.endpoints.hermes-agent.hostname}/auth/callback",
       ]
       consent_mode = "implicit"
     }
@@ -113,7 +113,7 @@ module "authelia" {
     }
   }
 
-  ingress_hostname = local.httproutes.authelia.hostname
+  ingress_hostname = local.endpoints.authelia.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

@@ -54,12 +54,12 @@ module "stump" {
     }
   }
   extra_envs = {
-    STUMP_OIDC_ISSUER_URL    = "https://${local.httproutes.authelia.hostname}"
+    STUMP_OIDC_ISSUER_URL    = "https://${local.endpoints.authelia.hostname}"
     STUMP_OIDC_CLIENT_ID     = local.authelia_oidc_clients.stump.client_id
     STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret
     STUMP_OIDC_SCOPES        = join(",", local.authelia_oidc_clients.stump.scopes)
   }
-  ingress_hostname = local.httproutes.stump.hostname
+  ingress_hostname = local.endpoints.stump.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

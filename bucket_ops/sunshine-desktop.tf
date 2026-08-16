@@ -18,8 +18,8 @@ module "sunshine-desktop" {
   extra_envs = {
     TZ = local.timezone
   }
-  service_hostname = local.httproutes.sunshine.hostname
-  ingress_hostname = local.httproutes.sunshine-admin.hostname
+  service_hostname = local.endpoints.sunshine.hostname
+  ingress_hostname = local.endpoints.sunshine-admin.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

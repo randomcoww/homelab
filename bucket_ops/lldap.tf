@@ -38,7 +38,7 @@ module "lldap" {
     LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp_password
   }
   ca_issuer_name   = local.cert_issuers.ca_internal
-  ingress_hostname = local.httproutes.lldap.hostname
+  ingress_hostname = local.endpoints.lldap.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

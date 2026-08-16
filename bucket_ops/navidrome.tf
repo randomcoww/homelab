@@ -59,7 +59,7 @@ module "navidrome" {
     ])
     TZ = local.timezone
   }
-  ingress_hostname = local.httproutes.navidrome.hostname
+  ingress_hostname = local.endpoints.navidrome.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace

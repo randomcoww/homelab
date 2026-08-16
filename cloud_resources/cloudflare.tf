@@ -153,7 +153,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel.id
   config = {
     ingress = concat([
-      for _, route in local.httproutes :
+      for _, route in local.endpoints :
       {
         hostname = route.hostname
         service  = "https://${route.hostname}"
@@ -180,7 +180,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
 
 resource "cloudflare_dns_record" "record" {
   for_each = {
-    for k, route in local.httproutes :
+    for k, route in local.endpoints :
     k => route.hostname if lookup(route, "tunnel", false)
   }
 

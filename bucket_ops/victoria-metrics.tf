@@ -128,7 +128,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     # UI at /select/vmui
                     # query at /select/prometheus/api/*
                     hostnames = [
-                      local.httproutes.victoria-metrics.hostname,
+                      local.endpoints.victoria-metrics.hostname,
                     ]
                     parentRefs = [
                       {

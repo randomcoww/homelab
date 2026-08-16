@@ -61,7 +61,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
                 tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
                 secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
                 ingress = [
-                  for _, route in local.httproutes :
+                  for _, route in local.endpoints :
                   {
                     hostname = route.hostname
                     service  = "https://${route.hostname}"

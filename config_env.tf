@@ -150,8 +150,8 @@ locals {
     }
   }
 
-  # All HTTPRoute resource entries #
-  httproutes = {
+  # Endpoints for external access (loadbalancer, gatewayAPI) #
+  endpoints = {
     registry = {
       hostname = "reg.${local.domains.kubernetes}"
     }
