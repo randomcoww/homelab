@@ -160,7 +160,7 @@ module "deployment" {
   template_spec = {
     resources = {
       requests = {
-        memory = "2Mi"
+        memory = "16Mi"
       }
       limits = {
         memory = "16Mi" # need at least 12582912 bytes at start
