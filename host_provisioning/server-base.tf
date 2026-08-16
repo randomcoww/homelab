@@ -29,7 +29,8 @@ module "systemd-networkd" {
   butane_version      = local.butane_version
   fw_mark             = local.fw_marks.accept
   host_netnum         = each.value.netnum
-  physical_interfaces = lookup(each.value, "physical_interfaces", [])
+  wired_interfaces    = lookup(each.value, "wired_interfaces", [])
+  wireless_interfaces = lookup(each.value, "wireless_interfaces", [])
   vlan_interfaces     = lookup(each.value, "vlan_interfaces", [])
   bridge_interfaces   = lookup(each.value, "bridge_interfaces", [])
   network_overrides   = lookup(each.value, "network_overrides", [])

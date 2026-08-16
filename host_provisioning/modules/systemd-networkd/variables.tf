@@ -10,7 +10,12 @@ variable "host_netnum" {
   type = number
 }
 
-variable "physical_interfaces" {
+variable "wired_interfaces" {
+  type    = any
+  default = []
+}
+
+variable "wireless_interfaces" {
   type    = any
   default = []
 }

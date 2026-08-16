@@ -3,7 +3,7 @@ locals {
     for key, config in {
       k-0 = {
         netnum = 1
-        physical_interfaces = [
+        wired_interfaces = [
           {
             match_mac = "b0-41-6f-16-a2-dc"
             # match_mac = "b0-41-6f-16-a2-dd"
@@ -74,7 +74,7 @@ locals {
 
       k-1 = {
         netnum = 3
-        physical_interfaces = [
+        wired_interfaces = [
           {
             match_mac = "b0-41-6f-16-f9-88"
             # match_mac = "b0-41-6f-16-f9-89"
@@ -145,7 +145,7 @@ locals {
 
       k-2 = {
         netnum = 5
-        physical_interfaces = [
+        wired_interfaces = [
           {
             match_mac = "b0-41-6f-16-9e-76"
             # match_mac = "b0-41-6f-16-9e-77"
@@ -207,11 +207,13 @@ locals {
 
       k-3 = {
         netnum = 6
-        physical_interfaces = [
+        wired_interfaces = [
           {
             match_mac = "9c-bf-0d-01-0e-7b"
             interface = "phy0"
           },
+        ]
+        wireless_interfaces = [
           {
             match_mac = "dc-56-7b-03-4c-e5" # MT7925
             interface = "wlan0"
