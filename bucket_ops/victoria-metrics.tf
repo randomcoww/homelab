@@ -76,7 +76,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 enabled = false
               }
               alertmanager = {
-                enabled = false
+                enabled = true
               }
               vmcluster = {
                 enabled = true
@@ -144,9 +144,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vmalert = {
                 enabled = true
                 spec = {
-                  extraArgs = {
-                    "notifier.blackhole" = "true" # needed when not using alertmanager
-                  }
                   replicaCount = 2
                   resources = {
                     requests = {
