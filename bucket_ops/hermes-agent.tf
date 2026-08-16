@@ -126,7 +126,7 @@ module "hermes-agent" {
         connect_timeout = 30
       }
       victoria-metrics = {
-        url             = "http://${local.victoria-metrics-mcp_name}-victoria-metrics-mcp.${local.victoria-metrics-mcp_namespace}:${local.victoria-metrics-mcp_port}/mcp"
+        url             = "http://${local.victoria-metrics-mcp_name}-victoria-metrics-mcp.${local.victoria-metrics_namespace}:${local.victoria-metrics-mcp_port}/mcp"
         timeout         = 300
         connect_timeout = 30
       }

@@ -1,6 +1,8 @@
 locals {
   victoria-metrics_name      = "vm"
   victoria-metrics_namespace = "monitoring"
+  victoria-metrics-mcp_name  = "${local.victoria-metrics_name}mcp"
+  victoria-metrics-mcp_port  = 8080
 }
 
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
@@ -317,12 +319,69 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           }
         },
 
+        # MCP
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = local.victoria-metrics-mcp_name
+            namespace = local.victoria-metrics_namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "victoria-metrics-mcp"
+                version = "0.3.0" # renovate: datasource=helm depName=victoria-metrics-mcp registryUrl=https://victoriametrics.github.io/helm-charts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = local.victoria-metrics_name
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = local.victoria-metrics-mcp_name
+            install = {
+              createNamespace = true
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              vm = {
+                type       = "cluster"
+                entrypoint = "https://${local.endpoints.victoria-metrics.hostname}"
+              }
+              service = {
+                port = local.victoria-metrics-mcp_port
+              }
+              resources = {
+                requests = {
+                  memory = "512Mi"
+                }
+                limits = {
+                  memory = "1Gi"
+                }
+              }
+            }
+          }
+        },
+
         # NS
         {
           apiVersion = "v1"
           kind       = "Namespace"
           metadata = {
-            name = local.victoria-metrics-mcp_namespace
+            name = local.victoria-metrics_namespace
             annotations = {
               "kustomize.toolkit.fluxcd.io/prune" = "disabled"
             }
