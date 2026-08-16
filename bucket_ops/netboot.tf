@@ -32,7 +32,7 @@ locals {
   netboot_config = {
     for mac, host in merge([
       for key, host in local.hosts : {
-        for _, iface in lookup(host, "physical_interfaces", []) :
+        for _, iface in lookup(host, "wired_interfaces", []) :
         iface.match_mac => host if contains(keys(iface), "match_mac")
       }
     ]...) :
