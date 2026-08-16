@@ -40,7 +40,7 @@ module "deployment" {
         memory = "128Mi"
       }
       limits = {
-        memory = "256Mi"
+        memory = "384Mi"
       }
     }
     containers = [

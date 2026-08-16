@@ -55,7 +55,7 @@ resource "helm_release" "cert-manager" {
             memory = "128Mi"
           }
           limits = {
-            memory = "128Mi"
+            memory = "256Mi"
           }
         }
       }
