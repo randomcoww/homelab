@@ -5,8 +5,9 @@ output "manifests" {
     module.service.manifest,
     ], [
     for _, m in [
+
+      # NS
       {
-        # NS
         apiVersion = "v1"
         kind       = "Namespace"
         metadata = {
