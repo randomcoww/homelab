@@ -9,7 +9,7 @@ module "sunshine-desktop" {
     }
     nginx = {
       repository = "docker.io/nginxinc/nginx-unprivileged"
-      tag        = "1.31.1-alpine@sha256:85bcbc6b2edd325462560c597d784ecee415024f1c6a004e53ac5f202b8ca561" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
+      tag        = "1.31.3-alpine@sha256:334d92979f15aaecd5dd50af5105e1230e2bb70765d45b1e2f964e7c5eda81c3" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
     }
   }
   user               = "sunshine"
