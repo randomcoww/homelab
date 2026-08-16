@@ -143,6 +143,7 @@ resource "helm_release" "fluxcd-bucket" {
           stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver"]
           navidrome              = ["mountpoint-s3-csi"]
           hostapd                = ["node-feature-discovery", "device-plugin"]
+          sunshine-desktop       = ["device-plugin", "resource-claims"]
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"

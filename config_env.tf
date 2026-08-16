@@ -182,6 +182,12 @@ locals {
     victoria-metrics = {
       hostname = "vm.${local.domains.public}"
     }
+    sunshine = {
+      hostname = "sunshine.${local.domains.public}"
+    }
+    sunshine-admin = {
+      hostname = "sunshine-admin.${local.domains.public}"
+    }
   }
 
   # All host exposed ports - do not overlap! #

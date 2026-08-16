@@ -65,6 +65,66 @@ module "daemonset" {
               },
             ]
           }),
+          "--device",
+          yamlencode({
+            name = "ntsync"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/ntsync"
+                  },
+                ]
+              },
+            ]
+          }),
+          "--device",
+          yamlencode({
+            name = "uinput"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/uinput"
+                  },
+                ]
+              },
+            ]
+          }),
+          "--device",
+          yamlencode({
+            name = "input"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/input"
+                    type = "Mount"
+                  },
+                ]
+              },
+            ]
+          }),
+          "--device",
+          yamlencode({
+            name = "tty"
+            groups = [
+              {
+                count = 8
+                paths = [
+                  {
+                    path = "/dev/tty0"
+                  },
+                  {
+                    path = "/dev/tty1"
+                  },
+                ]
+              },
+            ]
+          }),
           "--listen=0.0.0.0:${local.metrics_port}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",
         ]

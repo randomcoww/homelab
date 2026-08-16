@@ -38,6 +38,7 @@
     {
       "matchPackageNames": [
         "reg.cluster.internal/randomcoww/qrcode-resource",
+        "reg.cluster.internal/randomcoww/sunshine-desktop",
         "docker.io/cloudflare/cloudflared"
       ],
       "matchUpdateTypes": [
