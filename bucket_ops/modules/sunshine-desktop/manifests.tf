@@ -355,7 +355,7 @@ module "statefulset" {
 
           ## dbus-daemon ##
 
-          dbus-daemon --system
+          rm -f /run/dbus/pid && dbus-daemon --system
 
           ## Pulseaudio ##
 
@@ -494,7 +494,7 @@ module "statefulset" {
           }
         }
         securityContext = {
-          privileged = true # TODO: Privileged to make libinput work https://github.com/squat/generic-device-plugin/issues/148
+          privileged = true # TODO: Try https://github.com/joleuger/vuinputd
         }
       },
       {
