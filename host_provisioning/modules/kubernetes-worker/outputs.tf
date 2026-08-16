@@ -190,6 +190,16 @@ output "ignition_snippet" {
               EOF
             }
           },
+          # Sunshine desktop
+          {
+            path = "/etc/modules-load.d/20-ntsync.conf"
+            mode = 420
+            contents = {
+              inline = <<-EOF
+              ntsync
+              EOF
+            }
+          },
 
           # Internal registry
           {
