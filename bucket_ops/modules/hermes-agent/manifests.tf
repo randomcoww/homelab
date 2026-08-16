@@ -118,7 +118,7 @@ module "juicefs-secret" {
     access-key = var.minio_user.id
     secret-key = var.minio_user.secret
     format-options = join(",", [
-      "trash-days=0",
+      "trash-days=2",
       "block-size=4096",
     ])
 
