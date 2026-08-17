@@ -5,64 +5,6 @@ locals {
     acme_prod   = "letsencrypt-prod"
     ca_internal = "internal"
   }
-
-  cert-manager-crs = concat([
-    for _, m in [
-      # letsencrypt prod
-      {
-        apiVersion = "cert-manager.io/v1"
-        kind       = "ClusterIssuer"
-        metadata = {
-          name = local.cert_issuers.acme_prod
-        }
-        spec = {
-          acme = {
-            server = "https://acme-v02.api.letsencrypt.org/directory"
-            email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
-            privateKeySecretRef = {
-              name = module.cert-manager-issuer-acme-prod-secret.name
-            }
-            disableAccountKeyGeneration = true
-            solvers = [
-              {
-                dns01 = {
-                  cloudflare = {
-                    apiTokenSecretRef = {
-                      name = module.cert-manager-issuer-acme-prod-secret.name
-                      key  = "cloudflare-token"
-                    }
-                  }
-                }
-                selector = {
-                  dnsZones = [
-                    local.domains.public,
-                  ]
-                }
-              },
-            ]
-          }
-        }
-      },
-
-      # internal CA
-      {
-        apiVersion = "cert-manager.io/v1"
-        kind       = "ClusterIssuer"
-        metadata = {
-          name = local.cert_issuers.ca_internal
-        }
-        spec = {
-          ca = {
-            secretName = module.cert-manager-issuer-ca-internal-secret.name
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-    ], [
-    module.cert-manager-issuer-acme-prod-secret.manifest,
-    module.cert-manager-issuer-ca-internal-secret.manifest,
-  ])
 }
 
 module "cert-manager-issuer-acme-prod-secret" {
