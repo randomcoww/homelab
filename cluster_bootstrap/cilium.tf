@@ -158,5 +158,6 @@ resource "helm_release" "cilium" {
   depends_on = [
     kubernetes_labels.labels,
     helm_release.cert-manager-crds,
+    helm_release.prometheus-crds,
   ]
 }
