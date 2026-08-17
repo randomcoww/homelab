@@ -99,5 +99,5 @@ output "manifests" {
       },
     ] :
     yamlencode(m)
-  ], module.litestream-overlay.additional_manifests)
+  ])
 }

@@ -1,20 +1,5 @@
 locals {
-  config_file = "/etc/litestream/config.yaml"
-}
-
-module "secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-litestream"
-  namespace = var.namespace
-  app       = var.app
-  release   = var.release
-  data = {
-    "config.yaml" = yamlencode(merge({
-      retention = {
-        enabled = true
-      }
-    }, var.litestream_config))
-  }
+  config_file = "${var.mount_path}/config.yaml"
 }
 
 /*

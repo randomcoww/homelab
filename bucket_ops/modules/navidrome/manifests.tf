@@ -223,12 +223,9 @@ module "statefulset" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
-  annotations = merge({
+  annotations = {
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "checksum/litestream-${i}" => sha256(m)
-  })
+  }
   /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
@@ -251,7 +248,9 @@ module "statefulset" {
     ]
   }
   */
-  template_spec = module.litestream-overlay.template_spec
+  template_spec = merge(module.litestream-overlay.template_spec, {
+    terminationGracePeriodSeconds = 60
+  })
 }
 
 module "minio-user-secret" {

@@ -1,12 +1,34 @@
-output "additional_manifests" {
-  value = [
-    module.secret.manifest,
-  ]
-}
-
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
+      {
+        name  = "${var.name}-litestream-config"
+        image = "${var.images.litestream.repository}:${var.images.litestream.tag}"
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          echo "$CONFIG" > ${local.config_file}
+          EOF
+        ]
+        env = [
+          {
+            name = "CONFIG"
+            value = yamlencode(merge({
+              retention = {
+                enabled = true
+              }
+            }, var.litestream_config))
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "${var.name}-litestream-data"
+            mountPath = var.mount_path
+          },
+        ]
+      },
+      ], [
       for i, db in var.litestream_config.dbs :
       merge({
         name  = "${var.name}-litestream-restore-${i}"
@@ -37,11 +59,6 @@ output "template_spec" {
           },
         ]
         volumeMounts = [
-          {
-            name      = "${var.name}-litestream-config"
-            mountPath = local.config_file
-            subPath   = "config.yaml"
-          },
           {
             name      = "${var.name}-litestream-data"
             mountPath = var.mount_path
@@ -81,11 +98,6 @@ output "template_spec" {
           },
         ]
         volumeMounts = [
-          {
-            name      = "${var.name}-litestream-config"
-            mountPath = local.config_file
-            subPath   = "config.yaml"
-          },
           {
             name      = "${var.name}-litestream-data"
             mountPath = var.mount_path
@@ -160,12 +172,6 @@ output "template_spec" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "${var.name}-litestream-config"
-        secret = {
-          secretName = module.secret.name
-        }
-      },
-      {
         name = "${var.name}-litestream-ca-trust-bundle"
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
@@ -173,6 +179,5 @@ output "template_spec" {
         }
       },
     ])
-    terminationGracePeriodSeconds = 60
   })
 }
