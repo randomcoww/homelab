@@ -97,9 +97,9 @@ module "llama-cpp" {
           setParamsByID = {
             "$${MODEL_ID}" = {
               temperature = 1.0
-              chat_template_kwargs = {
-                enable_thinking = true
-              }
+            }
+            "$${MODEL_ID}:low" = {
+              temperature = 0.6
             }
           }
         }
