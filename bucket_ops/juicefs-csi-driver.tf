@@ -65,14 +65,6 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                       "backup-meta=0",
                       "no-usage-report=true",
                     ]
-                  },
-                  {
-                    ceMountImage = join(":", [
-                      "reg.cluster.internal/randomcoww/juicefs",
-                      "ce-v1.4.1.1786367431@sha256:6fd4e50823823ca71546920cbafb7c5b566bf4626227e5884db76672d10d872d", # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/juicefs
-                    ])
-                  },
-                  {
                     readinessProbe = {
                       exec = {
                         command = [
@@ -85,8 +77,6 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                       periodSeconds       = 5
                       successThreshold    = 1
                     }
-                  },
-                  {
                     resources = {
                       requests = {
                         memory = "1Gi"
@@ -95,6 +85,22 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                         memory = "2Gi"
                       }
                     }
+                    volumes = [
+                      {
+                        name = "ca-trust-bundle"
+                        hostPath = {
+                          path = "/etc/ssl/certs/ca-certificates.crt"
+                          type = "File"
+                        }
+                      },
+                    ]
+                    volumeMounts = [
+                      {
+                        name      = "ca-trust-bundle"
+                        mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                        readOnly  = true
+                      },
+                    ]
                   },
                 ]
               }
