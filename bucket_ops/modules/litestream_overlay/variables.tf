@@ -41,8 +41,18 @@ variable "mount_path" {
   type = string
 }
 
-variable "s3_access_secret" {
-  type = string
+variable "s3_access_key_ref" {
+  type = object({
+    name = string
+    key  = string
+  })
+}
+
+variable "s3_secret_key_ref" {
+  type = object({
+    name = string
+    key  = string
+  })
 }
 
 variable "litestream_container_params" {

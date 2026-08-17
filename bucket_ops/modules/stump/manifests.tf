@@ -148,8 +148,15 @@ module "litestream-overlay" {
       },
     ]
   }
-  mount_path       = dirname(local.db_file)
-  s3_access_secret = module.minio-user-secret.name
+  mount_path = dirname(local.db_file)
+  s3_access_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_ACCESS_KEY_ID"
+  }
+  s3_secret_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_SECRET_ACCESS_KEY"
+  }
 
   template_spec = {
     resources = {
@@ -235,14 +242,11 @@ module "statefulset" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
-  annotations = merge({
+  annotations = {
     "checksum/secret"            = sha256(module.secret.manifest)
     "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "checksum/litestream-${i}" => sha256(m)
-  })
+  }
   /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
@@ -265,7 +269,9 @@ module "statefulset" {
     ]
   }
   */
-  template_spec = module.litestream-overlay.template_spec
+  template_spec = merge(module.litestream-overlay.template_spec, {
+    terminationGracePeriodSeconds = 60
+  })
 }
 
 module "minio-user-secret" {

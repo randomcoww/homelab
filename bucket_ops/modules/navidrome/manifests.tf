@@ -135,8 +135,15 @@ module "litestream-overlay" {
       },
     ]
   }
-  mount_path       = dirname(local.db_file)
-  s3_access_secret = module.minio-user-secret.name
+  mount_path = dirname(local.db_file)
+  s3_access_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_ACCESS_KEY_ID"
+  }
+  s3_secret_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_SECRET_ACCESS_KEY"
+  }
 
   template_spec = {
     resources = {
