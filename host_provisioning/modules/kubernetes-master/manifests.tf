@@ -178,10 +178,10 @@ module "apiserver" {
         ] : []))
         resources = {
           requests = {
-            memory = "3Gi"
+            memory = "4Gi"
           }
           limits = {
-            memory = "4Gi"
+            memory = "5Gi"
           }
         }
         env = [
