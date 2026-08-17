@@ -164,7 +164,7 @@ module "litestream-overlay" {
         memory = "1Gi"
       }
       limits = {
-        memory = "2Gi"
+        memory = "3Gi" # around 2.4Gi during scan
       }
     }
     containers = [
