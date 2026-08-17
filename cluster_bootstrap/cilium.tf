@@ -1,3 +1,52 @@
+module "cilium-cert-issuer-secret" {
+  source    = "../modules/secret"
+  name      = "${local.services.cilium.name}-cert-manager-crs"
+  namespace = local.services.cilium.namespace
+  app       = "${local.services.cilium.name}-cert-manager-crs"
+  release   = "0.1.0"
+  data = {
+    "tls.crt" = data.terraform_remote_state.host.outputs.internal_ca.cert_pem
+    "tls.key" = data.terraform_remote_state.host.outputs.internal_ca.private_key_pem
+  }
+}
+
+resource "helm_release" "cilium-cert-manager-crs" {
+  chart            = "../helm-wrapper"
+  name             = "${local.services.cilium.name}-cert-manager-crs"
+  namespace        = local.services.cilium.namespace
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = false
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = concat([
+        for _, m in [
+          {
+            apiVersion = "cert-manager.io/v1"
+            kind       = "Issuer"
+            metadata = {
+              name = local.services.cilium.name
+            }
+            spec = {
+              ca = {
+                secretName = module.cilium-cert-issuer-secret.name
+              }
+            }
+          },
+        ] :
+        yamlencode(m)
+        ], [
+        module.cilium-cert-issuer-secret.manifest,
+      ])
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+    helm_release.cert-manager-crds,
+  ]
+}
+
 resource "helm_release" "cilium" {
   name             = local.services.cilium.name
   namespace        = local.services.cilium.namespace
@@ -27,7 +76,35 @@ resource "helm_release" "cilium" {
         enabled = true
       }
       hubble = {
-        enabled = false
+        enabled = true
+        metrics = {
+          enabled = [
+            "dns:query;ignoreAAAA",
+            "drop",
+            "tcp",
+            "flow",
+            "icmp",
+            "http",
+          ]
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+        peerService = {
+          clusterDomain = local.domains.kubernetes
+        }
+        tls = {
+          enabled = true
+          auto = {
+            enabled = true
+            method  = "certmanager"
+            certManagerIssuerRef = {
+              group = "cert-manager.io"
+              kind  = "Issuer"
+              name  = local.services.cilium.name
+            }
+          }
+        }
       }
       ipMasqAgent = {
         enabled = true
