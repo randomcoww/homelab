@@ -46,6 +46,10 @@ output "manifests" {
         metadata = {
           name      = "${var.name}-${var.minio_bucket}"
           namespace = var.namespace
+          labels = {
+            app       = var.name
+            namespace = var.namespace
+          }
         }
         spec = {
           accessModes = [
@@ -132,4 +136,23 @@ output "manifests" {
     ] :
     yamlencode(m)
   ])
+}
+
+output "juicefs-mountopts" {
+  value = {
+    pvcSelector = {
+      matchLabels = {
+        app       = var.name
+        namespace = var.namespace
+      }
+    }
+    resources = {
+      requests = {
+        memory = "2Gi"
+      }
+      limits = {
+        memory = "3Gi"
+      }
+    }
+  }
 }

@@ -105,6 +105,10 @@ output "manifests" {
         metadata = {
           name      = "${var.name}-${var.minio_bucket}"
           namespace = var.namespace
+          labels = {
+            app       = var.name
+            namespace = var.namespace
+          }
         }
         spec = {
           accessModes = [
@@ -190,5 +194,24 @@ output "manifests" {
       },
     ] :
     yamlencode(m)
-  ], module.litestream-overlay.additional_manifests)
+  ])
+}
+
+output "juicefs-mountopts" {
+  value = {
+    pvcSelector = {
+      matchLabels = {
+        app       = var.name
+        namespace = var.namespace
+      }
+    }
+    resources = {
+      requests = {
+        memory = "512Mi"
+      }
+      limits = {
+        memory = "1Gi"
+      }
+    }
+  }
 }
