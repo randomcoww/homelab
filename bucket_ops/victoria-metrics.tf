@@ -146,23 +146,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                           icon_emoji    = "{{ template \"slack.monzo.icon_emoji\" . }}"
                           color         = "{{ template \"slack.monzo.color\" . }}"
                           text          = "{{ template \"slack.monzo.text\" . }}"
-                          actions = [
-                            {
-                              type = "button"
-                              text = "Query :mag:"
-                              url  = "{{ (index .Alerts 0).GeneratorURL }}"
-                            },
-                            {
-                              type = "button"
-                              text = "Silence :no_bell:"
-                              url  = "{{ template \"__alert_silence_link\" . }}"
-                            },
-                            {
-                              type = "button"
-                              text = "{{ template \"slack.monzo.link_button_text\" . }}"
-                              url  = "{{ .CommonAnnotations.link_url }}"
-                            },
-                          ]
                         },
                       ]
                     },
