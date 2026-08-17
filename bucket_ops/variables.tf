@@ -51,6 +51,10 @@ variable "slack_home_channel" {
   type = string
 }
 
+variable "slack_alert_webhook" {
+  type = string
+}
+
 variable "alpaca_api_key" {
   type = string
 }

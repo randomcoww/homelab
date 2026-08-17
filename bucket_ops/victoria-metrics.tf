@@ -77,6 +77,97 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               }
               alertmanager = {
                 enabled = true
+                config = {
+                  route = {
+                    receiver        = "slack-monitoring"
+                    group_by        = ["alertgroup", "job"]
+                    group_wait      = "30s"
+                    group_interval  = "5m"
+                    repeat_interval = "12h"
+                    routes = [
+                      {
+                        matchers = [
+                          "severity=~\"info|warning|critical\"",
+                        ]
+                        receiver = "slack-monitoring"
+                        continue = true
+                      },
+                    ]
+                  }
+                  inhibit_rules = [
+                    {
+                      target_matchers = [
+                        "severity=~\"warning|info\"",
+                      ]
+                      source_matchers = [
+                        "severity=critical",
+                      ]
+                      equal = [
+                        "cluster",
+                        "namespace",
+                        "alertname",
+                      ]
+                    },
+                    {
+                      target_matchers = [
+                        "severity=info",
+                      ]
+                      source_matchers = [
+                        "severity=warning",
+                      ]
+                      equal = [
+                        "cluster",
+                        "namespace",
+                        "alertname",
+                      ]
+                    },
+                    {
+                      target_matchers = [
+                        "severity=info",
+                      ]
+                      source_matchers = [
+                        "alertname=InfoInhibitor",
+                      ]
+                      equal = [
+                        "cluster",
+                        "namespace",
+                      ]
+                    },
+                  ]
+                  receivers = [
+                    {
+                      name = "slack-monitoring"
+                      slack_configs = [
+                        {
+                          api_url       = var.slack_alert_webhook
+                          channel       = "#bot"
+                          send_resolved = true
+                          title         = "{{ template \"slack.monzo.title\" . }}"
+                          icon_emoji    = "{{ template \"slack.monzo.icon_emoji\" . }}"
+                          color         = "{{ template \"slack.monzo.color\" . }}"
+                          text          = "{{ template \"slack.monzo.text\" . }}"
+                          actions = [
+                            {
+                              type = "button"
+                              text = "Query :mag:"
+                              url  = "{{ (index .Alerts 0).GeneratorURL }}"
+                            },
+                            {
+                              type = "button"
+                              text = "Silence :no_bell:"
+                              url  = "{{ template \"__alert_silence_link\" . }}"
+                            },
+                            {
+                              type = "button"
+                              text = "{{ template \"slack.monzo.link_button_text\" . }}"
+                              url  = "{{ .CommonAnnotations.link_url }}"
+                            },
+                          ]
+                        },
+                      ]
+                    },
+                  ]
+                }
               }
               vmcluster = {
                 enabled = true
