@@ -5,11 +5,11 @@ module "sunshine-desktop" {
   images = {
     sunshine-desktop = {
       repository = "reg.cluster.internal/randomcoww/sunshine-desktop"
-      tag        = "v2026.516.143833.1786848971@sha256:d85193c4e83709b77b1190c67214c2eecda80548e3c9d98fcee9bc20d2aaaf74" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/sunshine-desktop
+      tag        = "v2026.516.143833.1786970437@sha256:2ad9f6581dfd1c677e58d82212ac86a8cf624f4bf5952d1d93fc1ed35c6026b7" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/sunshine-desktop
     }
     nginx = {
       repository = "docker.io/nginxinc/nginx-unprivileged"
-      tag        = "1.31.3-alpine@sha256:334d92979f15aaecd5dd50af5105e1230e2bb70765d45b1e2f964e7c5eda81c3" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
+      tag        = "1.31.3-alpine@sha256:f972e5322b9797dc2a6b830030094426437b1ae7032e4644496395336ac6fdac" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
     }
   }
   user               = "sunshine"
