@@ -70,7 +70,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
               }
               resources = {
                 requests = {
-                  memory = "32Mi"
+                  memory = "64Mi"
                 }
                 limits = {
                   memory = "64Mi"

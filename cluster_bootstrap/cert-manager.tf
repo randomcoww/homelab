@@ -52,7 +52,7 @@ resource "helm_release" "cert-manager" {
         replicaCount = 2
         resources = {
           requests = {
-            memory = "128Mi"
+            memory = "160Mi"
           }
           limits = {
             memory = "256Mi"

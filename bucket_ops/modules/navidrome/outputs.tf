@@ -39,7 +39,7 @@ output "manifests" {
               cache                                      = "emptyDir"
               cacheEmptyDirSizeLimit                     = "1Gi"
               cacheEmptyDirMedium                        = "Memory"
-              mountpointContainerResourcesRequestsMemory = "1Gi"
+              mountpointContainerResourcesRequestsMemory = "256Mi"
             }
           }
         }

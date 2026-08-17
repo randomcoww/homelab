@@ -59,6 +59,39 @@ resource "helm_release" "fluxcd" {
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
+      helmController = {
+        create = true
+        resources = {
+          limits = {
+            memory = "256Mi"
+          }
+          requests = {
+            memory = "180Mi"
+          }
+        }
+      }
+      kustomizeController = {
+        create = true
+        resources = {
+          limits = {
+            memory = "384Mi"
+          }
+          requests = {
+            memory = "256Mi"
+          }
+        }
+      }
+      sourceController = {
+        create = true
+        resources = {
+          limits = {
+            memory = "256Mi"
+          }
+          requests = {
+            memory = "180Mi"
+          }
+        }
+      }
       imageAutomationController = {
         create = false
       }

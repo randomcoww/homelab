@@ -366,7 +366,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 enabled = true
                 resources = {
                   requests = {
-                    memory = "32Mi"
+                    memory = "48Mi"
                   }
                   limits = {
                     memory = "64Mi"
@@ -454,7 +454,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               }
               resources = {
                 requests = {
-                  memory = "512Mi"
+                  memory = "640Mi"
                 }
                 limits = {
                   memory = "1Gi"

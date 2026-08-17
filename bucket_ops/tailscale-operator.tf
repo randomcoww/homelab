@@ -55,6 +55,16 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
                 clientId     = data.terraform_remote_state.sr.outputs.tailscale_oauth_client.id
                 clientSecret = data.terraform_remote_state.sr.outputs.tailscale_oauth_client.key
               }
+              operatorConfig = {
+                resources = {
+                  requests = {
+                    memory = "80Mi"
+                  }
+                  limits = {
+                    memory = "128Mi"
+                  }
+                }
+              }
             }
           }
         },
