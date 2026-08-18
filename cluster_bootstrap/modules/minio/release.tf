@@ -419,10 +419,7 @@ module "statefulset" {
   template_spec = {
     resources = merge({
       requests = {
-        memory = "2Gi"
-      }
-      limits = {
-        memory = "4Gi"
+        memory = "3Gi"
       }
     }, var.resources)
     priorityClassName = "system-node-critical"

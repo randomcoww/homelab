@@ -73,10 +73,10 @@ resource "minio_s3_object" "fluxcd-kured" {
               }
               resources = {
                 requests = {
-                  memory = "32Mi"
+                  memory = "64Mi"
                 }
                 limits = {
-                  memory = "64Mi"
+                  memory = "96Mi"
                 }
               }
               priorityClassName = "system-node-critical"
