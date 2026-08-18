@@ -209,9 +209,6 @@ output "juicefs-mountopts" {
       requests = {
         memory = "512Mi"
       }
-      limits = {
-        memory = "1Gi"
-      }
     }
   }
 }
