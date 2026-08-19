@@ -62,6 +62,7 @@ module "hermes-agent" {
     agent = {
       tool_use_enforcement = true
       reasoning_effort     = "xhigh"
+      max_turns            = 300
     }
     stt = {
       enabled  = true
