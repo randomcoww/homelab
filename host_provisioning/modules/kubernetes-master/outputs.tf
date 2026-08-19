@@ -84,9 +84,10 @@ output "ignition_snippet" {
             }
           },
 
-          # local haproxy for apiserver
-          # on node drain, apiserver static pod will often go down early breaking further pods from coordinating with apiserver to drain. 
-          # allow local apiserver endpoint to keep working
+          # Local haproxy for apiserver
+          # On node drain, apiserver static pod will often go down early breaking further pods on this node from coordinating with apiserver to drain.
+          # Allow local apiserver endpoint to keep working by failing over to clusterIP.
+          # This works on fresh start where clusterIP isn't up, and during shutdown when CNI is up, but when apiserver is killed early on this node.
           {
             path = "${var.haproxy_path}/${var.name}.cfg"
             mode = 420
@@ -104,7 +105,7 @@ output "ignition_snippet" {
                 balance leastconn
                 default-server verify none check-ssl rise 1 fall 2 maxconn 5000 maxqueue 5000 weight 100
                 server local 127.0.0.1:${var.ports.apiserver_backend} check
-                server cluster ${var.cluster_apiserver_ip}:443 check
+                server cluster ${var.cluster_apiserver_ip}:443 check backup
               EOF
             }
           },
