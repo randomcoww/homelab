@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
             chart = {
               spec = {
                 chart   = "metrics-server"
-                version = "3.13.1" # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server
+                version = "3.14.0" # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "metrics-server"
