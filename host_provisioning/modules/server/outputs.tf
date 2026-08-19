@@ -132,41 +132,57 @@ output "ignition_snippet" {
           overwrite = true
           contents = {
             inline = <<-EOF
-              router id ${var.bgp_router_id};
+router id ${var.bgp_router_id};
+protocol device {
+}
+protocol bfd {
+}
+protocol kernel {
+  merge paths on;
+  ipv4 {
+    export all;
+  };
+}
 
-              protocol device {
-              }
+ipv4 table ${var.bird_cache_table.name};
+protocol kernel cache_table {
+  learn;
+  kernel table ${var.bird_cache_table.table_id};
+  ipv4 {
+    import all;
+    export none;
+    table ${var.bird_cache_table.name};
+  };
+}
+protocol pipe {
+  table master4;
+  peer table ${var.bird_cache_table.name};
+  export none;
+  import filter {
+    if source = RTS_BGP then {
+      accept;
+    }
+    reject;
+  };
+}
+%{for host_key, netnum in var.bgp_neighbor_netnums}protocol bgp ${replace(host_key, "-", "_")} {
+  debug all;
+  local port ${var.bgp_port} as ${var.bgp_as};
+  neighbor ${cidrhost(var.bgp_prefix, netnum)} port ${var.bgp_port} internal;
+  graceful restart;
+  direct;
+  bfd {
+  };
+  ipv4 {
+    import all;
+    export all;
+    table ${var.bird_cache_table.name};
+  };
+}
+%{endfor~}
 
-              protocol direct {
-                disabled;
-              }
-
-              protocol bfd {
-              }
-
-              ipv4 table ${var.bird_cache_table_name};
-
-              protocol kernel {
-                merge paths yes;
-                ipv4 {
-                  export all;
-                };
-              }
-
-              include "${var.bird_path}/*.conf";
-
-              protocol pipe {
-                table master4;
-                peer table ${var.bird_cache_table_name};
-                export none;
-                import filter {
-                  if source = RTS_BGP then {
-                    accept;
-                  }
-                  reject;
-                };
-              }
-              EOF
+include "${var.bird_path}/*.conf";
+EOF
           }
         },
 

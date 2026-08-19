@@ -276,6 +276,20 @@ From=${iface.prefix}
 EOF
           }
         }
+        ], [
+
+        # arp sysctl for each interface
+        {
+          path = "/etc/sysctl.d/10-interface-arp.conf"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+%{for _, iface in var.network_overrides}net.ipv4.conf.${iface.interface}.arp_ignore=1
+net.ipv4.conf.${iface.interface}.arp_announce=2
+%{endfor~}
+EOF
+          }
+        },
       ])
     }
   })

@@ -71,7 +71,6 @@ variable "ports" {
     scheduler          = number
     etcd_client        = number
     etcd_metrics       = number
-    bgp                = number
   })
 }
 
@@ -156,18 +155,9 @@ variable "bird_path" {
   type = string
 }
 
-variable "bird_cache_table_name" {
-  type = string
-}
-
-variable "bgp_prefix" {
-  type = string
-}
-
-variable "bgp_as" {
-  type = number
-}
-
-variable "bgp_neighbor_netnums" {
-  type = map(number)
+variable "bird_cache_table" {
+  type = object({
+    name     = string
+    table_id = number
+  })
 }

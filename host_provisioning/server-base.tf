@@ -60,14 +60,22 @@ module "server" {
     public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
   }
   # HA config
-  keepalived_path       = local.keepalived_config_path
-  haproxy_path          = local.haproxy_config_path
-  bird_path             = local.bird_config_path
-  bird_cache_table_name = local.bird_cache_table_name
+  keepalived_path = local.keepalived_config_path
+  haproxy_path    = local.haproxy_config_path
+  # BIRD
+  bird_path        = local.bird_config_path
+  bird_cache_table = local.bird_cache_table
   bgp_router_id = reverse(sort(compact([
     for _, network in each.value.networks :
     cidrhost(network.prefix, each.value.netnum)
     if lookup(network, "enable_netnum", false)
   ])))[0]
   bgp_port = local.host_ports.bgp
+  bgp_neighbor_netnums = {
+    # target all gateways minus self if this is on a gateway instance
+    for host_key, host in local.members.gateway :
+    host_key => host.netnum if each.key != host_key
+  }
+  bgp_as     = local.bgp.host_as
+  bgp_prefix = each.value.networks.node.prefix
 }

@@ -50,8 +50,11 @@ variable "haproxy_path" {
   type = string
 }
 
-variable "bird_cache_table_name" {
-  type = string
+variable "bird_cache_table" {
+  type = object({
+    name     = string
+    table_id = number
+  })
 }
 
 variable "bgp_router_id" {
@@ -59,6 +62,18 @@ variable "bgp_router_id" {
 }
 
 variable "bgp_port" {
+  type = number
+}
+
+variable "bgp_neighbor_netnums" {
+  type = map(number)
+}
+
+variable "bgp_prefix" {
+  type = string
+}
+
+variable "bgp_as" {
   type = number
 }
 

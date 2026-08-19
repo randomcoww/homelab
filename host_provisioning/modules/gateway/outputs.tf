@@ -76,7 +76,7 @@ output "ignition_snippet" {
                   to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
                 }
                 virtual_routes {
-                  default dev ${var.vrrp_network_config.interface} table ${var.bird_slave_default_route.table_id}
+                  default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
                 }
               }
               EOF
@@ -88,61 +88,39 @@ output "ignition_snippet" {
           mode = 420
           contents = {
             inline = <<-EOF
-protocol kernel gateway_kernel {
-  learn;
-  kernel table ${var.bird_slave_default_route.table_id};
-  ipv4 {
-    import all;
-    export none;
-    table ${var.bird_cache_table_name};
-  };
-}
-%{for host_key, netnum in var.bgp_neighbor_netnums}protocol bgp ${replace(host_key, "-", "_")} {
-  debug all;
-  source address ${cidrhost(var.node_prefix, var.host_netnum)};
-  local port ${var.bgp_port} as ${var.bgp_as_members};
-  neighbor ${cidrhost(var.node_prefix, netnum)} port ${var.bgp_port} internal;
-  graceful restart;
-  direct;
-  bfd {
-  };
-  ipv4 {
-    import all;
-    export all;
-    table ${var.bird_cache_table_name};
-  };
-}
-%{endfor~}
-protocol bgp node {
-  debug all;
-  source address ${cidrhost(var.node_prefix, var.host_netnum)};
-  local port ${var.bgp_port} as ${var.bgp_as};
-  neighbor range ${var.node_prefix} port ${var.bgp_port} internal;
-  graceful restart;
-  direct;
-  bfd {
-  };
-  ipv4 {
-    import all;
-    export all;
-    table ${var.bird_cache_table_name};
-  };
-}
-protocol bgp service {
-  debug all;
-  source address ${cidrhost(var.service_prefix, var.host_netnum)};
-  local port ${var.bgp_port} as ${var.bgp_as};
-  neighbor range ${var.service_prefix} port ${var.bgp_port} as ${var.bgp_as_peer};
-  graceful restart;
-  direct;
-  bfd {
-  };
-  ipv4 {
-    import all;
-    export all;
-  };
-}
-EOF
+            # Bird peers sharing default gateway and apiserver
+            protocol bgp node {
+              debug all;
+              source address ${cidrhost(var.node_prefix, var.host_netnum)};
+              local port ${var.bgp_port} as ${var.bgp_as};
+              neighbor range ${var.node_prefix} port ${var.bgp_port} internal;
+              graceful restart;
+              direct;
+              bfd {
+              };
+              ipv4 {
+                import all;
+                export all;
+                table ${var.bird_cache_table.name};
+              };
+            }
+
+            # Cilium peers
+            protocol bgp service {
+              debug all;
+              source address ${cidrhost(var.service_prefix, var.host_netnum)};
+              local port ${var.bgp_port} as ${var.bgp_as};
+              neighbor range ${var.service_prefix} port ${var.bgp_port} as ${var.bgp_as_peer};
+              graceful restart;
+              direct;
+              bfd {
+              };
+              ipv4 {
+                import all;
+                export none;
+              };
+            }
+            EOF
           }
         },
         {
@@ -155,7 +133,7 @@ EOF
               ClientIdentifier=mac
               EOF
           }
-        }
+        },
       ]
     }
   })

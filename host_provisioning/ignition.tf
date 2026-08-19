@@ -5,7 +5,10 @@ locals {
   keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
   haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
   bird_config_path       = "/etc/bird.conf.d"
-  bird_cache_table_name  = "cache"
+  bird_cache_table = {
+    name     = "cache"
+    table_id = 240
+  }
 
   users = {
     ssh = {

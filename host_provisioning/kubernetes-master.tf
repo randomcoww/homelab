@@ -55,7 +55,6 @@ module "kubernetes-master" {
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
     etcd_metrics       = local.host_ports.etcd_metrics
-    bgp                = local.host_ports.bgp
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
   cluster_apiserver_endpoint = "kubernetes.default.svc.${local.domains.kubernetes}"
@@ -72,12 +71,6 @@ module "kubernetes-master" {
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates
   bird_path                = local.bird_config_path
-  bird_cache_table_name    = local.bird_cache_table_name
+  bird_cache_table         = local.bird_cache_table
   haproxy_path             = local.haproxy_config_path
-  bgp_prefix               = each.value.networks.node.prefix
-  bgp_as                   = local.bgp.host_as
-  bgp_neighbor_netnums = {
-    for host_key, host in local.members.gateway :
-    host_key => host.netnum if each.key != host_key
-  }
 }
