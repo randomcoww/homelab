@@ -1,29 +1,3 @@
-module "apiserver-lb-service" {
-  source    = "../modules/service"
-  name      = local.services.apiserver.name
-  namespace = local.services.apiserver.namespace
-  app       = local.services.apiserver.name
-  release   = "0.1.0"
-  annotations = {
-    "lbipam.cilium.io/ips" = local.networks.service.vips.apiserver
-  }
-  selector = {
-    component = local.services.apiserver.name
-  }
-  spec = {
-    type                  = "LoadBalancer"
-    externalTrafficPolicy = "Local"
-    ports = [
-      {
-        name       = "https"
-        port       = local.host_ports.apiserver
-        protocol   = "TCP"
-        targetPort = local.host_ports.apiserver
-      },
-    ]
-  }
-}
-
 resource "helm_release" "cilium-crs" {
   chart            = "../helm-wrapper"
   name             = "${local.services.cilium.name}-crs"
@@ -34,7 +8,7 @@ resource "helm_release" "cilium-crs" {
   max_history      = 2
   values = [
     yamlencode({
-      manifests = concat([
+      manifests = [
         for _, m in [
           {
             apiVersion = "cilium.io/v2"
@@ -117,35 +91,9 @@ resource "helm_release" "cilium-crs" {
               ]
             }
           },
-
-          # cilium loadbalancer for apiserver
-          {
-            apiVersion = "cilium.io/v2"
-            kind       = "CiliumLoadBalancerIPPool"
-            metadata = {
-              name = "${local.services.apiserver.namespace}-${local.services.apiserver.name}"
-            }
-            spec = {
-              blocks = [
-                {
-                  cidr = "${local.networks.service.vips.apiserver}/32"
-                },
-              ]
-              serviceSelector = {
-                matchLabels = {
-                  "io.kubernetes.service.namespace" = local.services.apiserver.namespace
-                  "io.kubernetes.service.name"      = local.services.apiserver.name
-                }
-              }
-            }
-          },
         ] :
         yamlencode(m)
-        ], [
-
-        # cilium loadbalancer for apiserver
-        module.apiserver-lb-service.manifest,
-      ])
+      ]
     }),
   ]
   depends_on = [

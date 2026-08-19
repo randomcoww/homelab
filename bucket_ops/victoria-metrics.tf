@@ -218,7 +218,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vmalert = {
                 enabled = true
                 spec = {
-                  replicaCount = 2
+                  replicaCount = 1 # need to handle some duplicate errors if adding more replicas
                   resources = {
                     requests = {
                       memory = "64Mi"
