@@ -1,5 +1,6 @@
 locals {
-  tls_path = "/etc/kubernetes-mcp-server"
+  config_path = "/etc/kubernetes-mcp-server/config.toml"
+  tls_path    = "/etc/kubernetes-mcp-server"
 }
 
 module "service" {
@@ -21,6 +22,33 @@ module "service" {
   }
 }
 
+module "configmap" {
+  source    = "../../../modules/configmap"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    basename(local.config_path) = <<-EOF
+    port = "${var.service_port}"
+    list_output = "yaml"
+
+    cluster_provider_strategy = "in-cluster"
+    log_level = 2
+    read_only = true
+    toolsets = ["core", "helm"]
+    require_tls = true
+    tls_cert = "${local.tls_path}/tls.crt"
+    tls_key = "${local.tls_path}/tls.key"
+
+    [[denied_resources]]
+    group = ""
+    version = "v1"
+    kind = "Secret"
+    EOF
+  }
+}
+
 module "deployment" {
   source = "../../../modules/deployment"
 
@@ -31,6 +59,7 @@ module "deployment" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = merge({
+    "checksum/configmap"                  = sha256(module.configmap.manifest)
     "secret.reloader.stakater.com/reload" = "${var.name}-tls"
   })
   template_spec = {
@@ -48,29 +77,24 @@ module "deployment" {
         name  = "${var.name}-kubernetes-mcp"
         image = "${var.images.kubernetes-mcp.repository}:${var.images.kubernetes-mcp.tag}"
         args = [
-          "--port",
-          tostring(var.service_port),
-          "--disable-multi-cluster",
-          "--stateless",
-          "--cluster-provider",
-          "in-cluster",
-          "--list-output",
-          "yaml",
-          "--toolsets",
-          "core,helm",
-          "--tls-cert",
-          "${local.tls_path}/tls.crt",
-          "--tls-key",
-          "${local.tls_path}/tls.key",
-          "--require-tls",
-          "--log-level",
-          "5",
-          "--read-only",
+          "--config",
+          local.config_path,
         ]
         volumeMounts = [
           {
             name      = "tls"
-            mountPath = local.tls_path
+            mountPath = "${local.tls_path}/tls.crt"
+            subPath   = "tls.crt"
+          },
+          {
+            name      = "tls"
+            mountPath = "${local.tls_path}/tls.key"
+            subPath   = "tls.key"
+          },
+          {
+            name      = "config"
+            mountPath = local.config_path
+            subPath   = basename(local.config_path)
           },
           {
             name      = "service-account"
@@ -101,6 +125,12 @@ module "deployment" {
         name = "tls"
         secret = {
           secretName = "${var.name}-tls"
+        }
+      },
+      {
+        name = "config"
+        configMap = {
+          name = module.configmap.name
         }
       },
       {

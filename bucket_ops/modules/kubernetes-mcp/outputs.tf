@@ -1,6 +1,7 @@
 output "manifests" {
   value = concat([
     module.deployment.manifest,
+    module.configmap.manifest,
     module.service.manifest,
     ], [
     for _, m in [
@@ -18,20 +19,6 @@ output "manifests" {
       },
       {
         apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRole"
-        metadata = {
-          name = var.name
-        }
-        rules = [
-          {
-            apiGroups = ["*"]
-            resources = ["*"]
-            verbs     = ["get", "list", "watch"]
-          },
-        ]
-      },
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
         kind       = "ClusterRoleBinding"
         metadata = {
           name = var.name
@@ -43,7 +30,7 @@ output "manifests" {
         roleRef = {
           apiGroup = "rbac.authorization.k8s.io"
           kind     = "ClusterRole"
-          name     = var.name
+          name     = "view"
         }
         subjects = [
           {
