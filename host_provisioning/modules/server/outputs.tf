@@ -176,6 +176,7 @@ protocol pipe {
   ipv4 {
     import all;
     export all;
+    add paths rx;
     table ${var.bird_cache_table.name};
   };
 }

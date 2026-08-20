@@ -74,7 +74,7 @@ module "server" {
   bgp_neighbor_netnums = {
     # target all gateways minus self if this is on a gateway instance
     for host_key, host in local.members.gateway :
-    host_key => host.netnum if each.key != host_key
+    host_key => host.netnum if each.value.netnum != host.netnum
   }
   bgp_as     = local.bgp.host_as
   bgp_prefix = each.value.networks.node.prefix

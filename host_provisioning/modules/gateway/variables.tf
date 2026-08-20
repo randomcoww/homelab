@@ -41,7 +41,7 @@ variable "bgp_port" {
   type = number
 }
 
-variable "node_prefix" {
+variable "bgp_prefix" {
   type = string
 }
 

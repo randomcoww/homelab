@@ -91,16 +91,18 @@ output "ignition_snippet" {
             # Bird peers sharing default gateway and apiserver
             protocol bgp node {
               debug all;
-              source address ${cidrhost(var.node_prefix, var.host_netnum)};
+              source address ${cidrhost(var.bgp_prefix, var.host_netnum)};
               local port ${var.bgp_port} as ${var.bgp_as};
-              neighbor range ${var.node_prefix} port ${var.bgp_port} internal;
+              neighbor range ${var.bgp_prefix} port ${var.bgp_port} internal;
               graceful restart;
               direct;
+              rr client;
               bfd {
               };
               ipv4 {
                 import all;
                 export all;
+                add paths tx;
                 table ${var.bird_cache_table.name};
               };
             }
