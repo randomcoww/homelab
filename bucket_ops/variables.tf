@@ -2,7 +2,15 @@ variable "github_username" {
   type = string
 }
 
-variable "github_token" {
+variable "github_renovate_token" {
+  type = string
+}
+
+variable "github_runner_token" {
+  type = string
+}
+
+variable "github_mcp_token" {
   type = string
 }
 

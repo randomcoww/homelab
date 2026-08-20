@@ -168,7 +168,7 @@ module "hermes-agent" {
     CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
     CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
     HERMES_TIMEZONE                     = local.timezone
-    GITHUB_TOKEN                        = var.github_token
+    GITHUB_TOKEN                        = var.github_mcp_token
     API_SERVER_MODEL_NAME               = "hermes-agent"
     API_SERVER_KEY                      = random_password.hermes-agent-auth-token.result
     SLACK_BOT_TOKEN                     = var.slack_bot_token

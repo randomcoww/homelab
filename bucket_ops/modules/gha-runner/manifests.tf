@@ -278,6 +278,6 @@ module "user-secret" {
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret
-    RENOVATE_TOKEN        = var.github_credentials.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
+    RENOVATE_TOKEN        = var.github_renovate_token # GITHUB_TOKEN cannot provide all permissions needed for renovate
   })
 }

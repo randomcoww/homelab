@@ -26,11 +26,16 @@ variable "images" {
   })
 }
 
-variable "github_credentials" {
-  type = object({
-    token    = string
-    username = string
-  })
+variable "github_username" {
+  type = string
+}
+
+variable "github_renovate_token" {
+  type = string
+}
+
+variable "github_runner_token" {
+  type = string
 }
 
 variable "ca_issuer_name" {

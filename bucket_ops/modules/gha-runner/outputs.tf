@@ -81,9 +81,9 @@ output "manifests" {
             enable = false
           }
           values = {
-            githubConfigUrl = "https://github.com/${var.github_credentials.username}/${k.repo}"
+            githubConfigUrl = "https://github.com/${var.github_username}/${k.repo}"
             githubConfigSecret = {
-              github_token = var.github_credentials.token
+              github_token = var.github_runner_token
             }
             maxRunners = 2
             containerMode = {
