@@ -176,8 +176,8 @@ protocol pipe {
   ipv4 {
     import all;
     export all;
-    add paths rx;
-    table ${var.bird_cache_table.name};
+    add paths rx; # allow propagating multiple routes for apiserver
+    table ${var.bird_cache_table.name}; # routes for apiserver and default gateway are populated here
   };
 }
 %{endfor~}

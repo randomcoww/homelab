@@ -102,8 +102,8 @@ output "ignition_snippet" {
               ipv4 {
                 import all;
                 export all;
-                add paths tx;
-                table ${var.bird_cache_table.name};
+                add paths tx; # allow propagating multiple routes for apiserver
+                table ${var.bird_cache_table.name}; # routes from cilium won't be pushed to k8s workers
               };
             }
 
