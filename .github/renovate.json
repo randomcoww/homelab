@@ -23,27 +23,9 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "!randomcoww/fedora-coreos-config-custom",
-        "!docker.io/pgsty/minio"
+        "!randomcoww/fedora-coreos-config-custom"
       ],
       "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
-      "automerge": true,
-      "ignoreTests": true,
-      "groupName": "renovate"
-    },
-    {
-      "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/qrcode-resource",
-        "reg.cluster.internal/randomcoww/sunshine-desktop",
-        "docker.io/cloudflare/cloudflared"
-      ],
-      "matchUpdateTypes": [
-        "major",
         "minor",
         "patch",
         "pin",
@@ -77,7 +59,6 @@
     },
     {
       "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/juicefs",
         "docker.io/juicedata/mount"
       ],
       "versioning": "regex:^ce-v(?<major>\\d+).(?<minor>\\d+).(?<patch>\\d+)(?:.(?<build>\\d+))?$"
