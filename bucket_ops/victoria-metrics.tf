@@ -208,6 +208,22 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               }
               vlagent = {
                 enabled = true
+                spec = {
+                  port = tostring(local.host_ports.vlagent)
+                  containers = [
+                    {
+                      name = "vlagent"
+                      ports = [
+                        {
+                          containerPort = local.host_ports.vlagent
+                          name          = "http"
+                          protocol      = "TCP"
+                          hostPort      = local.host_ports.vlagent # add this field to default to allow hitting this service from host
+                        },
+                      ]
+                    },
+                  ]
+                }
               }
               vmcluster = {
                 enabled = true
