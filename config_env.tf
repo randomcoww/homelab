@@ -182,6 +182,9 @@ locals {
     victoria-metrics = {
       hostname = "vm.${local.domains.public}"
     }
+    victoria-logs = {
+      hostname = "vl.${local.domains.public}"
+    }
     sunshine = {
       hostname = "sunshine.${local.domains.public}"
     }

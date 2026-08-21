@@ -3,6 +3,8 @@ locals {
   victoria-metrics_namespace = "monitoring"
   victoria-metrics-mcp_name  = "${local.victoria-metrics_name}mcp"
   victoria-metrics-mcp_port  = 8080
+  victoria-logs-mcp_name     = "vlmcp"
+  victoria-logs-mcp_port     = 8080
 }
 
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
@@ -151,6 +153,61 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     },
                   ]
                 }
+              }
+              vlcluster = {
+                enabled = true
+                spec = {
+                  vlstorage = {
+                    retentionPeriod = "24h"
+                    resources = {
+                      requests = {
+                        memory = "1Gi"
+                      }
+                      limits = {
+                        memory = "2Gi"
+                      }
+                    }
+                  }
+                  vlselect = {
+                    enabled = true
+                    resources = {
+                      requests = {
+                        memory = "256Mi"
+                      }
+                      limits = {
+                        memory = "256Mi"
+                      }
+                    }
+                  }
+                  vlinsert = {
+                    enabled = true
+                    resources = {
+                      requests = {
+                        memory = "256Mi"
+                      }
+                      limits = {
+                        memory = "256Mi"
+                      }
+                    }
+                  }
+                }
+                route = {
+                  vlselect = {
+                    enabled = true
+                    hostnames = [
+                      local.endpoints.victoria-logs.hostname,
+                    ]
+                    parentRefs = [
+                      {
+                        name      = local.services.cilium.name
+                        namespace = local.services.cilium.namespace
+                      },
+                    ]
+                  }
+                }
+              }
+              vlagent = {
+                enabled = true
               }
               vmcluster = {
                 enabled = true
@@ -442,6 +499,66 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 limits = {
                   memory = "1Gi"
                 }
+              }
+              scrape = {
+                enabled = true
+              }
+            }
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = local.victoria-logs-mcp_name
+            namespace = local.victoria-metrics_namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "victoria-logs-mcp"
+                version = "0.1.0" # renovate: datasource=helm depName=victoria-logs-mcp registryUrl=https://victoriametrics.github.io/helm-charts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = local.victoria-metrics_name
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = local.victoria-logs-mcp_name
+            install = {
+              createNamespace = true
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              vl = {
+                entrypoint = "https://${local.endpoints.victoria-logs.hostname}"
+              }
+              service = {
+                port = local.victoria-logs-mcp_port
+              }
+              resources = {
+                requests = {
+                  memory = "640Mi"
+                }
+                limits = {
+                  memory = "1Gi"
+                }
+              }
+              scrape = {
+                enabled = true
               }
             }
           }

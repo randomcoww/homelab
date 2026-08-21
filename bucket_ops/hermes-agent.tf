@@ -131,6 +131,11 @@ module "hermes-agent" {
         timeout         = 300
         connect_timeout = 30
       }
+      victoria-logs = {
+        url             = "http://${local.victoria-logs-mcp_name}-victoria-logs-mcp.${local.victoria-metrics_namespace}:${local.victoria-logs-mcp_port}/mcp"
+        timeout         = 300
+        connect_timeout = 30
+      }
     }
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
     memory = {
