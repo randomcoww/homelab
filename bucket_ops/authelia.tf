@@ -68,7 +68,7 @@ module "authelia-valkey" {
   images = {
     valkey = {
       repository = "ghcr.io/valkey-io/valkey"
-      tag        = "9.1-alpine@sha256:ee91f7a174ac4d6a6b0685b3a60e321f0a9dbbb691f9b0e285be2ba1d1be8328" # renovate: datasource=docker depName=ghcr.io/valkey-io/valkey
+      tag        = "9.1-alpine@sha256:de31910896150d5e754a07d57d227cfdde4e258ddd0d1aa4607f2d2f95843715" # renovate: datasource=docker depName=ghcr.io/valkey-io/valkey
     }
   }
   service_port   = local.authelia-valkey_port

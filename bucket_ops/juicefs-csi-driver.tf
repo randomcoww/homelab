@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             chart = {
               spec = {
                 chart   = "juicefs-csi-driver"
-                version = "0.32.3" # renovate: datasource=helm depName=juicefs-csi-driver registryUrl=https://juicedata.github.io/charts
+                version = "0.32.4" # renovate: datasource=helm depName=juicefs-csi-driver registryUrl=https://juicedata.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "juicefs-csi-driver"
