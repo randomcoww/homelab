@@ -80,6 +80,24 @@ output "ignition_snippet" {
             },
           ]
         },
+        {
+          name    = "systemd-journal-upload.service"
+          enabled = true
+          dropins = [
+            # This ships logs to a service on a container - at minimum kubelet needs to be up to work
+            {
+              name     = "10-kubelet-wait.conf"
+              contents = <<-EOF
+                [Unit]
+                Wants=kubelet.service
+                After=kubelet.service
+
+                [Service]
+                RestartSec=10
+                EOF
+            },
+          ]
+        },
       ]
     }
     storage = {
@@ -130,6 +148,18 @@ output "ignition_snippet" {
               EOF
             }
           },
+          # VLAgent journal ingestion - daemonset listens on hostPort
+          {
+            path = "/etc/systemd/journal-upload.conf.d/10-vlagent.conf"
+            mode = 420
+            contents = {
+              inline = <<-EOF
+              [Upload]
+              URL=http://127.0.0.1:${var.ports.vlagent}/insert/journald
+              Compression=zstd:4 lz4:2
+              EOF
+            }
+          },
           {
             path = "/etc/crio/crio.conf.d/20-worker.conf"
             mode = 420
@@ -166,7 +196,7 @@ output "ignition_snippet" {
             }
           },
 
-          # needed for hostapd and not needed for cilium
+          # Needed for hostapd wifi bridge. Normally needed for CNI but not needed with Cilium
           {
             path = "/etc/sysctl.d/99-bridge-iptables.conf"
             mode = 420
@@ -178,7 +208,6 @@ output "ignition_snippet" {
               EOF
             }
           },
-
           # Image build dependency
           {
             path = "/etc/modules-load.d/20-uinput.conf"
@@ -189,7 +218,7 @@ output "ignition_snippet" {
               EOF
             }
           },
-          # Sunshine desktop
+          # Sunshine desktop game performance
           {
             path = "/etc/modules-load.d/20-ntsync.conf"
             mode = 420

@@ -32,6 +32,7 @@ module "kubernetes-worker" {
   ports = {
     kubelet      = local.host_ports.kubelet
     crio_metrics = local.host_ports.crio_metrics
+    vlagent      = local.host_ports.vlagent
   }
   # allow host to resolve registry by name
   internal_registries = [

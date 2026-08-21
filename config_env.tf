@@ -209,6 +209,7 @@ locals {
     etcd_metrics       = 58086
     bgp                = 179 # not configurable
     crio_metrics       = 58091
+    vlagent            = 9429 # victoria logs agent listens on host port to ingest logs from journald
   }
 
   # Loadbalancer or externalIP service ports referenced globally #

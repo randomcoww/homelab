@@ -34,6 +34,7 @@ variable "ports" {
   type = object({
     kubelet      = number
     crio_metrics = number
+    vlagent      = number
   })
 }
 
