@@ -161,10 +161,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     retentionPeriod = "24h"
                     resources = {
                       requests = {
-                        memory = "1Gi"
+                        memory = "256Mi"
                       }
                       limits = {
-                        memory = "2Gi"
+                        memory = "512Mi"
                       }
                     }
                   }
@@ -172,10 +172,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     enabled = true
                     resources = {
                       requests = {
-                        memory = "256Mi"
+                        memory = "64Mi"
                       }
                       limits = {
-                        memory = "256Mi"
+                        memory = "128Mi"
                       }
                     }
                   }
@@ -183,10 +183,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     enabled = true
                     resources = {
                       requests = {
-                        memory = "256Mi"
+                        memory = "64Mi"
                       }
                       limits = {
-                        memory = "256Mi"
+                        memory = "128Mi"
                       }
                     }
                   }
@@ -223,6 +223,14 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       ]
                     },
                   ]
+                  resources = {
+                    requests = {
+                      memory = "128Mi"
+                    }
+                    limits = {
+                      memory = "256Mi"
+                    }
+                  }
                 }
               }
               vmcluster = {
