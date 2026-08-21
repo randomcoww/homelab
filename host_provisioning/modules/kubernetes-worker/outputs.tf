@@ -45,7 +45,6 @@ output "ignition_snippet" {
                 After=crio.service
                 Wants=local-fs.target
                 After=local-fs.target
-                Before=generate-backup-boot-device.service
 
                 [Service]
                 ExecStartPre=/usr/bin/mkdir -p ${var.kubelet_root_path} ${var.static_pod_path} ${local.config_path}
