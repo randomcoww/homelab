@@ -241,7 +241,35 @@ EOF
               inline = var.registry_ca.cert_pem
             }
           }
-      ])
+          ], [
+
+          # Kured check for host reboot required
+          {
+            path = "/usr/local/bin/reboot-required.sh"
+            mode = 493
+            contents = {
+              inline = <<-EOF
+                #!/bin/bash
+                set -xe -o pipefail
+
+                if [ -f /var/run/reboot-required ]; then
+                  exit 0
+                fi
+                if [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]; then
+                  exit 0
+                fi
+                ipxe_url=$(xargs -n1 -a /proc/cmdline | grep ^ipxe.url= | sed -r 's/^ipxe.url=//')
+                remote_digest=$(curl -fsSL --remove-on-error $ipxe_url | grep ^kernel | xargs -n1 | grep ^digest= | sed -e 's/^digest=//')
+                digest=$(xargs -n1 -a /proc/cmdline | grep ^digest= | sed -e 's/^digest=//')
+                if [ "$remote_digest" != "$digest" ]; then
+                  exit 0
+                fi
+                exit 1
+                EOF
+            }
+          },
+        ]
+      )
     }
   })
 }
