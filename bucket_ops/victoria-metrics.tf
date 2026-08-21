@@ -223,6 +223,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       ]
                     },
                   ]
+                  extraArgs = {
+                    "journald.streamFields" = "_HOSTNAME,_SYSTEMD_UNIT,_TRANSPORT"
+                  }
                   resources = {
                     requests = {
                       memory = "128Mi"
