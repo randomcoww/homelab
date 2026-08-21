@@ -501,7 +501,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 }
               }
               scrape = {
-                enabled = true
+                enabled = false # TODO: enable after release of https://github.com/VictoriaMetrics/helm-charts/pull/3108
               }
             }
           }
