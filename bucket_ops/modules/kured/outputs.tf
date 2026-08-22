@@ -58,6 +58,9 @@ output "manifests" {
               repository = var.images.kured.repository
               tag        = var.images.kured.tag
             }
+            podAnnotations = {
+              "checksum/configmap" = sha256(module.configmap.manifest)
+            }
             configuration = merge({
               period       = "2m"
               forceReboot  = true
