@@ -79,28 +79,6 @@ output "ignition_snippet" {
           name    = "sshd.service"
           enabled = true
         },
-
-        # Backup network boot environment to USB disk
-        {
-          name     = "generate-backup-boot-device.service"
-          enabled  = true
-          contents = <<-EOF
-            [Unit]
-            Wants=network-online.target
-            After=network-online.target
-            ConditionKernelCommandLine=coreos.live.rootfs_url
-
-            [Service]
-            Type=oneshot
-            RemainAfterExit=yes
-            ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle generate-backup-boot-device.sh
-            Restart=on-failure
-            RestartSec=30
-
-            [Install]
-            WantedBy=multi-user.target
-            EOF
-        },
       ]
     }
     passwd = {
@@ -324,62 +302,8 @@ EOF
               EOF
           }
         },
-
-        # Backup network boot environment to USB disk
-        {
-          path = "/usr/local/bin/generate-backup-boot-device.sh"
-          mode = 493
-          contents = {
-            inline = <<-EOF
-              #!/bin/bash
-              set -xe -o pipefail
-              mkdir -p ${var.backup_bind_mount_path}
-
-              cleanup() {
-                if mountpoint -q ${var.backup_bind_mount_path}; then
-                  sync
-                  umount ${var.backup_bind_mount_path}
-                fi
-                rmdir ${var.backup_bind_mount_path}
-
-                if [ -f ${var.backup_temp_image_path} ]; then
-                  sync
-                  rm ${var.backup_temp_image_path}
-                fi
-              }
-              trap cleanup EXIT
-
-              image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/^coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
-              if [ -z "$image_url" ]; then
-                exit 1
-              fi
-              disk=$(lsblk -ndo kname /dev/disk/by-id/usb-* | head -1)
-              if [ -z "$disk" ]; then
-                exit 1
-              fi
-
-              # Compare image version
-              backup_label=$(blkid /dev/$disk -s LABEL -o value)
-              current_label=$(cat /proc/cmdline | awk '{print $1}' | sed -r 's/-live-kernel.*//')
-              if [ "$backup_label" != "$current_label" ]; then
-                curl -fsSL --remove-on-error $image_url --output ${var.backup_temp_image_path}
-                cat /run/ignition.json | coreos-installer iso ignition embed ${var.backup_temp_image_path}
-
-                dd if=${var.backup_temp_image_path} of=/dev/$disk bs=4M
-                exit 0
-              fi
-
-              # Compare ignition
-              bindfs --block-devices-as-files /dev ${var.backup_bind_mount_path}
-              backup_ign=$(coreos-installer iso ignition show ${var.backup_bind_mount_path}/$disk | sha256sum | awk '{print $1}')
-              current_ign=$(cat /run/ignition.json | sha256sum | awk '{print $1}')
-              if [ "$backup_ign" != "$current_ign" ]; then
-                cat /run/ignition.json | coreos-installer iso ignition embed ${var.backup_bind_mount_path}/$disk -f
-              fi
-              EOF
-          }
-        },
-      ])
+        ]
+      )
     }
   })
 }
