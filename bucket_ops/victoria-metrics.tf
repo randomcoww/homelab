@@ -219,6 +219,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                           name          = "http"
                           protocol      = "TCP"
                           hostPort      = local.host_ports.vlagent # add this field to default to allow hitting this service from host
+                          hostIP        = "127.0.0.1"
                         },
                       ]
                     },
