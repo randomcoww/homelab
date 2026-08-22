@@ -158,7 +158,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 enabled = true
                 spec = {
                   vlstorage = {
-                    retentionPeriod = "24h"
+                    retentionPeriod = "72h"
                     resources = {
                       requests = {
                         memory = "256Mi"
