@@ -20,6 +20,24 @@ module "kured" {
     ]
     timeZone = local.timezone
   }
+  reboot_required_script = <<-EOF
+  #!/bin/bash
+  set -xe -o pipefail
+
+  if [ -f /var/run/reboot-required ]; then
+    exit 0
+  fi
+  if [ -z $(xargs -n1 -a /proc/cmdline | grep ^${local.custom_kargs.ipxe_url}=) ]; then
+    exit 0
+  fi
+  ipxe_url=$(xargs -n1 -a /proc/cmdline | grep ^${local.custom_kargs.ipxe_url}= | sed -r 's/^${local.custom_kargs.ipxe_url}=//')
+  remote_digest=$(curl -fsSL --remove-on-error $ipxe_url | grep ^kernel | xargs -n1 | grep ^${local.custom_kargs.digest}= | sed -e 's/^${local.custom_kargs.digest}=//')
+  digest=$(xargs -n1 -a /proc/cmdline | grep ^${local.custom_kargs.digest}= | sed -e 's/^${local.custom_kargs.digest}=//')
+  if [ "$remote_digest" != "$digest" ]; then
+    exit 0
+  fi
+  exit 1
+  EOF
 }
 
 resource "minio_s3_object" "fluxcd-kured" {

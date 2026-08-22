@@ -24,3 +24,7 @@ variable "kured_config" {
   type    = any
   default = {}
 }
+
+variable "reboot_required_script" {
+  type = string
+}
