@@ -16,6 +16,11 @@ module "kubernetes-worker" {
     private_key_pem = tls_private_key.internal-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.internal-ca.cert_pem
   }
+  vlagent_ca = {
+    algorithm       = tls_private_key.internal-ca.algorithm
+    private_key_pem = tls_private_key.internal-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.internal-ca.cert_pem
+  }
   host_netnum             = each.value.netnum
   cluster_domain          = local.domains.kubernetes
   apiserver_endpoint      = "https://${local.networks.service.vips.apiserver}:${local.host_ports.apiserver}"

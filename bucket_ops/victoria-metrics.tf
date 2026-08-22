@@ -225,7 +225,24 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   ]
                   extraArgs = {
                     "journald.streamFields" = "_HOSTNAME,_SYSTEMD_UNIT,_TRANSPORT"
+                    tls                     = "true"
+                    tlsCertFile             = "/etc/vlagent/tls.crt"
+                    tlsKeyFile              = "/etc/vlagent/tls.key"
                   }
+                  volumeMounts = [
+                    {
+                      name      = "vlagent-tls"
+                      mountPath = "/etc/vlagent"
+                    },
+                  ]
+                  volumes = [
+                    {
+                      name = "vlagent-tls"
+                      secret = {
+                        secretName = "${local.victoria-metrics_name}-vlagent-tls"
+                      }
+                    },
+                  ]
                   resources = {
                     requests = {
                       memory = "128Mi"
@@ -470,6 +487,39 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   }
                 }
               }
+            }
+          }
+        },
+
+        # vlagent server cert
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Certificate"
+          metadata = {
+            name      = "${local.victoria-metrics_name}-vlagent-tls"
+            namespace = local.victoria-metrics_namespace
+          }
+          spec = {
+            secretName = "${local.victoria-metrics_name}-vlagent-tls"
+            isCA       = false
+            privateKey = {
+              algorithm = "ECDSA"
+              size      = 521
+            }
+            commonName = local.victoria-metrics_name
+            usages = [
+              "key encipherment",
+              "digital signature",
+            ]
+            ipAddresses = [
+              "127.0.0.1",
+            ]
+            dnsNames = [
+              "localhost",
+            ]
+            issuerRef = {
+              name = local.cert_issuers.ca_internal
+              kind = "ClusterIssuer"
             }
           }
         },

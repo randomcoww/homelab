@@ -30,7 +30,7 @@ locals {
             enabled = true
           }
           x509 = {
-            clientCAFile = local.pki_files["ca.crt"].path
+            clientCAFile = local.pki_files["kubernetes-ca.crt"].path
           }
         }
         authorization = {
@@ -91,9 +91,12 @@ locals {
 
   pki_files = {
     for key, f in {
-      "ca.crt"           = var.kubernetes_ca.cert_pem
-      "crio-metrics.crt" = tls_locally_signed_cert.crio-metrics.cert_pem
-      "crio-metrics.key" = tls_private_key.crio-metrics.private_key_pem
+      "kubernetes-ca.crt"  = var.kubernetes_ca.cert_pem
+      "crio-metrics.crt"   = tls_locally_signed_cert.crio-metrics.cert_pem
+      "crio-metrics.key"   = tls_private_key.crio-metrics.private_key_pem
+      "vlagent-ca.crt"     = var.vlagent_ca.cert_pem
+      "vlagent-client.crt" = tls_locally_signed_cert.vlagent-client.cert_pem
+      "vlagent-client.key" = tls_private_key.vlagent-client.private_key_pem
     } :
     key => {
       mode = 384

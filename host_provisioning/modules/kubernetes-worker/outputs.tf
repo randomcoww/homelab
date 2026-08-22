@@ -93,6 +93,11 @@ output "ignition_snippet" {
                 After=kubelet.service
 
                 [Service]
+                LoadCredential=tls.key:${local.pki_files["vlagent-client.key"].path}
+                LoadCredential=tls.crt:${local.pki_files["vlagent-client.crt"].path}
+                LoadCredential=ca.crt:${local.pki_files["vlagent-ca.crt"].path}
+                ExecStart=
+                ExecStart=/usr/lib/systemd/systemd-journal-upload --save-state --key=%d/tls.key --cert=%d/tls.crt --trust=%d/ca.crt
                 RestartSec=10
                 EOF
             },
@@ -155,7 +160,7 @@ output "ignition_snippet" {
             contents = {
               inline = <<-EOF
               [Upload]
-              URL=http://127.0.0.1:${var.ports.vlagent}/insert/journald
+              URL=https://127.0.0.1:${var.ports.vlagent}/insert/journald
               Compression=zstd:4 lz4:2
               EOF
             }
