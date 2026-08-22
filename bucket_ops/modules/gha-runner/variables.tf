@@ -56,3 +56,7 @@ variable "minio_user" {
     secret = string
   })
 }
+
+variable "cosa_build_tag_karg" {
+  type = string
+}

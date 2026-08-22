@@ -4,6 +4,7 @@ locals {
     ipxe_url    = "custom.ipxe_url"
     liveiso_url = "custon.liveiso_url"
     digest      = "custom.digest"
+    build_tag   = "custom.build_tag"
   }
 
   host_images = {
@@ -36,6 +37,7 @@ locals {
       "amd_iommu=off",                                                             # memory performance for LLM
       "${local.custom_kargs.ipxe_url}=${local.boot_base_url}/ipxe-$${mac:hexhyp}", # for custom update check
       "${local.custom_kargs.liveiso_url}=${local.boot_base_url}/${local.current_host_image.liveiso}",
+      "${local.custom_kargs.build_tag}=${tag}",
     ], host.boot_args)
   }
   netboot_config = {

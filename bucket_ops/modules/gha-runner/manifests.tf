@@ -139,6 +139,10 @@ locals {
               name  = "RCLONE_S3_ENDPOINT"
               value = var.minio_endpoint
             },
+            {
+              name  = "BUILD_TAG_KARG"
+              value = var.cosa_build_tag_karg
+            },
           ]
           volumeMounts = [
             {
