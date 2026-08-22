@@ -146,10 +146,6 @@ locals {
               mountPath = "/etc/ssl/certs/ca-certificates.crt"
               readOnly  = true
             },
-            {
-              name      = "rclone"
-              mountPath = "/rclone"
-            },
           ]
         },
       ]
@@ -159,15 +155,6 @@ locals {
           hostPath = {
             path = "/etc/ssl/certs/ca-certificates.crt"
             type = "File"
-          }
-        },
-        {
-          name = "rclone"
-          image = {
-            reference = join(":", [
-              "ghcr.io/rclone/rclone",
-              "1.74.4@sha256:c61954aaa32328a5486715dd063a81c7879f5195ad3505cd362deddd509dc4a1", # renovate: datasource=docker depName=ghcr.io/rclone/rclone
-            ])
           }
         },
       ]
