@@ -24,11 +24,11 @@ module "llama-cpp" {
         }
       },
       {
-        repository = "reg.cluster.internal/randomcoww/muse-glimmer-30b-ud-q8-k-xl"
-        tag        = "v1786426571@sha256:88acda0846a6bac50ab95556fd925ea26e7cd9ed85f8039360a1b35915235a66" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/muse-glimmer-30b-ud-q8-k-xl
+        repository = "reg.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl"
+        tag        = "v1787524139@sha256:a86f56a009fa6a81528dedc00d65b648df55c84f96ca038f4a36a3d4d1be7791" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
         files = {
-          muse-glimmer-30b        = "Muse-Glimmer-30B-UD-Q8_K_XL.gguf"
-          muse-glimmer-30b-mmproj = "mmproj-Muse-Glimmer-30B-BF16.gguf"
+          qwen-3-5-4b        = "Qwen3.5-4B-UD-Q8_K_XL.gguf"
+          qwen-3-5-4b-mmproj = "mmproj-BF16.gguf"
         }
       },
       {
@@ -67,7 +67,7 @@ module "llama-cpp" {
           --spec-draft-n-max 3 \
           --reasoning-preserve \
           --no-context-shift \
-          --image-min-tokens 2048 \
+          --image-min-tokens 1024 \
           --mmproj $${qwen-3-8-27b-mmproj}
         EOF
         filters = {
@@ -82,24 +82,30 @@ module "llama-cpp" {
           }
         }
       }
-      muse-glimmer-30b = {
+      qwen-3-5-4b = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${muse-glimmer-30b} \
+          --model $${qwen-3-5-4b} \
           --ctx-size 262144 \
           --jinja \
           --top-p 0.95 \
-          --top-k 64 \
-          --mmproj $${muse-glimmer-30b-mmproj} \
+          --top-k 20 \
+          --min-p 0.0 \
+          --repeat-penalty 1.0 \
+          --no-context-shift \
+          --image-min-tokens 1024 \
+          --mmproj $${qwen-3-5-4b-mmproj}
         EOF
         filters = {
-          stripParams = "temperature"
+          stripParams = "temperature,presence_penalty"
           setParamsByID = {
             "$${MODEL_ID}" = {
-              temperature = 1.0
+              temperature      = 1.0
+              presence_penalty = 1.5
             }
             "$${MODEL_ID}:low" = {
-              temperature = 0.6
+              temperature      = 0.6
+              presence_penalty = 0.0
             }
           }
         }
@@ -127,13 +133,14 @@ module "llama-cpp" {
         persistent = true
         members = [
           "whisper-large-v3-turbo",
+          "qwen-3-5-4b",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "whisper-large-v3-turbo",
+          "qwen-3-5-4b",
           "qwen-3-8-27b",
         ]
       }

@@ -61,7 +61,7 @@ module "hermes-agent" {
   extra_configs = {
     agent = {
       tool_use_enforcement = true
-      reasoning_effort     = "xhigh"
+      reasoning_effort     = "medium"
       max_turns            = 300
     }
     stt = {
@@ -89,14 +89,6 @@ module "hermes-agent" {
           "$${INTERNAL_CLIENT_CERT_PATH}",
           "$${INTERNAL_CLIENT_KEY_PATH}",
         ]
-        timeout         = 300
-        connect_timeout = 30
-      }
-      github = {
-        url = "https://api.githubcopilot.com/mcp"
-        headers = {
-          Authorization = "Bearer $${GITHUB_TOKEN}"
-        }
         timeout         = 300
         connect_timeout = 30
       }
@@ -147,8 +139,49 @@ module "hermes-agent" {
       ]
     }
     auxiliary = {
+      title_generation = {
+        timeout          = 600
+        provider         = "custom"
+        name             = "qwen-3-5-4b:low"
+        reasoning_effort = "low"
+      }
       vision = {
-        timeout = 1800
+        timeout  = 600
+        provider = "custom"
+        name     = "qwen-3-5-4b:low"
+      }
+      compression = {
+        timeout  = 600
+        provider = "custom"
+        name     = "qwen-3-5-4b:low"
+      }
+      approval = {
+        timeout          = 600
+        provider         = "custom"
+        name             = "qwen-3-5-4b:low"
+        reasoning_effort = "low"
+      }
+      web_extract = {
+        timeout          = 600
+        provider         = "custom"
+        name             = "qwen-3-5-4b:low"
+        reasoning_effort = "low"
+      }
+      triage_specifier = {
+        timeout  = 600
+        provider = "custom"
+        name     = "qwen-3-5-4b:low"
+      }
+      profile_describer = {
+        timeout          = 600
+        provider         = "custom"
+        name             = "qwen-3-5-4b:low"
+        reasoning_effort = "low"
+      }
+      curator = {
+        timeout  = 600
+        provider = "custom"
+        name     = "qwen-3-5-4b:low"
       }
     }
     group_sessions_per_user = false
@@ -164,6 +197,70 @@ module "hermes-agent" {
     slack = {
       require_mention = true
       strict_mention  = true
+    }
+    skills = {
+      disabled = sort([
+        "xurl",
+        "openhue",
+        "airtable",
+        "box",
+        "document-to-action-items",
+        "docx",
+        "google-workspace",
+        "maps",
+        "meeting-action-items",
+        "notion",
+        "xlsx",
+        "weekly-review-planning",
+        "teams-meeting-pipeline",
+        "obsidian",
+        "songsee",
+        "email-inbox-triage",
+        "himalaya",
+        "touchdesigner-mcp",
+        "songwriting-and-ai-music",
+        "sketch",
+        "pretext",
+        "popular-web-designs",
+        "p5js",
+        "manim-video",
+        "humanizer",
+        "excalidraw",
+        "design-md",
+        "comfyui",
+        "claude-design",
+        "baoyu-infographic",
+        "ascii-video",
+        "ascii-art",
+        "architecture-diagram",
+        "claude-code",
+        "codex",
+        "computer-use",
+        "merge-reconciler",
+        "opencode",
+        "gif-search",
+        "youtube-content",
+        "evaluating-llms-harness",
+        "huggingface-hub",
+        "serving-llms-vllm",
+        "weights-and-biases",
+        "nano-pdf",
+        "ocr-and-documents",
+        "pdf",
+        "powerpoint",
+        "product-price-monitor",
+        "session-librarian",
+        "arxiv",
+        "blocked-page-recovery",
+        "blogwatcher",
+        "competitor-news-monitor",
+        "grounded-citations",
+        "llm-wiki",
+        "polymarket",
+        "research-paper-writing",
+        "web-retrieval",
+        "llama-cpp",
+      ])
     }
   }
   extra_config_envs = {
