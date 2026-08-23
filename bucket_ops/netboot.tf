@@ -12,10 +12,11 @@ locals {
       default = "44.20260820.20.1" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
-      kernel  = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
-      initrd  = "fedora-coreos-${tag}-live-initramfs.$${buildarch:uristring}.img"
-      rootfs  = "fedora-coreos-${tag}-live-rootfs.$${buildarch:uristring}.img"
-      liveiso = "fedora-coreos-${tag}-live-iso.$${buildarch:uristring}.iso"
+      kernel    = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
+      initrd    = "fedora-coreos-${tag}-live-initramfs.$${buildarch:uristring}.img"
+      rootfs    = "fedora-coreos-${tag}-live-rootfs.$${buildarch:uristring}.img"
+      liveiso   = "fedora-coreos-${tag}-live-iso.$${buildarch:uristring}.iso"
+      build_tag = tag
     }
   }
   current_host_image = local.host_images.default
@@ -30,14 +31,14 @@ locals {
       "coreos.no_persist_ip",
       "initrd=${local.current_host_image.initrd}",
       "ignition.config.url=${local.boot_base_url}/ignition-$${mac:hexhyp}",
-      "coreos.live.rootfs_url${local.boot_base_url}/${local.current_host_image.rootfs}",
+      "coreos.live.rootfs_url=${local.boot_base_url}/${local.current_host_image.rootfs}",
       "rd.driver.blacklist=nouveau,nova_core",
       "modprobe.blacklist=nouveau,nova_core",
       "selinux=0",
       "amd_iommu=off",                                                             # memory performance for LLM
       "${local.custom_kargs.ipxe_url}=${local.boot_base_url}/ipxe-$${mac:hexhyp}", # for custom update check
       "${local.custom_kargs.liveiso_url}=${local.boot_base_url}/${local.current_host_image.liveiso}",
-      "${local.custom_kargs.build_tag}=${tag}",
+      "${local.custom_kargs.build_tag}=${local.current_host_image.build_tag}",
     ], host.boot_args)
   }
   netboot_config = {
@@ -94,8 +95,8 @@ resource "minio_s3_object" "ipxe" {
   content_type = "text/plain"
   content      = <<-EOF
   #!ipxe
-  kernel ${local.current_host_image.initrd}/${each.value.kernel} ${join(" ", each.value.netboot_args)}
-  initrd ${local.current_host_image.initrd}/${each.value.initrd}
+  kernel ${local.boot_base_url}/${each.value.kernel} ${join(" ", each.value.netboot_args)}
+  initrd ${local.boot_base_url}/${each.value.initrd}
   boot
   EOF
 
