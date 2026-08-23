@@ -49,7 +49,7 @@ module "gha-runner" {
   registry_endpoint     = "${local.endpoints.registry.hostname}:${local.service_ports.registry}"
   minio_endpoint        = "${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_user            = minio_iam_user.gha-runner
-  cosa_build_tag_karg   = local.custom_kargs.build_tag
+  cosa_build_tag_karg   = local.netboot_custom_kargs.build_tag
 }
 
 resource "minio_s3_object" "fluxcd-gha-runner" {
