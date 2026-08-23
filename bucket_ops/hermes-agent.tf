@@ -54,7 +54,7 @@ module "hermes-agent" {
     }
     hermes-webui = {
       repository = "ghcr.io/nesquena/hermes-webui"
-      tag        = "0.52.261@sha256:cef972549f7f6a1f1504fa09b8cf3ac5551111abea39cc09e952ef5e3c023b18" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
+      tag        = "0.52.262@sha256:52644509d2967489acec78fa70d3d3450e07dbd60e738b2b5753ba97dd166bca" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
     }
   }
   # TODO: investigate apptainer and podman for agent terminal
