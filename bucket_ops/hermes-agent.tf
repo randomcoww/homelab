@@ -263,7 +263,7 @@ module "hermes-agent" {
       ])
     }
   }
-  extra_config_envs = {
+  extra_config_envs = { # set in hermes agent .env file
     OPENAI_BASE_URL                     = "https://${local.endpoints.llama-cpp.hostname}/v1"
     OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
@@ -279,6 +279,8 @@ module "hermes-agent" {
     SLACK_HOME_CHANNEL                  = var.slack_home_channel
     SLACK_HOME_CHANNEL_NAME             = "bot"
     AUXILIARY_VISION_PROVIDER           = "auto"
+    HERMES_API_CALL_STALE_TIMEOUT       = "1800s"                                                    # default 90s times out with cronjobs
+    HERMES_CRON_TIMEOUT                 = 0                                                          # unlimited
     HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id     # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"             # only used if HERMES_DASHBOARD=true
@@ -290,7 +292,10 @@ module "hermes-agent" {
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
   }
-  extra_webui_envs = {
+  extra_agent_envs = { # passed to hermes agent container
+    "TZ" = local.timezone
+  }
+  extra_webui_envs = { # unique env passed to hermes webui container
     HERMES_WEBUI_GATEWAY_API_KEY = random_password.hermes-agent-auth-token.result
     # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
     # HERMES_WEBUI_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
@@ -298,10 +303,6 @@ module "hermes-agent" {
     # HERMES_WEBUI_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"
     # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
     # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
-  }
-
-  extra_agent_envs = {
-    "TZ" = local.timezone
   }
   ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes-agent.hostname

@@ -221,6 +221,7 @@ module "statefulset" {
     "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
   }
   template_spec = {
+    terminationGracePeriodSeconds = 60
     resources = {
       requests = {
         memory = "1Gi"
