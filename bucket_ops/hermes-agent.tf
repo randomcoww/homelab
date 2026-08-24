@@ -142,46 +142,46 @@ module "hermes-agent" {
       title_generation = {
         timeout          = 600
         provider         = "custom"
-        name             = "qwen-3-5-4b:low"
+        model            = "qwen-3-5-4b:low"
         reasoning_effort = "low"
       }
       vision = {
         timeout  = 600
         provider = "custom"
-        name     = "qwen-3-5-4b:low"
+        model    = "qwen-3-5-4b:low"
       }
       compression = {
         timeout  = 600
         provider = "custom"
-        name     = "qwen-3-5-4b:low"
+        model    = "qwen-3-5-4b:low"
       }
       approval = {
         timeout          = 600
         provider         = "custom"
-        name             = "qwen-3-5-4b:low"
+        model            = "qwen-3-5-4b:low"
         reasoning_effort = "low"
       }
       web_extract = {
         timeout          = 600
         provider         = "custom"
-        name             = "qwen-3-5-4b:low"
+        model            = "qwen-3-5-4b:low"
         reasoning_effort = "low"
       }
       triage_specifier = {
         timeout  = 600
         provider = "custom"
-        name     = "qwen-3-5-4b:low"
+        model    = "qwen-3-5-4b:low"
       }
       profile_describer = {
         timeout          = 600
         provider         = "custom"
-        name             = "qwen-3-5-4b:low"
+        model            = "qwen-3-5-4b:low"
         reasoning_effort = "low"
       }
       curator = {
         timeout  = 600
         provider = "custom"
-        name     = "qwen-3-5-4b:low"
+        model    = "qwen-3-5-4b:low"
       }
     }
     group_sessions_per_user = false
