@@ -18,7 +18,9 @@ module "kured" {
     blockingPodSelector = [
       "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
     ]
-    timeZone = local.timezone
+    timeZone     = local.timezone
+    slackChannel = "bot"
+    notifyUrl    = "slack://hook:${join("-", slice(split("/", var.slack_alert_webhook), 4, 7))}@webhook"
   }
   reboot_required_script = <<-EOF
   #!/bin/bash
