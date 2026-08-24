@@ -4,8 +4,8 @@ module "generate-backup-disk" {
   namespace = "default"
   images = {
     backup-runner = {
-      repository = "registry.fedoraproject.org/fedora-minimal"
-      tag        = "latest@sha256:fb20d0a6558889c2bcc038ac77e2be551e3f989fc54b03e7cc5c90a539035b72" # renovate: datasource=docker depName=registry.fedoraproject.org/fedora-minimal
+      repository = "reg.cluster.internal/randomcoww/coreos-installer"
+      tag        = "v1787545110@sha256:9e1fc7b2ceb521a131b122801cc9dbd13e251cda53dd361d04e1215ab6733b7b" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/coreos-installer
     }
   }
   cosa_build_tag_karg = local.netboot_custom_kargs.build_tag

@@ -23,9 +23,6 @@ module "daemonset" {
           set -xe -o pipefail
           mkdir -p ${local.backup_bind_mount_path}
 
-          microdnf install -y --setopt=install_weak_deps=False \
-            bindfs coreos-installer
-
           cleanup() {
             if mountpoint -q ${local.backup_bind_mount_path}; then
               sync
