@@ -176,6 +176,7 @@ resource "helm_release" "fluxcd-bucket" {
           navidrome              = ["mountpoint-s3-csi"]
           hostapd                = ["node-feature-discovery", "device-plugin"]
           sunshine-desktop       = ["device-plugin", "resource-claims"]
+          generate-backup-disk   = []
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
