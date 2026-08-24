@@ -198,6 +198,13 @@ module "hermes-agent" {
       require_mention = true
       strict_mention  = true
     }
+    gateway = {
+      platforms = {
+        slack = {
+          gateway_restart_notification = false
+        }
+      }
+    }
     skills = {
       disabled = sort([
         "xurl",
