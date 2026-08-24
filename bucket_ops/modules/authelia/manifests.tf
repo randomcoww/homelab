@@ -10,6 +10,7 @@ locals {
   authelia_oidc_jwk_key_file       = "/custom/oidc-jwk.key"
   autehlia_oidc_client_shared_path = "/oidc"
   domain_regex                     = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
+  redis_port                       = 6379 # not configurable
 
   values = {
     ## manifest start ##
@@ -349,20 +350,13 @@ EOF
         ]
         redis = {
           enabled = true
-          host    = var.redis_sentinel_endpoint.host
-          port    = var.redis_sentinel_endpoint.port
+          host    = "${var.name}-redis.${var.namespace}"
+          port    = local.redis_port
           password = {
             disabled = true
           }
           tls = {
             enabled = true
-          }
-          high_availability = {
-            enabled       = true
-            sentinel_name = var.redis_sentinel_endpoint.master_name
-            password = {
-              disabled = true
-            }
           }
         }
       }

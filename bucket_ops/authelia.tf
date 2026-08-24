@@ -1,7 +1,6 @@
 locals {
-  authelia_name        = "authelia"
-  authelia_namespace   = "auth"
-  authelia-valkey_port = 26379
+  authelia_name      = "authelia"
+  authelia_namespace = "auth"
 
   # OIDC clients
   authelia_oidc_clients_base = {
@@ -60,21 +59,6 @@ resource "random_password" "authelia-oidc-client-secret" {
   special = false
 }
 
-module "authelia-valkey" {
-  source         = "./modules/valkey"
-  name           = "${local.authelia_name}-valkey"
-  namespace      = local.authelia_namespace
-  service_domain = local.domains.kubernetes # needs fqdn
-  images = {
-    valkey = {
-      repository = "ghcr.io/valkey-io/valkey"
-      tag        = "9.1-alpine@sha256:de31910896150d5e754a07d57d227cfdde4e258ddd0d1aa4607f2d2f95843715" # renovate: datasource=docker depName=ghcr.io/valkey-io/valkey
-    }
-  }
-  service_port   = local.authelia-valkey_port
-  ca_issuer_name = local.cert_issuers.ca_internal
-}
-
 module "authelia" {
   source    = "./modules/authelia"
   name      = local.authelia_name
@@ -88,11 +72,6 @@ module "authelia" {
   }
   ca_issuer_name = local.cert_issuers.ca_internal
   ldap_endpoint  = "${local.lldap_name}.${local.lldap_namespace}.svc.${local.domains.kubernetes}:${local.lldap_port}" # needs fqdn
-  redis_sentinel_endpoint = {
-    host        = "${local.authelia_name}-valkey.${local.authelia_namespace}.svc.${local.domains.kubernetes}" # needs fqdn
-    port        = local.authelia-valkey_port
-    master_name = "${local.authelia_name}-valkey"
-  }
   smtp = {
     host     = var.smtp_host
     port     = var.smtp_port
@@ -126,7 +105,7 @@ module "authelia" {
 
 resource "minio_s3_object" "fluxcd-authelia" {
   for_each = {
-    "manifest.yaml" = join("\n---\n", distinct(concat(module.authelia-valkey.manifests, module.authelia.manifests)))
+    "manifest.yaml" = join("\n---\n", module.authelia.manifests)
     "kustomization.yaml" = yamlencode({
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"

@@ -3,7 +3,7 @@ output "manifests" {
     module.secret.manifest,
     ], [
     for _, m in [
-      # database
+      # postgres
       {
         apiVersion = "postgresql.cnpg.io/v1"
         kind       = "Cluster"
@@ -50,6 +50,65 @@ output "manifests" {
               port = "metrics"
             },
           ]
+        }
+      },
+
+      # redis
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-redis-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-redis-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = "${var.name}-redis"
+          usages = [
+            "key encipherment",
+            "digital signature",
+          ]
+          dnsNames = [
+            "${var.name}-redis.${var.namespace}",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      {
+        apiVersion = "dragonflydb.io/v1alpha1"
+        kind       = "Dragonfly"
+        metadata = {
+          name      = "${var.name}-redis"
+          namespace = var.namespace
+        }
+        spec = {
+          replicas = 2
+          annotations = {
+            "secret.reloader.stakater.com/reload" = "${var.name}-redis-tls"
+          }
+          resources = {
+            requests = {
+              memory = "128Mi"
+            }
+          }
+          authentication = {
+            clientCaCertSecret = {
+              name = "${var.name}-redis-tls"
+              key  = "ca.crt"
+            }
+          }
+          tlsSecretRef = {
+            name      = "${var.name}-redis-tls"
+            namespace = var.namespace
+          }
         }
       },
 

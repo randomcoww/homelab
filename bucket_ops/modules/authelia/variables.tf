@@ -77,14 +77,6 @@ variable "ldap_endpoint" {
   type = string
 }
 
-variable "redis_sentinel_endpoint" {
-  type = object({
-    host        = string
-    port        = number
-    master_name = string
-  })
-}
-
 variable "reference_grant_namespaces" {
   type    = list(string)
   default = ["default"]
