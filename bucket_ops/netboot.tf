@@ -2,7 +2,7 @@ locals {
   netboot_base_url = "https://${local.networks.service.vips.minio}:${local.service_ports.minio}/boot"
   netboot_custom_kargs = {
     ipxe_url    = "custom.ipxe_url"
-    liveiso_url = "custon.liveiso_url"
+    liveiso_url = "custom.liveiso_url"
     digest      = "custom.digest"
     build_tag   = "custom.build_tag"
   }
