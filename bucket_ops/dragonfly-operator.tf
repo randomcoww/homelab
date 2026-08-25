@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
             interval = "15m"
             url      = "oci://ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator"
             ref = {
-              tag = "v1.6.1" # renovate: datasource=docker depName=ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator"
+              tag = "v1.6.1" # renovate: datasource=docker depName=ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator depType=helm_regex
             }
           }
         },
