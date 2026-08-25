@@ -154,7 +154,8 @@ module "litestream-overlay" {
       },
     ]
   }
-  mount_path = dirname(local.db_file)
+  mount_path            = dirname(local.db_file)
+  mount_path_volume_ref = "${var.name}-litestream-data"
   s3_access_key_ref = {
     name = module.minio-user-secret.name
     key  = "AWS_ACCESS_KEY_ID"
