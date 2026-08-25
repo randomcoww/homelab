@@ -34,18 +34,10 @@ locals {
     HERMES_WEBUI_GATEWAY_BASE_URL  = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
   }, var.extra_webui_envs)
 
-  files = {
-    "config.yaml" = yamlencode(var.extra_configs)
-    ".env"        = <<-EOF
-%{for k, v in local.config_envs}${k}=${v}
-%{endfor~}
-EOF
-  }
-
   # mounts for both agent and webui
   common_volume_mounts = [
     {
-      name      = "data"
+      name      = "hermes-home"
       mountPath = local.config_envs.HERMES_HOME
     },
     {
@@ -66,13 +58,35 @@ EOF
       readOnly  = true
     },
     {
-      name      = "tmp"
+      name      = "tmpfs"
       mountPath = "${local.config_envs.HERMES_HOME}/logs"
       subPath   = "logs"
     },
+    {
+      name      = "tmpfs"
+      mountPath = "${local.config_envs.HERMES_HOME}/webui"
+      subPath   = "webui"
+    },
   ]
 
-  tmp_path                  = "/tmp/hermes-config"
+  litestream_symlink_path = "/var/tmp/hermes/db"
+  litestream_targets = [ # mount these to tmpfs for performance
+    "state.db",
+    "kanban.db",
+    "projects.db",
+    "response_store.db",
+    "mnemosyne/data/mnemosyne.db",
+  ]
+
+  files_copy_path = "/var/tmp/hermes/config"
+  files = {
+    "config.yaml" = yamlencode(var.extra_configs)
+    ".env"        = <<-EOF
+%{for k, v in local.config_envs}${k}=${v}
+%{endfor~}
+EOF
+  }
+
   juicefs_name              = "${var.name}-juicefs"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_username = "juicefs"
@@ -211,21 +225,54 @@ module "httproute" {
   }
 }
 
-module "statefulset" {
-  source = "../../../modules/statefulset"
+module "litestream-overlay" {
+  source = "../litestream_overlay"
 
   name      = var.name
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
-  annotations = {
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/env-secret"        = sha256(module.env-secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
+  images = {
+    litestream = var.images.litestream
   }
+  litestream_config = {
+    dbs = [
+      for _, db in local.litestream_targets :
+      {
+        path                = "${local.litestream_symlink_path}/${db}"
+        monitor-interval    = "1s"
+        checkpoint-interval = "60s"
+        replica = {
+          type          = "s3"
+          endpoint      = var.minio_endpoint
+          bucket        = var.minio_bucket
+          path          = "$POD_NAME/${db}"
+          sync-interval = "1s"
+          part-size     = "50MB"
+          concurrency   = 10
+          auto-recover  = true
+        }
+      }
+    ]
+  }
+  mount_path            = local.litestream_symlink_path
+  mount_path_volume_ref = "${var.name}-litestream-data"
+  s3_access_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_ACCESS_KEY_ID"
+  }
+  s3_secret_key_ref = {
+    name = module.minio-user-secret.name
+    key  = "AWS_SECRET_ACCESS_KEY"
+  }
+  litestream_container_params = {
+    securityContext = {
+      # run litestream as hermes user
+      runAsUser  = local.agent_envs.HERMES_UID
+      runAsGroup = local.agent_envs.HERMES_GID
+    }
+  }
+
   template_spec = {
     terminationGracePeriodSeconds = 60
     resources = {
@@ -246,26 +293,31 @@ module "statefulset" {
           "-c",
           <<-EOF
 set -xe
-
 rm -f \
   ${local.config_envs.HERMES_HOME}/config.yaml.bak-* \
   ${local.config_envs.HERMES_HOME}/.env.bak-*
 
-cp -afL ${local.tmp_path}/. \
-  ${local.config_envs.HERMES_HOME}
+%{~for _, db in local.litestream_targets}
+%{~if dirname(db) != "."}mkdir -p ${dirname("${local.config_envs.HERMES_HOME}/${db}")}%{endif}
+ln -sf ${local.litestream_symlink_path}/${db} ${local.config_envs.HERMES_HOME}/${db}
+%{endfor~}
+
+%{~for f, _ in local.files}
+%{~if dirname(f) != "."}mkdir -p ${dirname("${local.config_envs.HERMES_HOME}/${f}")}%{endif}
+cp -afL ${local.files_copy_path}/${f} ${local.config_envs.HERMES_HOME}/${f}
+%{endfor~}
 
 chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
-%{for f, _ in local.files}  ${local.config_envs.HERMES_HOME}/${f} \
+%{for f, _ in local.files}${local.config_envs.HERMES_HOME}/${f} \
 %{endfor~}
-  ${local.config_envs.HERMES_HOME} \
-  ${local.config_envs.HERMES_HOME}/logs
+${local.config_envs.HERMES_HOME}
 EOF
         ]
         volumeMounts = concat(local.common_volume_mounts, [
           for f, _ in local.files :
           {
             name      = "config"
-            mountPath = "${local.tmp_path}/${f}"
+            mountPath = "${local.files_copy_path}/${f}"
             subPath   = f
           }
         ])
@@ -362,7 +414,7 @@ EOF
     ]
     volumes = [
       {
-        name = "data"
+        name = "hermes-home"
         persistentVolumeClaim = {
           claimName = "${var.name}-${var.minio_bucket}"
         }
@@ -382,7 +434,13 @@ EOF
         }
       },
       {
-        name = "tmp"
+        name = "tmpfs"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "${var.name}-litestream-data"
         emptyDir = {
           medium = "Memory"
         }
@@ -413,6 +471,48 @@ EOF
       },
     ]
   }
+}
+
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = {
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/env-secret"        = sha256(module.env-secret.manifest)
+    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+  }
+  /* persistent path for sqlite
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "${var.name}-litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
+  */
+  template_spec = merge(module.litestream-overlay.template_spec, {
+    terminationGracePeriodSeconds = 60
+  })
 }
 
 module "minio-user-secret" {

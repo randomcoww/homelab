@@ -23,7 +23,7 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name      = "${var.name}-litestream-data"
+            name      = var.mount_path_volume_ref
             mountPath = var.mount_path
           },
         ]
@@ -69,7 +69,7 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name      = "${var.name}-litestream-data"
+            name      = var.mount_path_volume_ref
             mountPath = var.mount_path
           },
           {
@@ -113,7 +113,7 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name      = "${var.name}-litestream-data"
+            name      = var.mount_path_volume_ref
             mountPath = var.mount_path
           },
           {
@@ -167,7 +167,7 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "${var.name}-litestream-data"
+            name      = var.mount_path_volume_ref
             mountPath = var.mount_path
           },
         ])
@@ -178,7 +178,7 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "${var.name}-litestream-data"
+            name      = var.mount_path_volume_ref
             mountPath = var.mount_path
           },
         ])

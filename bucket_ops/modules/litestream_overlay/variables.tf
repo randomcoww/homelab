@@ -41,6 +41,10 @@ variable "mount_path" {
   type = string
 }
 
+variable "mount_path_volume_ref" {
+  type = string
+}
+
 variable "s3_access_key_ref" {
   type = object({
     name = string
