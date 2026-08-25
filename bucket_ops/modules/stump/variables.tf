@@ -65,3 +65,11 @@ variable "minio_user" {
     secret = string
   })
 }
+
+variable "ca_issuer_name" {
+  type = string
+}
+
+variable "juicefs_client_tls_path" {
+  type = string
+}

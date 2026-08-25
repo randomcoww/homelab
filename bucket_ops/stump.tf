@@ -59,6 +59,9 @@ module "stump" {
     STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret
     STUMP_OIDC_SCOPES        = join(",", local.authelia_oidc_clients.stump.scopes)
   }
+  juicefs_client_tls_path = local.juicefs_client_tls_path
+
+  ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.stump.hostname
   gateway_ref = {
     name      = local.services.cilium.name

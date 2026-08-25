@@ -19,6 +19,7 @@ locals {
   data_path       = "/data"
   thumbnails_path = "${local.envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
   # juicefs for thumbnails
+  juicefs_name              = "${var.name}-juicefs"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_username = "juicefs"
 }
@@ -42,14 +43,19 @@ module "secret" {
 
 module "juicefs-secret" {
   source    = "../../../modules/secret"
-  name      = "${var.name}-juicefs"
+  name      = local.juicefs_name
   namespace = var.namespace
   app       = var.name
   release   = var.release
   data = {
     # juicefs params
-    name       = var.name
-    metaurl    = "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${var.name}-juicefs-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
+    name = var.name
+    metaurl = join("&", [
+      "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${local.juicefs_name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}?sslmode=verify-full",
+      "sslrootcert=${var.juicefs_client_tls_path}/ca.crt",
+      "sslcert=${var.juicefs_client_tls_path}/tls.crt",
+      "sslkey=${var.juicefs_client_tls_path}/tls.key",
+    ])
     storage    = "minio"
     bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
     access-key = var.minio_user.id

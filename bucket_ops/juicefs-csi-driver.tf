@@ -1,3 +1,7 @@
+locals {
+  juicefs_client_tls_path = "/var/tmp/juicefs"
+}
+
 resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
@@ -52,6 +56,25 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             }
             values = {
               kubeletDir = local.kubernetes.kubelet_root_path
+              node = {
+                extraVolumes = [
+                  {
+                    name = "juicefs-metadata-client-tls"
+                    secret = {
+                      secretName = "juicefs-metadata-client-tls"
+                    }
+                  },
+                ]
+                extraVolumeMounts = [
+                  {
+                    name      = "juicefs-metadata-client-tls"
+                    mountPath = local.juicefs_client_tls_path
+                  },
+                ]
+              }
+              metrics = {
+                enabled = true
+              }
               dashboard = {
                 enabled = false
               }
@@ -90,6 +113,12 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                           type = "File"
                         }
                       },
+                      {
+                        name = "juicefs-metadata-client-tls"
+                        secret = {
+                          secretName = "juicefs-metadata-client-tls"
+                        }
+                      },
                     ]
                     volumeMounts = [
                       {
@@ -97,12 +126,43 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                         mountPath = "/etc/ssl/certs/ca-certificates.crt"
                         readOnly  = true
                       },
+                      {
+                        name      = "juicefs-metadata-client-tls"
+                        mountPath = local.juicefs_client_tls_path
+                      },
                     ]
                   },
                   module.hermes-agent.juicefs-mountopts,
                   module.stump.juicefs-mountopts,
                 ]
               }
+            }
+          }
+        },
+
+        # metadata client tls
+        # this is mounted to both juicefs-node and mount container configured via configMap
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Certificate"
+          metadata = {
+            name      = "juicefs-metadata-client-tls"
+            namespace = "juicefs"
+          }
+          spec = {
+            secretName = "juicefs-metadata-client-tls"
+            isCA       = false
+            privateKey = {
+              algorithm = "ECDSA"
+              size      = 521
+            }
+            commonName = "juicefs"
+            usages = [
+              "client auth",
+            ]
+            issuerRef = {
+              name = local.cert_issuers.ca_internal
+              kind = "ClusterIssuer"
             }
           }
         },

@@ -57,6 +57,7 @@ module "hermes-agent" {
       tag        = "0.52.263@sha256:271dc24cea00470d4364513e3d100207095fe7efc8d2fc574fac0c497bb0b340" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
     }
   }
+  juicefs_client_tls_path = local.juicefs_client_tls_path
   # TODO: investigate apptainer and podman for agent terminal
   extra_configs = {
     agent = {

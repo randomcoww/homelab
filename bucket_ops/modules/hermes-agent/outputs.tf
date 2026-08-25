@@ -68,17 +68,89 @@ output "manifests" {
 
       # juicefs data volume metadata
       {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${local.juicefs_name}-pg-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${local.juicefs_name}-pg-tls"
+          secretTemplate = {
+            labels = {
+              "cnpg.io/reload" = ""
+            }
+          }
+          isCA = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "server auth",
+          ]
+          dnsNames = [
+            "${local.juicefs_name}-pg-rw",
+            "${local.juicefs_name}-pg-rw.${var.namespace}",
+            "${local.juicefs_name}-pg-r",
+            "${local.juicefs_name}-pg-r.${var.namespace}",
+            "${local.juicefs_name}-pg-ro",
+            "${local.juicefs_name}-pg-ro.${var.namespace}",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${local.juicefs_name}-pg-rep-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${local.juicefs_name}-pg-rep-client-tls"
+          secretTemplate = {
+            labels = {
+              "cnpg.io/reload" = ""
+            }
+          }
+          isCA = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = "streaming_replica" # required user name for replication client
+          usages = [
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      {
         apiVersion = "postgresql.cnpg.io/v1"
         kind       = "Cluster"
         metadata = {
-          name      = "${var.name}-juicefs-pg"
+          name      = "${local.juicefs_name}-pg"
           namespace = var.namespace
           labels = {
             "cnpg.io/reload" = "true"
           }
         }
         spec = {
-          instances = 3
+          instances = 2
+          certificates = {
+            serverTLSSecret      = "${local.juicefs_name}-pg-tls"
+            serverCASecret       = "${local.juicefs_name}-pg-tls"
+            clientCASecret       = "${local.juicefs_name}-pg-rep-client-tls"
+            replicationTLSSecret = "${local.juicefs_name}-pg-rep-client-tls"
+          }
           storage = {
             size = "2Gi"
           }
@@ -105,13 +177,13 @@ output "manifests" {
         apiVersion = "monitoring.coreos.com/v1"
         kind       = "PodMonitor"
         metadata = {
-          name      = "${var.name}-juicefs-pg"
+          name      = "${local.juicefs_name}-pg"
           namespace = var.namespace
         }
         spec = {
           selector = {
             matchLabels = {
-              "cnpg.io/cluster" = "${var.name}-juicefs-pg"
+              "cnpg.io/cluster" = "${local.juicefs_name}-pg"
             }
           }
           podMetricsEndpoints = [
