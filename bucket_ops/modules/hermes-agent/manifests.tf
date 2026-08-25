@@ -138,7 +138,7 @@ module "juicefs-secret" {
     access-key = var.minio_user.id
     secret-key = var.minio_user.secret
     format-options = join(",", [
-      "trash-days=1",
+      "trash-days=1", # set to greater than metadata backup period
       "block-size=4096",
     ])
 
