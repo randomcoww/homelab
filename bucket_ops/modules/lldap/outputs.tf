@@ -23,8 +23,8 @@ output "manifests" {
           }
           isCA = false
           privateKey = {
-            algorithm = "RSA"
-            size      = 4096
+            algorithm = "ECDSA"
+            size      = 521
           }
           commonName = var.name
           usages = [
@@ -60,8 +60,8 @@ output "manifests" {
           }
           isCA = false
           privateKey = {
-            algorithm = "RSA"
-            size      = 4096
+            algorithm = "ECDSA"
+            size      = 521
           }
           commonName = "streaming_replica" # required user name for replication client
           usages = [
