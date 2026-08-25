@@ -33,13 +33,17 @@ output "template_spec" {
       merge({
         name  = "${var.name}-litestream-restore-${i}"
         image = "${var.images.litestream.repository}:${var.images.litestream.tag}"
-        args = [
-          "restore",
-          "-if-db-not-exists",
-          "-if-replica-exists",
-          "-config",
-          local.config_file,
-          db.path,
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          mkdir -p "${dirname(db.path)}"
+
+          litestream restore -if-db-not-exists -if-replica-exists -config \
+            "${local.config_file}" "${db.path}"
+
+          touch "${db.path}"
+          EOF
         ]
         env = [
           {
