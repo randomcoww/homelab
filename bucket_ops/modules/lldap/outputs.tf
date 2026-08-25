@@ -6,7 +6,73 @@ output "manifests" {
     module.secret.manifest,
     ], [
     for _, m in [
-      # database
+      # postgres
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-pg-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-pg-tls"
+          secretTemplate = {
+            labels = {
+              "cnpg.io/reload" = ""
+            }
+          }
+          isCA = false
+          privateKey = {
+            algorithm = "RSA"
+            size      = 4096
+          }
+          commonName = var.name
+          usages = [
+            "server auth",
+          ]
+          dnsNames = [
+            "${var.name}-pg-rw",
+            "${var.name}-pg-rw.${var.namespace}",
+            "${var.name}-pg-r",
+            "${var.name}-pg-r.${var.namespace}",
+            "${var.name}-pg-ro",
+            "${var.name}-pg-ro.${var.namespace}",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-pg-rep-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-pg-rep-client-tls"
+          secretTemplate = {
+            labels = {
+              "cnpg.io/reload" = ""
+            }
+          }
+          isCA = false
+          privateKey = {
+            algorithm = "RSA"
+            size      = 4096
+          }
+          commonName = "streaming_replica" # required user name for replication client
+          usages = [
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
       {
         apiVersion = "postgresql.cnpg.io/v1"
         kind       = "Cluster"
@@ -15,7 +81,13 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          instances = 3
+          instances = 2
+          certificates = {
+            serverTLSSecret      = "${var.name}-pg-tls"
+            serverCASecret       = "${var.name}-pg-tls"
+            clientCASecret       = "${var.name}-pg-rep-client-tls"
+            replicationTLSSecret = "${var.name}-pg-rep-client-tls"
+          }
           storage = {
             size = "2Gi"
           }
@@ -56,7 +128,33 @@ output "manifests" {
         }
       },
 
-      # server cert
+      # lldap pg client
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-pg-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-pg-client-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "RSA"
+            size      = 4096
+          }
+          commonName = var.name
+          usages = [
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+
+      # lldap server
       {
         apiVersion = "cert-manager.io/v1"
         kind       = "Certificate"

@@ -2,6 +2,8 @@ locals {
   envs = {
     AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE       = "/custom/ldap-client.key"
     AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE = "/custom/ldap-client.crt"
+    AUTHELIA_STORAGE_POSTGRES_TLS_PRIVATE_KEY_FILE                  = "/custom/pg-client.key"
+    AUTHELIA_STORAGE_POSTGRES_TLS_CERTIFICATE_CHAIN_FILE            = "/custom/pg-client.crt"
     AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE                     = "/custom/redis-client.key"
     AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE               = "/custom/redis-client.crt"
     AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE                         = "/custom/posgres-password"
@@ -43,6 +45,7 @@ locals {
         "checksum/secret" = sha256(module.secret.manifest)
         "secret.reloader.stakater.com/reload" = join(",", [
           "${var.name}-ldap-client-tls",
+          "${var.name}-pg-client-tls",
           "${var.name}-redis-client-tls",
           "${var.name}-pg-app",
         ])
@@ -68,6 +71,18 @@ locals {
         {
           name      = "ldap-client-tls"
           mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE
+          subPath   = "tls.key"
+          readOnly  = true
+        },
+        {
+          name      = "pg-client-tls"
+          mountPath = local.envs.AUTHELIA_STORAGE_POSTGRES_TLS_CERTIFICATE_CHAIN_FILE
+          subPath   = "tls.crt"
+          readOnly  = true
+        },
+        {
+          name      = "pg-client-tls"
+          mountPath = local.envs.AUTHELIA_STORAGE_POSTGRES_TLS_PRIVATE_KEY_FILE
           subPath   = "tls.key"
           readOnly  = true
         },
@@ -120,6 +135,12 @@ locals {
           name = "ldap-client-tls"
           secret = {
             secretName = "${var.name}-ldap-client-tls"
+          }
+        },
+        {
+          name = "pg-client-tls"
+          secret = {
+            secretName = "${var.name}-pg-client-tls"
           }
         },
         {
@@ -372,6 +393,9 @@ EOF
           deploy  = false
           password = {
             disabled = true # manually create and define AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
+          }
+          tls = {
+            enabled = true
           }
         }
       }

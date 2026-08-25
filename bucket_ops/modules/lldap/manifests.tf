@@ -24,6 +24,7 @@ locals {
     LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", split(".", "${var.namespace}.svc.${var.service_domain}"))}"
     LLDAP_LDAPS_OPTIONS__ENABLED   = true
   })
+  pg_tls_path = "${local.base_path}/pg"
 }
 
 module "secret" {
@@ -115,6 +116,7 @@ module "deployment" {
     "secret.reloader.stakater.com/reload" = join(",", [
       "${var.name}-tls",
       "${var.name}-pg-app",
+      "${var.name}-pg-client-tls",
     ])
   }
   template_spec = {
@@ -148,13 +150,22 @@ module "deployment" {
           }
           ], [
           {
-            name = "LLDAP_DATABASE_URL"
+            name = "pg_uri"
             valueFrom = {
               secretKeyRef = {
                 name = "${var.name}-pg-app"
                 key  = "uri"
               }
             }
+          },
+          {
+            name = "LLDAP_DATABASE_URL"
+            value = join("&", [
+              "$(pg_uri)?sslmode=verify-full",
+              "sslrootcert=${local.pg_tls_path}/ca.crt",
+              "sslcert=${local.pg_tls_path}/tls.crt",
+              "sslkey=${local.pg_tls_path}/tls.key",
+            ])
           },
         ])
         volumeMounts = [
@@ -164,14 +175,18 @@ module "deployment" {
             subPath   = "storage-secret"
           },
           {
-            name      = "lldap-cert"
+            name      = "lldap-tls"
             mountPath = local.envs.LLDAP_LDAPS_OPTIONS__CERT_FILE
             subPath   = "tls.crt"
           },
           {
-            name      = "lldap-cert"
+            name      = "lldap-tls"
             mountPath = local.envs.LLDAP_LDAPS_OPTIONS__KEY_FILE
             subPath   = "tls.key"
+          },
+          {
+            name      = "lldap-pg-client-tls"
+            mountPath = local.pg_tls_path
           },
         ]
         ports = [
@@ -214,9 +229,15 @@ module "deployment" {
         }
       },
       {
-        name = "lldap-cert"
+        name = "lldap-tls"
         secret = {
           secretName = "${var.name}-tls"
+        }
+      },
+      {
+        name = "lldap-pg-client-tls"
+        secret = {
+          secretName = "${var.name}-pg-client-tls"
         }
       },
     ]
