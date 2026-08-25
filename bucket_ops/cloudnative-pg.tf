@@ -51,7 +51,11 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
               enable = false
             }
             values = {
-
+              config = {
+                data = {
+                  KUBERNETES_CLUSTER_DOMAIN = local.domains.kubernetes
+                }
+              }
             }
           }
         },
