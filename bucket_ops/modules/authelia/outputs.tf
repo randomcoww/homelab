@@ -210,7 +210,7 @@ output "manifests" {
           chart = {
             spec = {
               chart   = "authelia"
-              version = "0.11.6" # renovate: datasource=helm depName=authelia registryUrl=https://charts.authelia.com
+              version = "0.11.20" # renovate: datasource=helm depName=authelia registryUrl=https://charts.authelia.com
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
