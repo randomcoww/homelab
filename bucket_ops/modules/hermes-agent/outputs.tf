@@ -140,7 +140,7 @@ output "manifests" {
           name      = "${local.juicefs_name}-pg"
           namespace = var.namespace
           labels = {
-            "cnpg.io/reload" = "true"
+            "cnpg.io/reload" = ""
           }
         }
         spec = {
