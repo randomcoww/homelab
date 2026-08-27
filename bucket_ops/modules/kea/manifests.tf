@@ -74,10 +74,12 @@ module "secret" {
             network.config.interface
           ]
         }
-        control-socket = {
-          socket-type = "unix"
-          socket-name = local.kea_socket_path
-        }
+        control-sockets = [
+          {
+            socket-type = "unix"
+            socket-name = local.kea_socket_path
+          },
+        ]
         hooks-libraries = concat([
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
