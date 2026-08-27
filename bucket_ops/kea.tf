@@ -4,12 +4,12 @@ module "kea" {
   namespace = "netboot"
   images = {
     kea = {
-      repository = "reg.cluster.internal/randomcoww/kea"
-      tag        = "v3.3.0.1787575351@sha256:141a24a41223d827438437dead74fe5ccbdfbd938e335e3e2e02fbbfcea07bc8" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/kea
+      repository = "zot.cluster.internal/randomcoww/kea"
+      tag        = "v3.3.1.1787811740@sha256:6e7db352fbbc31d7370c655d5826b2d536ce797a2ee694701ef3d9791b6c101a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kea
     }
     ipxe = {
-      repository = "reg.cluster.internal/randomcoww/ipxe"
-      tag        = "v2.0.0.1787576102@sha256:ceed93949a07d5c35bb011c70fbf79c9dff757bf02f769d47f53a1363e927a84" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/ipxe
+      repository = "zot.cluster.internal/randomcoww/ipxe"
+      tag        = "v2.0.0.1787811599@sha256:58b2718cdd64bfca23667dea74b6021c65f191f460ee0d904a372f4e1ca88108" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe
     }
   }
   peer_service_ips = [

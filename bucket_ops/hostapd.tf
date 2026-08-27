@@ -14,8 +14,8 @@ module "hostapd" {
   replicas = 1
   images = {
     hostapd = {
-      repository = "reg.cluster.internal/randomcoww/hostapd"
-      tag        = "v2.12.1787574741@sha256:b1ea002bd7ae3984fbd1f25c1357d0c6e94149ad1ef3cef100173c7c7dd9ac03" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/hostapd
+      repository = "zot.cluster.internal/randomcoww/hostapd"
+      tag        = "v2.12.1787812517@sha256:41d70f4f1e2fd2f6d6344945a22214400eca7fcbaf46c6ec411633394ad4d27c" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/hostapd
     }
   }
   affinity = {
@@ -112,8 +112,8 @@ module "hostapd-qrcode" {
   replicas  = 2
   images = {
     qrcode = {
-      repository = "reg.cluster.internal/randomcoww/qrcode-resource"
-      tag        = "v1787575282@sha256:848018a8ae3277eb8e4f9fa5ea28127e3015ef96abd79896fd810b45d7909b56" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qrcode-resource
+      repository = "zot.cluster.internal/randomcoww/qrcode-resource"
+      tag        = "v1.1787802569@sha256:ac271c59cab981695c9a37c2f3d35ad25ba56a44c9def279fd34df84b3dbbeb7" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qrcode-resource
     }
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"

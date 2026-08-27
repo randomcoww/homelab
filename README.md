@@ -227,18 +227,6 @@ tofu -chdir=bucket_ops output hermes-agent
 Internal registry:
 
 ```bash
-regctl registry set reg.cluster.internal \
-  --tls enabled \
-  --cacert "$(tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem')" \
-  --client-cert "$(tofu -chdir=local_credentials output -json registry_client | jq -r '.cert_pem')" \
-  --client-key "$(tofu -chdir=local_credentials output -json registry_client | jq -r '.private_key_pem')"
-
-regctl repo ls reg.cluster.internal
-regctl tag ls reg.cluster.internal/${REPO}
-regctl tag delete reg.cluster.internal/${REPO}:${TAG}
-```
-
-```bash
 regctl registry set zot.cluster.internal \
   --tls enabled \
   --cacert "$(tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem')" \

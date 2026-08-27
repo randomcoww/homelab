@@ -51,7 +51,7 @@
     },
     {
       "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/llama-swap-ffmpeg",
+        "zot.cluster.internal/randomcoww/llama-swap-ffmpeg",
         "ghcr.io/mostlygeek/llama-swap"
       ],
       "versioning": "regex:^unified-vulkan-(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})(?:.(?<build>\\d+))?$"

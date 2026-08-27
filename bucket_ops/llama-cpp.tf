@@ -9,8 +9,8 @@ module "llama-cpp" {
   namespace = "default"
   images = {
     llama-swap = {
-      repository = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
-      tag        = "unified-vulkan-2026-08-24.1787574184@sha256:eb791ff81906cd053500f5bce42b485b55773cf5e2592857fd69d8f614e675f0" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/llama-swap-ffmpeg
+      repository = "zot.cluster.internal/randomcoww/llama-swap-ffmpeg"
+      tag        = "unified-vulkan-2026-08-26.1787812361@sha256:195624d7a18603b199d88e4cfb670cb9c0e28e038e2cde1ac34aad681314e19b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
   }
   models = merge([
@@ -24,16 +24,16 @@ module "llama-cpp" {
         }
       },
       {
-        repository = "reg.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl"
-        tag        = "v1787524139@sha256:a86f56a009fa6a81528dedc00d65b648df55c84f96ca038f4a36a3d4d1be7791" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
+        repository = "zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl"
+        tag        = "v1787816448@sha256:e7561db0c3c7f55c79af61ec33916edeb3ef86f4e37f150df15ccf17a32ae4b1" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
         files = {
           qwen-3-5-4b        = "Qwen3.5-4B-UD-Q8_K_XL.gguf"
           qwen-3-5-4b-mmproj = "mmproj-BF16.gguf"
         }
       },
       {
-        repository = "reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
-        tag        = "v1781645858@sha256:b6ddc70ec2752d59bbaaa936ec2ae6e4ee1e5a5ced5fb4cd8d77e4a272585039" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
+        repository = "zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
+        tag        = "v1787813052@sha256:2e96135a2795810ad5b53fd23de4c1a21a1e29adfa4d8cdc2e5d36155189128b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
         files = {
           whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
         }
