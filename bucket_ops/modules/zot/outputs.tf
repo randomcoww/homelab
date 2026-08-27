@@ -85,8 +85,10 @@ output "manifests" {
             configFiles = {
               "config.json" = jsonencode({
                 http = {
-                  address = "0.0.0.0"
-                  port    = var.service_port
+                  address      = "0.0.0.0"
+                  port         = var.service_port
+                  readTimeout  = "900s"
+                  writeTimeout = "900s"
                   compat = [
                     "docker2s2",
                   ]
@@ -142,6 +144,7 @@ output "manifests" {
                     bucket         = var.name
                     secure         = true
                     skipverify     = false
+                    chunksize      = tostring(50 * 1024 * 1024)
                   }
                 }
                 log = {
@@ -200,15 +203,54 @@ output "manifests" {
             metrics = {
               enabled = true
               serviceMonitor = {
-                enabled   = true
-                scheme    = "https"
-                basicAuth = null
+                enabled = false
               }
             }
           }
         }
       },
 
+      {
+        apiVersion = "monitoring.coreos.com/v1"
+        kind       = "ServiceMonitor"
+        metadata = {
+          labels = {
+            "app.kubernetes.io/component" = "metrics"
+          }
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          endpoints = [
+            {
+              interval = "30s"
+              path     = "/metrics"
+              port     = "zot"
+              scheme   = "https"
+              tlsConfig = {
+                ca = {
+                  secret = {
+                    key  = "ca.crt"
+                    name = "${var.name}-tls"
+                  }
+                }
+                insecureSkipVerify = false
+                serverName         = "${var.name}.${var.namespace}"
+              }
+            },
+          ]
+          namespaceSelector = {
+            matchNames = [
+              var.namespace,
+            ]
+          }
+          selector = {
+            matchLabels = {
+              "app.kubernetes.io/name" = var.name
+            }
+          }
+        }
+      },
       {
         apiVersion = "cert-manager.io/v1"
         kind       = "Certificate"
