@@ -291,8 +291,9 @@ module "hermes-agent" {
     SLACK_HOME_CHANNEL                  = var.slack_home_channel
     SLACK_HOME_CHANNEL_NAME             = "bot"
     AUXILIARY_VISION_PROVIDER           = "auto"
-    HERMES_API_CALL_STALE_TIMEOUT       = 1800                                                       # default 90s times out with cronjobs
+    HERMES_AGENT_TIMEOUT                = 0                                                          # unlimited
     HERMES_CRON_TIMEOUT                 = 0                                                          # unlimited
+    HERMES_API_CALL_STALE_TIMEOUT       = 1800                                                       # default 90s times out with cronjobs
     HERMES_DASHBOARD_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id     # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"             # only used if HERMES_DASHBOARD=true
