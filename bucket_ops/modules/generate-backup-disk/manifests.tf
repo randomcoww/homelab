@@ -37,9 +37,10 @@ module "daemonset" {
           }
           trap cleanup EXIT
 
+          # Only exists in network boot environment. Exit otherwise
           image_url=$(xargs -n1 -a /proc/cmdline | grep ^${var.liveiso_url_karg}= | sed -r 's/^${var.liveiso_url_karg}=//')
           if [ -z "$image_url" ]; then
-            exit 1
+            exit 0
           fi
 
           # TODO: This uses the first USB device. Might want to control this better
