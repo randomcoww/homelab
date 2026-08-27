@@ -40,6 +40,7 @@ locals {
           k8s-gateway = 33
           minio       = 34
           registry    = 35
+          zot         = 36
         }
       }
       # Etcd peering
@@ -191,6 +192,9 @@ locals {
     sunshine-admin = {
       hostname = "sunshine-admin.${local.domains.public}"
     }
+    zot = {
+      hostname = "zot.${local.domains.kubernetes}"
+    }
   }
 
   # All host exposed ports - do not overlap! #
@@ -217,5 +221,6 @@ locals {
     minio           = 9000
     coredns_metrics = 9153
     registry        = 443 # not configurable
+    zot             = 443 # not configurable
   }
 }

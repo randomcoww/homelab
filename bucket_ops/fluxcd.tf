@@ -178,6 +178,7 @@ resource "helm_release" "fluxcd-bucket" {
           hostapd                = ["node-feature-discovery", "device-plugin"]
           sunshine-desktop       = ["device-plugin", "resource-claims"]
           generate-backup-disk   = []
+          zot                    = []
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"

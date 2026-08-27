@@ -46,7 +46,7 @@ module "gha-runner" {
   github_renovate_token = var.github_renovate_token
   github_runner_token   = var.github_runner_token
   ca_issuer_name        = local.cert_issuers.ca_internal
-  registry_endpoint     = "${local.endpoints.registry.hostname}:${local.service_ports.registry}"
+  registry_endpoint     = "${local.endpoints.zot.hostname}:${local.service_ports.zot}"
   minio_endpoint        = "${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_user            = minio_iam_user.gha-runner
   cosa_build_tag_karg   = local.netboot_custom_kargs.build_tag

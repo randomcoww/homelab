@@ -18,7 +18,7 @@ resource "tls_cert_request" "registry-client" {
   private_key_pem = tls_private_key.registry-client[each.key].private_key_pem
 
   subject {
-    common_name = each.key
+    common_name = var.name
   }
 }
 
