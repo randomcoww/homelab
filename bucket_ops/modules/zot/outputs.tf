@@ -87,6 +87,9 @@ output "manifests" {
                 http = {
                   address = "0.0.0.0"
                   port    = var.service_port
+                  compat = [
+                    "docker2s2",
+                  ]
                   tls = {
                     cert   = "${local.tls_path}/tls.crt"
                     key    = "${local.tls_path}/tls.key"
@@ -115,7 +118,7 @@ output "manifests" {
                             groups  = ["machines"]
                             actions = ["read", "create", "update", "delete"]
                           },
-                        ],
+                        ]
                         defaultPolicy = ["read"]
                       }
                     },
@@ -126,6 +129,9 @@ output "manifests" {
                 }
                 storage = {
                   rootDirectory = "/var/tmp/zot"
+                  gc            = true
+                  gcDelay       = "1h"
+                  gcInterval    = "24h"
                   dedupe        = false
                   remoteCache   = false
                   storageDriver = {
