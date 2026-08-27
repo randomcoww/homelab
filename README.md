@@ -238,6 +238,18 @@ regctl tag ls reg.cluster.internal/${REPO}
 regctl tag delete reg.cluster.internal/${REPO}:${TAG}
 ```
 
+```bash
+regctl registry set zot.cluster.internal \
+  --tls enabled \
+  --cacert "$(tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem')" \
+  --client-cert "$(tofu -chdir=local_credentials output -json zot_client | jq -r '.cert_pem')" \
+  --client-key "$(tofu -chdir=local_credentials output -json zot_client | jq -r '.private_key_pem')"
+
+regctl repo ls zot.cluster.internal
+regctl tag ls zot.cluster.internal/${REPO}
+regctl tag delete zot.cluster.internal/${REPO}:${TAG}
+```
+
 ## Notes
 
 ### Renovate local test
