@@ -87,8 +87,8 @@ output "manifests" {
                 http = {
                   address      = "0.0.0.0"
                   port         = var.service_port
-                  readTimeout  = "900s"
-                  writeTimeout = "900s"
+                  readTimeout  = "1800s"
+                  writeTimeout = "1800s"
                   compat = [
                     "docker2s2",
                   ]
