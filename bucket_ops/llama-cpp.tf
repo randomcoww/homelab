@@ -16,8 +16,8 @@ module "llama-cpp" {
   models = merge([
     for _, image in [
       {
-        repository = "reg.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
-        tag        = "v1786728652@sha256:76c5cbf6ac40d6b5edf9c1e9cb9f35c12810e743b34011d27e8757b18963af77" # renovate: datasource=docker depName=reg.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
+        repository = "zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
+        tag        = "v1787822301@sha256:a3b049548171d3f66f1ecbd31c139f2c9ac051e178e3f130fbaf0f7ae42c7c7b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
         files = {
           qwen-3-8-27b        = "Qwen3.8-27B-UD-Q8_K_XL.gguf"
           qwen-3-8-27b-mmproj = "mmproj-BF16.gguf"

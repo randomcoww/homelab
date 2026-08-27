@@ -160,7 +160,6 @@ resource "helm_release" "fluxcd-bucket" {
           kured                  = []
           reloader               = []
           victoria-metrics       = []
-          registry               = []
           kea                    = []
           juicefs-csi-driver     = ["cloudnative-pg"]
           mountpoint-s3-csi      = []

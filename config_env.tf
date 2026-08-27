@@ -39,7 +39,6 @@ locals {
           apiserver   = 2
           k8s-gateway = 33
           minio       = 34
-          registry    = 35
           zot         = 36
         }
       }
@@ -153,9 +152,6 @@ locals {
 
   # Endpoints for external access (loadbalancer, gatewayAPI) #
   endpoints = {
-    registry = {
-      hostname = "reg.${local.domains.kubernetes}"
-    }
     lldap = {
       hostname = "ldap.${local.domains.public}"
     }
@@ -220,7 +216,6 @@ locals {
   service_ports = {
     minio           = 9000
     coredns_metrics = 9153
-    registry        = 443 # not configurable
     zot             = 443 # not configurable
   }
 }
