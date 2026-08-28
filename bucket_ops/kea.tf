@@ -9,7 +9,7 @@ module "kea" {
     }
     ipxe = {
       repository = "zot.cluster.internal/randomcoww/ipxe"
-      tag        = "v2.0.0.1787950592@sha256:a9614572ac87d6f7d0e7520de4f76b97cf3b095331cd1770d770c8fa69090e5b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe
+      tag        = "v2.0.0.1787955205@sha256:76bce46ca2c05dc4fbc3eb0009934ab19d5627f0aee48428bacdc90f62fb9e11" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe
     }
   }
   peer_service_ips = [
