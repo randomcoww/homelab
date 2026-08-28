@@ -51,6 +51,14 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
               serviceMonitor = {
                 enabled = true
               }
+              rbacProxy = {
+                enabled = true
+                resources = {
+                  limits = {
+                    memory = "192Mi"
+                  }
+                }
+              }
             }
           }
         },

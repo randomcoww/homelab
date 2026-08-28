@@ -61,7 +61,7 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
                     memory = "32Mi"
                   }
                   limits = {
-                    memory = "64Mi"
+                    memory = "96Mi"
                   }
                 }
               }
