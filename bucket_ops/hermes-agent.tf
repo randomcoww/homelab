@@ -271,7 +271,6 @@ module "hermes-agent" {
         "polymarket",
         "research-paper-writing",
         "web-retrieval",
-        "llama-cpp",
       ])
     }
   }
