@@ -225,13 +225,14 @@ output "manifests" {
           secretName = "${var.name}-client-tls"
           isCA       = false
           privateKey = {
-            algorithm = "ECDSA"
-            size      = 521
+            algorithm = "RSA" # compatibility with iPXE
+            size      = 4096
           }
           commonName = var.name
           usages = [
             "key encipherment",
             "digital signature",
+            "client auth",
           ]
           issuerRef = {
             name = var.ca_issuer_name
