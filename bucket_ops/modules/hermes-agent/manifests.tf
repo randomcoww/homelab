@@ -77,11 +77,20 @@ locals {
     "response_store.db",
     "mnemosyne/data/mnemosyne.db",
   ]
+  litestream_mcp_port = 3001
 
   files_copy_path = "/var/tmp/hermes/config"
   files = {
-    "config.yaml" = yamlencode(var.extra_configs)
-    ".env"        = <<-EOF
+    "config.yaml" = yamlencode(merge(var.extra_configs, {
+      mcp_servers = merge(lookup(var.extra_configs, "mcp_servers", {}), {
+        "${var.name}-litestream" = {
+          url             = "http://127.0.0.1:${local.litestream_mcp_port}"
+          timeout         = 300
+          connect_timeout = 30
+        }
+      })
+    }))
+    ".env" = <<-EOF
 %{for k, v in local.config_envs}${k}=${v}
 %{endfor~}
 EOF
@@ -236,6 +245,7 @@ module "litestream-overlay" {
     litestream = var.images.litestream
   }
   litestream_config = {
+    mcp-addr = "127.0.0.1:${local.litestream_mcp_port}"
     dbs = [
       for _, db in local.litestream_targets :
       {
@@ -271,6 +281,11 @@ module "litestream-overlay" {
       runAsUser  = local.agent_envs.HERMES_UID
       runAsGroup = local.agent_envs.HERMES_GID
     }
+    ports = [
+      {
+        containerPort = local.litestream_mcp_port
+      },
+    ]
   }
 
   template_spec = {
