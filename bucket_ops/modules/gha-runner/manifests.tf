@@ -24,15 +24,6 @@ locals {
           }
           env = [
             {
-              name = "INTERNAL_CA_CERT" # add to some builds such as iPXE
-              valueFrom = {
-                secretKeyRef = {
-                  name = "${var.name}-client-tls"
-                  key  = "ca.crt"
-                }
-              }
-            },
-            {
               name  = "INTERNAL_REGISTRY"
               value = local.internal_registry
             },
@@ -54,6 +45,7 @@ locals {
               mountPath = "/kaniko/ssl/certs/ca-certificates.crt"
               readOnly  = true
             },
+            # certs used by kaniko to upload to private registry and adding certs to iPXE
             {
               name      = "internal-client-tls"
               mountPath = "${local.kaniko_docker_config_path}/ca.crt"
