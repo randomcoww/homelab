@@ -17,7 +17,7 @@ module "llama-cpp" {
     for _, image in [
       {
         repository = "zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
-        tag        = "v1787822301@sha256:a3b049548171d3f66f1ecbd31c139f2c9ac051e178e3f130fbaf0f7ae42c7c7b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
+        tag        = "v1787906227@sha256:65cc79a804b0c6e6b1d386428bb0f675780b44c44a64edab2a481132c962aec7" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
         files = {
           qwen-3-8-27b        = "Qwen3.8-27B-UD-Q8_K_XL.gguf"
           qwen-3-8-27b-mmproj = "mmproj-BF16.gguf"
@@ -25,7 +25,7 @@ module "llama-cpp" {
       },
       {
         repository = "zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl"
-        tag        = "v1787816448@sha256:e7561db0c3c7f55c79af61ec33916edeb3ef86f4e37f150df15ccf17a32ae4b1" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
+        tag        = "v1787904849@sha256:0e7529f28e28bfa18aad67d8b377d6c95dc6cbc661dfa899855aa66ae47937d6" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
         files = {
           qwen-3-5-4b        = "Qwen3.5-4B-UD-Q8_K_XL.gguf"
           qwen-3-5-4b-mmproj = "mmproj-BF16.gguf"
@@ -33,7 +33,7 @@ module "llama-cpp" {
       },
       {
         repository = "zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
-        tag        = "v1787813052@sha256:2e96135a2795810ad5b53fd23de4c1a21a1e29adfa4d8cdc2e5d36155189128b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
+        tag        = "v1787900300@sha256:3a5b69ec71b585ac016b190ebcdbae1ac4ac19b3e3f393c31c08c709b851429a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
         files = {
           whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
         }

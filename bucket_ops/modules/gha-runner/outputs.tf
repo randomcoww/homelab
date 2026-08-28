@@ -39,6 +39,9 @@ output "manifests" {
           "kaniko-high-memory" = [
             "container-builds",
           ]
+          "oras" = [
+            "container-builds",
+          ]
           "cosa" = [
             "fedora-coreos-config-custom",
           ]

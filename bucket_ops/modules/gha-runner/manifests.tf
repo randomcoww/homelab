@@ -1,6 +1,9 @@
 locals {
-  service_account_name = "${var.name}-scale-set-controller"
-  domain_regex         = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
+  service_account_name      = "${var.name}-scale-set-controller"
+  domain_regex              = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
+  internal_registry         = regex(local.domain_regex, var.registry_endpoint).port == "443" ? regex(local.domain_regex, var.registry_endpoint).hostname : var.registry_endpoint
+  kaniko_docker_config_path = "/kaniko/.docker"
+  oras_tls_path             = "/etc/oras/tls"
 
   kaniko_worker = {
     spec = {
@@ -31,11 +34,7 @@ locals {
             },
             {
               name  = "INTERNAL_REGISTRY"
-              value = regex(local.domain_regex, var.registry_endpoint).port == "443" ? regex(local.domain_regex, var.registry_endpoint).hostname : var.registry_endpoint
-            },
-            {
-              name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
-              value = "true"
+              value = local.internal_registry
             },
             {
               name  = "SSL_CERT_DIR"
@@ -43,7 +42,7 @@ locals {
             },
             {
               name  = "DOCKER_CONFIG"
-              value = "/kaniko/.docker"
+              value = local.kaniko_docker_config_path
             },
           ]
           # ** Don't mount volumes outside of /kaniko to this container **
@@ -57,18 +56,65 @@ locals {
             },
             {
               name      = "internal-client-tls"
-              mountPath = "/kaniko/.docker/ca.crt"
+              mountPath = "${local.kaniko_docker_config_path}/ca.crt"
               subPath   = "ca.crt"
             },
             {
               name      = "internal-client-tls"
-              mountPath = "/kaniko/.docker/client.cert"
+              mountPath = "${local.kaniko_docker_config_path}/client.cert"
               subPath   = "tls.crt"
             },
             {
               name      = "internal-client-tls"
-              mountPath = "/kaniko/.docker/client.key"
+              mountPath = "${local.kaniko_docker_config_path}/client.key"
               subPath   = "tls.key"
+            },
+          ]
+        },
+      ]
+      volumes = [
+        {
+          name = "ca-trust-bundle"
+          hostPath = {
+            path = "/etc/ssl/certs/ca-certificates.crt"
+            type = "File"
+          }
+        },
+        {
+          name = "internal-client-tls"
+          secret = {
+            secretName = "${var.name}-client-tls"
+          }
+        },
+      ]
+    }
+  }
+
+  oras_worker = {
+    spec = {
+      resources = {
+        requests = {
+          memory = "2Gi"
+        }
+      }
+      containers = [
+        {
+          name = "$job"
+          env = [
+            {
+              name  = "INTERNAL_REGISTRY"
+              value = local.internal_registry
+            },
+          ]
+          volumeMounts = [
+            {
+              name      = "internal-client-tls"
+              mountPath = local.oras_tls_path
+            },
+            {
+              name      = "ca-trust-bundle"
+              mountPath = "/etc/ssl/certs/ca-certificates.crt"
+              readOnly  = true
             },
           ]
         },
@@ -264,6 +310,9 @@ module "workflow-config" {
         }
       }
     }))
+
+    # oras build
+    "workflow-podspec-oras.yaml" = yamlencode(local.oras_worker)
 
     # cosa build
     "workflow-podspec-cosa.yaml" = yamlencode(local.cosa_worker)
