@@ -76,7 +76,8 @@ resource "helm_release" "cilium" {
         enabled = true
       }
       hubble = {
-        enabled = true
+        enabled           = true
+        enableOpenMetrics = true # TODO: revisit using these
         metrics = {
           enabled = [
             "dns:query;ignoreAAAA",
