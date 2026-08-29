@@ -343,8 +343,8 @@ EOF
         name  = var.name
         image = "${var.images.hermes-agent.repository}:${var.images.hermes-agent.tag}"
         args = [
-          "gateway",
-          "run",
+          "sleep",
+          "infinity",
         ]
         env = [
           for k, v in local.agent_envs :
