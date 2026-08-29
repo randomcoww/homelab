@@ -81,8 +81,7 @@ module "hermes-agent" {
       context_length = 262144
     }
     web = {
-      search_backend  = "searxng"
-      extract_backend = "camofox"
+      search_backend = "searxng"
     }
     browser = {
       camofox_url = "$${CAMOFOX_URL}"
