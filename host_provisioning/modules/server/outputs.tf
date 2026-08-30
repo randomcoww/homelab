@@ -166,7 +166,7 @@ EOF
         },
 
         # HAproxy
-        # Last line is a hack for: https://stackoverflow.com/questions/68350378/unable-to-start-haproxy-2-4-missing-lf-on-last-line
+        # EOF can be tricky: https://stackoverflow.com/questions/68350378/unable-to-start-haproxy-2-4-missing-lf-on-last-line
         {
           path      = "/etc/haproxy/haproxy.cfg"
           mode      = 420
