@@ -34,6 +34,20 @@ output "ignition_snippet" {
     }
     storage = {
       files = concat([
+        # Preserve routes created by BIRD during restart/reconfigure
+        {
+          path = "/etc/systemd/networkd.conf.d/10-preserve-routes.conf"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [Network]
+              ManageForeignNextHops=no
+              ManageForeignRoutes=no
+              ManageForeignRoutingPolicyRules=no
+              EOF
+          }
+        },
+
         # systemd-networkd defaults should be unmanaged=true
         # CNI may fail if systemd-networkd tries to manage the interface
         {

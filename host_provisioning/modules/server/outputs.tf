@@ -11,9 +11,6 @@ output "ignition_snippet" {
             {
               name     = "10-dependency.conf"
               contents = <<-EOF
-                [Unit]
-                PartOf=systemd-networkd.service
-
                 [Service]
                 ExecStartPre=
                 ExecStartPre=/usr/bin/mkdir -p ${var.bird_path}
@@ -118,10 +115,10 @@ protocol bfd {
 protocol kernel {
   merge paths on;
   ipv4 {
+    import none;
     export all;
   };
 }
-
 ipv4 table ${var.bird_cache_table.name};
 protocol kernel cache_table {
   learn;
