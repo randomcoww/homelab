@@ -196,6 +196,8 @@ EOF
               global_defs {
                 vrrp_version 3
                 nftables keepalived
+                enable_script_security
+                script_user root
               }
               include ${var.keepalived_path}/*.conf
               EOF
