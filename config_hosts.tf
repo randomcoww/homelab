@@ -28,26 +28,32 @@ locals {
           },
           {
             source    = local.networks.lan.interface
-            interface = local.networks.wan.interface
+            interface = "${local.networks.wan.interface}-base"
             vlan_id   = local.networks.wan.vlan_id
+          },
+        ]
+        macvlan_interfaces = [
+          {
+            source    = "${local.networks.wan.interface}-base"
+            interface = local.networks.wan.interface
             mac       = local.networks.wan.mac
           },
         ]
-        network_overrides = [
+        interface_overrides = [
           merge(local.networks.lan, {
-            source = local.networks.lan.interface
+            interface = local.networks.lan.interface
           }),
           merge(local.networks.node, {
-            source = local.networks.node.interface
+            interface = local.networks.node.interface
           }),
           merge(local.networks.service, {
-            source = local.networks.service.interface
+            interface = local.networks.service.interface
           }),
           merge(local.networks.etcd, {
-            source = local.networks.etcd.interface
+            interface = local.networks.etcd.interface
           }),
           merge(local.networks.wan, {
-            source = local.networks.wan.interface
+            interface = local.networks.wan.interface
           }),
         ]
         disks = [
@@ -99,26 +105,32 @@ locals {
           },
           {
             source    = local.networks.lan.interface
-            interface = local.networks.wan.interface
+            interface = "${local.networks.wan.interface}-base"
             vlan_id   = local.networks.wan.vlan_id
+          },
+        ]
+        macvlan_interfaces = [
+          {
+            source    = "${local.networks.wan.interface}-base"
+            interface = local.networks.wan.interface
             mac       = local.networks.wan.mac
           },
         ]
-        network_overrides = [
+        interface_overrides = [
           merge(local.networks.lan, {
-            source = local.networks.lan.interface
+            interface = local.networks.lan.interface
           }),
           merge(local.networks.node, {
-            source = local.networks.node.interface
+            interface = local.networks.node.interface
           }),
           merge(local.networks.service, {
-            source = local.networks.service.interface
+            interface = local.networks.service.interface
           }),
           merge(local.networks.etcd, {
-            source = local.networks.etcd.interface
+            interface = local.networks.etcd.interface
           }),
           merge(local.networks.wan, {
-            source = local.networks.wan.interface
+            interface = local.networks.wan.interface
           }),
         ]
         disks = [
@@ -169,18 +181,18 @@ locals {
             vlan_id   = local.networks.etcd.vlan_id
           },
         ]
-        network_overrides = [
+        interface_overrides = [
           merge(local.networks.lan, {
-            source = local.networks.lan.interface
+            interface = local.networks.lan.interface
           }),
           merge(local.networks.node, {
-            source = local.networks.node.interface
+            interface = local.networks.node.interface
           }),
           merge(local.networks.service, {
-            source = local.networks.service.interface
+            interface = local.networks.service.interface
           }),
           merge(local.networks.etcd, {
-            source = local.networks.etcd.interface
+            interface = local.networks.etcd.interface
           }),
         ]
         disks = [
@@ -242,18 +254,18 @@ locals {
             interface = local.networks.lan.interface
           },
         ]
-        network_overrides = [
+        interface_overrides = [
           merge(local.networks.lan, {
-            source = local.networks.lan.interface
+            interface = local.networks.lan.interface
           }),
           merge(local.networks.node, {
-            source = local.networks.node.interface
+            interface = local.networks.node.interface
           }),
           merge(local.networks.service, {
-            source = local.networks.service.interface
+            interface = local.networks.service.interface
           }),
           merge(local.networks.etcd, {
-            source = local.networks.etcd.interface
+            interface = local.networks.etcd.interface
           }),
         ]
         disks = [
@@ -284,7 +296,7 @@ locals {
     key => merge(config, {
       key = key
       networks = {
-        for _, config in lookup(config, "network_overrides", []) :
+        for _, config in lookup(config, "interface_overrides", []) :
         config.key => config
       }
     })

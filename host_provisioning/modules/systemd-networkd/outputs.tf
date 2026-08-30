@@ -1,3 +1,20 @@
+locals {
+  interface_defaults = <<-EOF
+    [Link]
+    ARP=false
+    RequiredForOnline=false
+
+    [Network]
+    LinkLocalAddressing=false
+    DHCP=false
+    MulticastDNS=false
+    IPv6AcceptRA=false
+    IPv6SendRA=false
+    LLDP=false
+    EmitLLDP=false
+    EOF
+}
+
 output "ignition_snippet" {
   value = yamlencode({
     variant = "fcos"
@@ -41,9 +58,9 @@ output "ignition_snippet" {
           contents = {
             inline = <<-EOF
               [Network]
-              ManageForeignNextHops=no
-              ManageForeignRoutes=no
-              ManageForeignRoutingPolicyRules=no
+              ManageForeignNextHops=false
+              ManageForeignRoutes=false
+              ManageForeignRoutingPolicyRules=false
               EOF
           }
         },
@@ -65,7 +82,7 @@ output "ignition_snippet" {
         },
         ], [
 
-        # Wired interfaces
+        # Hardware interfaces
         for _, iface in concat(var.wired_interfaces, var.wireless_interfaces) :
         # TODO: workaround for r8169 transmit queue timed out issue
         {
@@ -113,14 +130,7 @@ EOF
               [Match]
               PermanentMACAddress=${iface.match_mac}
 
-              [Link]
-              ARP=false
-              RequiredForOnline=false
-
-              [Network]
-              LinkLocalAddressing=false
-              DHCP=false
-              MulticastDNS=false
+              ${local.interface_defaults~}
               EOF
           }
         }
@@ -167,14 +177,70 @@ EOF
               [Match]
               Name=${iface.interface}
 
+              ${local.interface_defaults~}
+              EOF
+          }
+        }
+        ], [
+
+        # MACVLAN interfaces
+        # Set parent interface ARP on that it will work on the macvlan if enabled
+        for _, iface in var.macvlan_interfaces :
+        {
+          path = "/etc/systemd/network/20-${iface.source}.network.d/10-macvlan-${iface.interface}.conf"
+          mode = 420
+          contents = {
+            inline = <<-EOF
               [Link]
-              ARP=false
-              RequiredForOnline=false
+              ARP=true
 
               [Network]
-              LinkLocalAddressing=false
-              DHCP=false
-              MulticastDNS=false
+              MACVLAN=${iface.interface}
+              EOF
+          }
+        }
+        ], [
+        for _, iface in var.macvlan_interfaces :
+        {
+          path = "/etc/systemd/network/12-${iface.interface}.netdev"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [NetDev]
+              Name=${iface.interface}
+              Kind=macvlan
+              MACAddress=${lookup(iface, "mac", "none")}
+
+              [MACVLAN]
+              Mode=${lookup(iface, "macvlan_mode", "private")}
+              EOF
+          }
+        }
+        ], [
+        for _, iface in var.macvlan_interfaces :
+        {
+          path = "/etc/systemd/network/20-${iface.interface}.network"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [Match]
+              Name=${iface.interface}
+
+              ${local.interface_defaults~}
+              EOF
+          }
+        }
+        ], [
+        for _, iface in var.macvlan_interfaces :
+        # arp sysctl for macvlan parent
+        {
+          path = "/etc/sysctl.d/10-interface-arp-${iface.source}.conf"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              net.ipv4.conf.${iface.source}.arp_ignore=1
+              net.ipv4.conf.${iface.source}.arp_announce=2
+              net.ipv4.conf.${iface.source}.rp_filter=2
               EOF
           }
         }
@@ -220,21 +286,14 @@ EOF
               [Match]
               Name=${iface.interface}
 
-              [Link]
-              ARP=false
-              RequiredForOnline=false
-
-              [Network]
-              LinkLocalAddressing=false
-              DHCP=false
-              MulticastDNS=false
+              ${local.interface_defaults~}
               EOF
           }
         }
 
         ], [
         # Interface config override
-        for _, iface in var.network_overrides :
+        for _, iface in var.interface_overrides :
         {
           path = "/etc/systemd/network/20-${iface.interface}.network.d/20-default-network.conf"
           mode = 420
@@ -298,8 +357,9 @@ EOF
           mode = 420
           contents = {
             inline = <<-EOF
-%{for _, iface in var.network_overrides}net.ipv4.conf.${iface.interface}.arp_ignore=1
+%{for _, iface in var.interface_overrides}net.ipv4.conf.${iface.interface}.arp_ignore=1
 net.ipv4.conf.${iface.interface}.arp_announce=2
+net.ipv4.conf.${iface.interface}.rp_filter=2
 %{endfor~}
 EOF
           }

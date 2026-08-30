@@ -62,7 +62,7 @@ output "ignition_snippet" {
             # DHCP routes won't recover unless reconfigure is called
             inline = <<-EOF
               #!/bin/bash
-              networkctl reconfigure "${var.wan_network_config.interface}"
+              ip link set dev "${var.wan_network_config.interface}" up
               ip rule add to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
               ip route add default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
               EOF
@@ -158,11 +158,9 @@ output "ignition_snippet" {
           contents = {
             inline = <<-EOF
               [Link]
-              ActivationPolicy=passive
-              RequiredForOnline=false
+              ActivationPolicy=down
 
               [DHCPv4]
-              RequestBroadcast=true
               ClientIdentifier=mac
               EOF
           }

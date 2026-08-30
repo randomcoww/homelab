@@ -32,8 +32,9 @@ module "systemd-networkd" {
   wired_interfaces    = lookup(each.value, "wired_interfaces", [])
   wireless_interfaces = lookup(each.value, "wireless_interfaces", [])
   vlan_interfaces     = lookup(each.value, "vlan_interfaces", [])
+  macvlan_interfaces  = lookup(each.value, "macvlan_interfaces", [])
   bridge_interfaces   = lookup(each.value, "bridge_interfaces", [])
-  network_overrides   = lookup(each.value, "network_overrides", [])
+  interface_overrides = lookup(each.value, "interface_overrides", [])
 }
 
 module "server" {

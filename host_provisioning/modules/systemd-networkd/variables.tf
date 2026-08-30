@@ -25,12 +25,17 @@ variable "vlan_interfaces" {
   default = []
 }
 
+variable "macvlan_interfaces" {
+  type    = any
+  default = []
+}
+
 variable "bridge_interfaces" {
   type    = any
   default = []
 }
 
-variable "network_overrides" {
+variable "interface_overrides" {
   type    = any
   default = []
 }
