@@ -50,12 +50,15 @@ output "ignition_snippet" {
           name    = "keepalived.service"
           enabled = true
           dropins = [
-            # Part of networkd:
-            # Adds the policy route for WAN back in on networkd restart
+            # Alwys restart after systemd-networkd.
+            # Ensure WAN interface on slave instance is put down.
+            # If master, networkd restart will cause transition, but keep interface state consistent.
             {
               name     = "10-dependency.conf"
               contents = <<-EOF
                 [Unit]
+                Requires=systemd-networkd.service
+                After=systemd-networkd.service
                 PartOf=systemd-networkd.service
                 ConditionDirectoryNotEmpty=${var.keepalived_path}
 

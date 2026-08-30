@@ -54,6 +54,34 @@ output "ignition_snippet" {
           }
         },
         {
+          path = "${var.keepalived_path}/master.sh"
+          mode = 448
+          contents = {
+            # bring wan interface up on transition to master
+            # use same mac on WAN across all gateways
+            # DHCP routes won't recover unless reconfigure is called
+            inline = <<-EOF
+              #!/bin/bash
+              networkctl reconfigure "${var.wan_network_config.interface}"
+              ip rule add to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
+              ip route add default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
+              EOF
+          }
+        },
+        {
+          path = "${var.keepalived_path}/backup.sh"
+          mode = 448
+          contents = {
+            # take down wan interface on transition to slave
+            inline = <<-EOF
+              #!/bin/bash
+              ip link set dev "${var.wan_network_config.interface}" down
+              ip rule del to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
+              ip route del default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
+              EOF
+          }
+        },
+        {
           path = "${var.keepalived_path}/gateway.conf"
           mode = 420
           contents = {
@@ -72,12 +100,8 @@ output "ignition_snippet" {
                 virtual_ipaddress {
                   ${var.vrrp_network_config.vips.vrrp}/${var.vrrp_network_config.cidr}
                 }
-                virtual_rules {
-                  to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
-                }
-                virtual_routes {
-                  default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
-                }
+                notify_master "${var.keepalived_path}/master.sh"
+                notify_backup "${var.keepalived_path}/backup.sh"
               }
               EOF
           }
@@ -125,11 +149,18 @@ output "ignition_snippet" {
             EOF
           }
         },
+        # Redundant interface for gateways.
+        # Mac is duplicated on nodes. Use mac as client identifier to get the same WAN IP.
+        # Passive keeps WAN interfaces down until Keepalived negotiates and brings one up.
         {
           path = "/etc/systemd/network/20-${var.wan_network_config.interface}.network.d/30-master-default-route.conf"
           mode = 420
           contents = {
             inline = <<-EOF
+              [Link]
+              ActivationPolicy=passive
+              RequiredForOnline=false
+
               [DHCPv4]
               RequestBroadcast=true
               ClientIdentifier=mac
