@@ -171,6 +171,7 @@ resource "helm_release" "fluxcd-bucket" {
           camofox-browser        = []
           searxng                = []
           kubernetes-mcp         = []
+          hindsight              = ["cloudnative-pg"]
           hermes-agent           = ["juicefs-csi-driver"]
           stump                  = ["mountpoint-s3-csi", "juicefs-csi-driver"]
           navidrome              = ["mountpoint-s3-csi"]
