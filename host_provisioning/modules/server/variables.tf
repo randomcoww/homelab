@@ -18,9 +18,9 @@ variable "ssh_ca" {
   })
 }
 
-variable "user" {
-  type    = any
-  default = {}
+variable "users" {
+  type    = list(any)
+  default = []
 }
 
 variable "valid_principals" {

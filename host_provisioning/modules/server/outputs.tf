@@ -83,11 +83,12 @@ output "ignition_snippet" {
     }
     passwd = {
       users = [
-        merge(var.user, {
+        for _, user in var.users :
+        merge(user, {
           ssh_authorized_keys = [
             "cert-authority ${chomp(var.ssh_ca.public_key_openssh)}",
           ]
-        }),
+        })
       ]
     }
     storage = {

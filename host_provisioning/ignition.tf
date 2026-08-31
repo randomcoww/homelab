@@ -10,8 +10,8 @@ locals {
     table_id = 240
   }
 
-  users = {
-    ssh = {
+  users = [
+    {
       name     = "fcos"
       home_dir = "/var/home/fcos"
       groups = [
@@ -20,8 +20,16 @@ locals {
         "systemd-journal",
         "wheel",
       ],
-    }
-  }
+    },
+    {
+      name     = "agent"
+      home_dir = "/var/home/agent"
+      groups = [
+        "adm",
+        "systemd-journal",
+      ],
+    },
+  ]
 
   ignition_snippets = {
     for key in keys(local.hosts) :

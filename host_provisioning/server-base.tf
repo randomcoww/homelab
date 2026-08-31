@@ -44,7 +44,7 @@ module "server" {
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
   # SSH
-  user   = local.users.ssh
+  users  = local.users
   key_id = each.key
   valid_principals = sort(concat([
     for _, network in each.value.networks :
