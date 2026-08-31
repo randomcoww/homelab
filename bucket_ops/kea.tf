@@ -5,11 +5,11 @@ module "kea" {
   images = {
     kea = {
       repository = "zot.cluster.internal/randomcoww/kea"
-      tag        = "v3.3.1.1787811740@sha256:6e7db352fbbc31d7370c655d5826b2d536ce797a2ee694701ef3d9791b6c101a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kea
+      tag        = "v3.3.1.1788201870@sha256:a3a0597569b80b1c016088326c196716363ba9849623940a2967c09127e44df4" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kea
     }
     ipxe = {
       repository = "zot.cluster.internal/randomcoww/ipxe"
-      tag        = "v2.0.0.1787955205@sha256:76bce46ca2c05dc4fbc3eb0009934ab19d5627f0aee48428bacdc90f62fb9e11" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe
+      tag        = "v2.0.0.1788202573@sha256:0763c02a583f5ff43131e8683eff45b26677e283c990d9a5960fe5dc2259c176" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe
     }
   }
   peer_service_ips = [

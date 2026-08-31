@@ -50,7 +50,7 @@ module "hermes-agent" {
   images = {
     hermes-agent = {
       repository = "zot.cluster.internal/randomcoww/hermes-mnemosyne"
-      tag        = "v2026.8.19.1787811146@sha256:5ddfa0ec95929aea9646295284d1170b0c19c6bb5d48564fa0a544253786fd9f" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/hermes-mnemosyne
+      tag        = "v2026.8.27.1788200602@sha256:d15baa58bb0476bbccbeea5a6bb26a30c4834d5a4256b8b59d424888a6669cc3" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/hermes-mnemosyne
     }
     hermes-webui = {
       repository = "ghcr.io/nesquena/hermes-webui"
