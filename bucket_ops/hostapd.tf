@@ -113,7 +113,7 @@ module "hostapd-qrcode" {
   images = {
     qrcode = {
       repository = "zot.cluster.internal/randomcoww/qrcode-resource"
-      tag        = "v1.1787802569@sha256:ac271c59cab981695c9a37c2f3d35ad25ba56a44c9def279fd34df84b3dbbeb7" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qrcode-resource
+      tag        = "v1.1788201747@sha256:3b6263d93d095a79cce9562628bf1cb35358e4f3a0b45c565a66495dc17d3417" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qrcode-resource
     }
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
