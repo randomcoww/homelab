@@ -198,6 +198,7 @@ module "litestream-overlay" {
           {
             name      = "thumbnails"
             mountPath = local.thumbnails_path
+            subPath   = "mount"
           },
         ]
         livenessProbe = {
