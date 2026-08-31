@@ -317,6 +317,8 @@ module "hermes-agent" {
     # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
     # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
   }
+  ssh_ca           = data.terraform_remote_state.host.outputs.ssh_ca
+  ssh_user         = "agent"
   ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes-agent.hostname
   gateway_ref = {

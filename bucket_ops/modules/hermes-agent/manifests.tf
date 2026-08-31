@@ -69,6 +69,51 @@ locals {
     },
   ]
 
+  # mount configs here to copy on init
+  home_copy_path = "/var/tmp/hermes/config"
+  configs = {
+    ssh_known_hosts = {
+      path    = ".ssh/known_hosts"
+      content = "@cert-authority * ${chomp(var.ssh_ca.public_key_openssh)}"
+    }
+    ssh_private_key = {
+      path    = ".ssh/id_ecdsa"
+      content = tls_private_key.ssh-client.private_key_pem
+    }
+    ssh_cert = {
+      path    = ".ssh/id_ecdsa-cert.pub"
+      content = ssh_user_cert.ssh-client.cert_authorized_key
+    }
+    ssh_config = {
+      path    = ".ssh/config"
+      content = <<-EOF
+        Host *
+          User ${var.ssh_user}
+          IdentityFile "${local.config_envs.HERMES_HOME}/.ssh/id_ecdsa"
+          PubkeyAuthentication yes
+        EOF
+    }
+    config = {
+      path = "config.yaml"
+      content = yamlencode(merge(var.extra_configs, {
+        mcp_servers = merge(lookup(var.extra_configs, "mcp_servers", {}), {
+          "${var.name}-litestream" = {
+            url             = "http://127.0.0.1:${local.litestream_mcp_port}"
+            timeout         = 300
+            connect_timeout = 30
+          }
+        })
+      }))
+    }
+    env = {
+      path    = ".env"
+      content = <<-EOF
+%{for k, v in local.config_envs}${k}=${v}
+%{endfor~}
+EOF
+    }
+  }
+
   litestream_symlink_path = "/var/tmp/hermes/db"
   litestream_targets = [ # mount these to tmpfs for performance
     "state.db",
@@ -78,23 +123,6 @@ locals {
     "mnemosyne/data/mnemosyne.db",
   ]
   litestream_mcp_port = 3001
-
-  files_copy_path = "/var/tmp/hermes/config"
-  files = {
-    "config.yaml" = yamlencode(merge(var.extra_configs, {
-      mcp_servers = merge(lookup(var.extra_configs, "mcp_servers", {}), {
-        "${var.name}-litestream" = {
-          url             = "http://127.0.0.1:${local.litestream_mcp_port}"
-          timeout         = 300
-          connect_timeout = 30
-        }
-      })
-    }))
-    ".env" = <<-EOF
-%{for k, v in local.config_envs}${k}=${v}
-%{endfor~}
-EOF
-  }
 
   juicefs_name              = "${var.name}-juicefs"
   juicefs_postgres_database = "juicefs"
@@ -112,7 +140,10 @@ module "secret" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  data      = local.files
+  data = {
+    for k, v in local.configs :
+    k => v.content
+  }
 }
 
 module "env-secret" {
@@ -308,32 +339,40 @@ module "litestream-overlay" {
           "-c",
           <<-EOF
 set -xe
+cd ${local.config_envs.HERMES_HOME}
+chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} .
+
+runuser -p -u hermes -- bash <<EOT
+set -x
 rm -f \
-  ${local.config_envs.HERMES_HOME}/config.yaml.bak-* \
-  ${local.config_envs.HERMES_HOME}/.env.bak-*
+  config.yaml.bak-* .env.bak-*
 
-%{~for _, db in local.litestream_targets}
-%{~if dirname(db) != "."}mkdir -p ${dirname("${local.config_envs.HERMES_HOME}/${db}")}%{endif}
-ln -sf ${local.litestream_symlink_path}/${db} ${local.config_envs.HERMES_HOME}/${db}
+# Symlink sqlite DBs to litestream replication path
+%{for _, d in distinct([for _, db in local.litestream_targets : dirname(db) if dirname(db) != "."])}mkdir -p ${d}
+%{endfor~}
+%{for _, db in local.litestream_targets}ln -sf ${local.litestream_symlink_path}/${db} ${db}
 %{endfor~}
 
-%{~for f, _ in local.files}
-%{~if dirname(f) != "."}mkdir -p ${dirname("${local.config_envs.HERMES_HOME}/${f}")}%{endif}
-cp -afL ${local.files_copy_path}/${f} ${local.config_envs.HERMES_HOME}/${f}
+# Config.yaml and .env need to be writeable. Copy from mount to hermes home.
+%{for _, d in distinct([for _, f in local.configs : dirname(f.path) if dirname(f.path) != "."])}mkdir -p ${d}
+%{endfor~}
+%{for _, f in local.configs}cp -afL ${local.home_copy_path}/${f.path} ${f.path}
 %{endfor~}
 
-chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} \
-%{for f, _ in local.files}${local.config_envs.HERMES_HOME}/${f} \
-%{endfor~}
-${local.config_envs.HERMES_HOME}
+# Update permissions for ssh files
+chmod 600 \
+  ${local.configs.ssh_private_key.path} \
+  ${local.configs.ssh_known_hosts.path} \
+  ${local.configs.ssh_cert.path}
+EOT
 EOF
         ]
         volumeMounts = concat(local.common_volume_mounts, [
-          for f, _ in local.files :
+          for k, v in local.configs :
           {
             name      = "config"
-            mountPath = "${local.files_copy_path}/${f}"
-            subPath   = f
+            mountPath = "${local.home_copy_path}/${v.path}"
+            subPath   = k
           }
         ])
       }

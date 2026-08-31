@@ -89,3 +89,14 @@ variable "ca_issuer_name" {
 variable "juicefs_client_tls_path" {
   type = string
 }
+
+variable "ssh_user" {
+  type = string
+}
+
+variable "ssh_ca" {
+  type = object({
+    private_key_pem    = string
+    public_key_openssh = string
+  })
+}
