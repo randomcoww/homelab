@@ -50,6 +50,9 @@ output "manifests" {
           }
           values = {
             api = {
+              service = {
+                targetPort = var.service_port
+              }
               env = merge({
               }, var.extra_envs)
               secrets = merge({
@@ -69,6 +72,9 @@ output "manifests" {
                   }
                 },
               ]
+            }
+            controlPlane = {
+              enabled = false
             }
             postgresql = {
               enabled = false

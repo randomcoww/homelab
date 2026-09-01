@@ -8,8 +8,6 @@ locals {
     HERMES_STREAM_STALE_TIMEOUT = 1800
     HERMES_CRON_TIMEOUT         = 1800
     GATEWAY_ALLOW_ALL_USERS     = true
-    # mnemosyne vars #
-    MNEMOSYNE_HOST_LLM_ENABLED = true
     # custom vars #
     INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
     INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
@@ -120,7 +118,7 @@ EOF
     "kanban.db",
     "projects.db",
     "response_store.db",
-    "mnemosyne/data/mnemosyne.db",
+    "verification_evidence.db",
   ]
   litestream_mcp_port = 3001
 

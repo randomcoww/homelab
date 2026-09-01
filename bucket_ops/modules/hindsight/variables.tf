@@ -16,6 +16,10 @@ variable "affinity" {
   default = {}
 }
 
+variable "service_port" {
+  type = number
+}
+
 variable "extra_envs" {
   type    = any
   default = {}

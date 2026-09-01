@@ -270,6 +270,7 @@ module "hermes-agent" {
         "polymarket",
         "research-paper-writing",
         "web-retrieval",
+        "llama-cpp",
       ])
     }
   }
@@ -301,6 +302,11 @@ module "hermes-agent" {
     GROQ_BASE_URL                       = "https://${local.endpoints.llama-cpp.hostname}/v1"         # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
     GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
     STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
+    # hindsight #
+    HINDSIGHT_API_URL      = "http://${local.hindsight_name}-api.${local.hindsight_namespace}:${local.hindsight_port}"
+    HINDSIGHT_MODE         = "local_external"
+    HINDSIGHT_TIMEOUT      = 600
+    HINDSIGHT_IDLE_TIMEOUT = 0 # unlimited
     # custom vars #
     ALPACA_API_KEY    = var.alpaca_api_key
     ALPACA_SECRET_KEY = var.alpaca_secret_key
@@ -317,8 +323,9 @@ module "hermes-agent" {
     # HERMES_WEBUI_OIDC_ALLOW_CLAIM   = "group"
     # HERMES_WEBUI_OIDC_ALLOW_VALUES  = "hermes-admin"
   }
-  ssh_ca           = data.terraform_remote_state.host.outputs.ssh_ca
-  ssh_user         = "agent"
+  ssh_ca   = data.terraform_remote_state.host.outputs.ssh_ca
+  ssh_user = "agent"
+
   ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes-agent.hostname
   gateway_ref = {
