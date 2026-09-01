@@ -1,6 +1,7 @@
 output "manifests" {
   value = concat([
     module.cnpg-secret.manifest,
+    module.httproute.manifest,
     ], [
     for _, m in [
       {
@@ -74,7 +75,10 @@ output "manifests" {
               ]
             }
             controlPlane = {
-              enabled = false
+              enabled = true
+              service = {
+                targetPort = local.controlplane_port
+              }
             }
             postgresql = {
               enabled = false

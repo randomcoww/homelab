@@ -33,3 +33,19 @@ variable "extra_secrets" {
 variable "ca_issuer_name" {
   type = string
 }
+
+variable "ingress_hostname" {
+  type = string
+}
+
+variable "gateway_ref" {
+  type = any
+}
+
+variable "auth_backend_ref" {
+  type = object({
+    name      = string
+    namespace = string
+    port      = number
+  })
+}

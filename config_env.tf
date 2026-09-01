@@ -191,6 +191,9 @@ locals {
     zot = {
       hostname = "zot.${local.domains.kubernetes}"
     }
+    hindsight = {
+      hostname = "hindsight.${local.domains.public}"
+    }
   }
 
   # All host exposed ports - do not overlap! #

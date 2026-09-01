@@ -19,6 +19,17 @@ module "hindsight" {
   }
   ca_issuer_name = local.cert_issuers.ca_internal
   service_port   = local.hindsight_port
+
+  ingress_hostname = local.endpoints.hindsight.hostname
+  gateway_ref = {
+    name      = local.services.cilium.name
+    namespace = local.services.cilium.namespace
+  }
+  auth_backend_ref = {
+    name      = local.authelia_name
+    namespace = local.authelia_namespace
+    port      = 80
+  }
 }
 
 resource "minio_s3_object" "fluxcd-hindsight" {
