@@ -58,7 +58,7 @@ module "hermes-agent" {
     }
     litestream = {
       repository = "docker.io/litestream/litestream"
-      tag        = "0.5.16@sha256:f085f8bce71a5ad4ce8e28b28ea522de1d9e0d7dd0af3ea5c1bd626d0f341954" # renovate: datasource=docker depName=docker.io/litestream/litestream
+      tag        = "0.5.17@sha256:4b02b9859a6b6b4087d8b8944e15f7e984bd7957cba322bbeee38b0e27b9656a" # renovate: datasource=docker depName=docker.io/litestream/litestream
     }
   }
   juicefs_client_tls_path = local.juicefs_client_tls_path
