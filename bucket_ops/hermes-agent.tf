@@ -301,6 +301,7 @@ module "hermes-agent" {
     HINDSIGHT_API_URL      = "http://${local.hindsight_name}-api.${local.hindsight_namespace}:${local.hindsight_port}"
     HINDSIGHT_MODE         = "local_external"
     HINDSIGHT_TIMEOUT      = 600
+    HINDSIGHT_BUDGET       = "low"
     HINDSIGHT_IDLE_TIMEOUT = 0 # unlimited
     # custom vars #
     ALPACA_API_KEY    = var.alpaca_api_key

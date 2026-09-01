@@ -10,7 +10,8 @@ module "hindsight" {
   namespace = "ai"
 
   extra_envs = {
-    HINDSIGHT_API_LLM_MODEL = "granite-4-2-3b"
+    HINDSIGHT_API_LLM_MODEL            = "granite-4-2-3b"
+    HINDSIGHT_API_REFLECT_WALL_TIMEOUT = "600" # default 300
   }
   extra_secrets = {
     HINDSIGHT_API_LLM_API_KEY  = random_password.llama-cpp-auth-token.result
