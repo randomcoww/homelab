@@ -24,11 +24,10 @@ module "llama-cpp" {
         }
       },
       {
-        repository = "zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl"
-        tag        = "v1787904849@sha256:0e7529f28e28bfa18aad67d8b377d6c95dc6cbc661dfa899855aa66ae47937d6" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.5-4b-ud-q8-k-xl
+        repository = "zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0"
+        tag        = "v1788247923@sha256:4174ba613c266d09fa2fa4c854e948b28c10d067a7ce71966b56bc88c92059d5" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0
         files = {
-          qwen-3-5-4b        = "Qwen3.5-4B-UD-Q8_K_XL.gguf"
-          qwen-3-5-4b-mmproj = "mmproj-BF16.gguf"
+          granite-4-2-3b = "granite-4.2-3b-Q8_0.gguf"
         }
       },
       {
@@ -82,30 +81,20 @@ module "llama-cpp" {
           }
         }
       }
-      qwen-3-5-4b = {
+      granite-4-2-3b = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${qwen-3-5-4b} \
-          --ctx-size 262144 \
+          --model $${granite-4-2-3b} \
+          --ctx-size 131072 \
           --jinja \
           --top-p 0.95 \
-          --top-k 20 \
-          --min-p 0.0 \
-          --repeat-penalty 1.0 \
-          --no-context-shift \
-          --image-min-tokens 1024 \
-          --mmproj $${qwen-3-5-4b-mmproj}
+          --no-context-shift
         EOF
         filters = {
-          stripParams = "temperature,presence_penalty"
+          stripParams = "temperature"
           setParamsByID = {
             "$${MODEL_ID}" = {
-              temperature      = 1.0
-              presence_penalty = 1.5
-            }
-            "$${MODEL_ID}:low" = {
-              temperature      = 0.6
-              presence_penalty = 0.0
+              temperature = 1.0
             }
           }
         }
@@ -133,14 +122,14 @@ module "llama-cpp" {
         persistent = true
         members = [
           "whisper-large-v3-turbo",
-          "qwen-3-5-4b",
+          "granite-4-2-3b",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "qwen-3-5-4b",
+          "granite-4-2-3b",
           "qwen-3-8-27b",
         ]
       }
