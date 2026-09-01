@@ -1,7 +1,7 @@
 module "device-plugin" {
   source    = "./modules/device-plugin"
   name      = "device-plugin"
-  namespace = "kube-system"
+  namespace = "host-system"
   images = {
     device-plugin = {
       repository = "ghcr.io/squat/generic-device-plugin"

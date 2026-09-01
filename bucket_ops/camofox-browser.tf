@@ -1,6 +1,6 @@
 locals {
   camofox-browser_name      = "camofox"
-  camofox-browser_namespace = "default"
+  camofox-browser_namespace = "ai"
   camofox-browser_port      = 9377
 }
 

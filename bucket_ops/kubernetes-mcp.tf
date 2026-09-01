@@ -1,6 +1,6 @@
 locals {
   kubernetes-mcp_name      = "kubernetes-mcp"
-  kubernetes-mcp_namespace = "default"
+  kubernetes-mcp_namespace = "ai"
   kubernetes-mcp_port      = 8080
 }
 

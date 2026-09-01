@@ -13,7 +13,7 @@ output "manifests" {
             "kustomize.toolkit.fluxcd.io/prune" = "disabled"
           }
         }
-      }
+      },
     ] :
     yamlencode(m)
   ])

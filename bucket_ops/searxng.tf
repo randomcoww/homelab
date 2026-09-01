@@ -1,6 +1,6 @@
 locals {
   searxng_name      = "searxng"
-  searxng_namespace = "default"
+  searxng_namespace = "ai"
   searxng_port      = 8080
 }
 

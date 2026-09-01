@@ -1,7 +1,7 @@
 module "kured" {
   source    = "./modules/kured"
   name      = "kured"
-  namespace = "monitoring"
+  namespace = "host-system"
   images = {
     kured = {
       repository = "ghcr.io/kubereboot/kured"

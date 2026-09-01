@@ -6,7 +6,7 @@ resource "random_password" "llama-cpp-auth-token" {
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
   name      = "llama-cpp"
-  namespace = "default"
+  namespace = "default" # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
       repository = "zot.cluster.internal/randomcoww/llama-swap-ffmpeg"

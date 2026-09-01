@@ -9,9 +9,10 @@ resource "random_password" "hostapd-password" {
 }
 
 module "hostapd" {
-  source   = "./modules/hostapd"
-  name     = "hostapd"
-  replicas = 1
+  source    = "./modules/hostapd"
+  name      = "hostapd"
+  namespace = "hostnet"
+  replicas  = 1
   images = {
     hostapd = {
       repository = "zot.cluster.internal/randomcoww/hostapd"
@@ -108,7 +109,7 @@ module "hostapd" {
 module "hostapd-qrcode" {
   source    = "./modules/qrcode"
   name      = "hostapd-qrcode"
-  namespace = "default"
+  namespace = "hostnet"
   replicas  = 2
   images = {
     qrcode = {

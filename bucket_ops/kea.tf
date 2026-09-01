@@ -1,7 +1,7 @@
 module "kea" {
   source    = "./modules/kea"
   name      = "kea"
-  namespace = "netboot"
+  namespace = "hostnet"
   images = {
     kea = {
       repository = "zot.cluster.internal/randomcoww/kea"

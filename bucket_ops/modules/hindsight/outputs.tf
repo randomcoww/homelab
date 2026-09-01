@@ -286,6 +286,7 @@ output "manifests" {
           }
         }
       },
+
       # NS
       {
         apiVersion = "v1"

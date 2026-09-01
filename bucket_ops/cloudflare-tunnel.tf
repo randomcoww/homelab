@@ -7,7 +7,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
           kind       = "HelmRepository"
           metadata = {
             name      = "cloudflare-tunnel"
-            namespace = "default"
+            namespace = "cloudflare-tunnel"
           }
           spec = {
             interval = "15m"
@@ -19,7 +19,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
           kind       = "HelmRelease"
           metadata = {
             name      = "cloudflare-tunnel"
-            namespace = "default"
+            namespace = "cloudflare-tunnel"
           }
           spec = {
             interval = "15m"
@@ -76,6 +76,18 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
                   memory = "64Mi"
                 }
               }
+            }
+          }
+        },
+
+        # NS
+        {
+          apiVersion = "v1"
+          kind       = "Namespace"
+          metadata = {
+            name = "cloudflare-tunnel"
+            annotations = {
+              "kustomize.toolkit.fluxcd.io/prune" = "disabled"
             }
           }
         },

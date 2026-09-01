@@ -6,8 +6,8 @@ locals {
 
 module "hindsight" {
   source    = "./modules/hindsight"
-  name      = "hindsight"
-  namespace = "ai"
+  name      = local.hindsight_name
+  namespace = local.hindsight_namespace
 
   extra_envs = {
     HINDSIGHT_API_LLM_MODEL            = "granite-4-2-3b"

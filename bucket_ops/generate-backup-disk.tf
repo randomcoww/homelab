@@ -1,7 +1,7 @@
 module "generate-backup-disk" {
   source    = "./modules/generate-backup-disk"
   name      = "generate-backup-disk"
-  namespace = "default"
+  namespace = "host-system"
   images = {
     backup-runner = {
       repository = "zot.cluster.internal/randomcoww/coreos-installer"
