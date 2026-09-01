@@ -32,11 +32,23 @@ locals {
     HERMES_WEBUI_GATEWAY_BASE_URL  = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
   }, var.extra_webui_envs)
 
+  overlay_paths = [
+    ".cache",
+    ".local",
+    ".ssh",
+    "cache",
+    "home",
+    "lazy-packages",
+    "logs",
+    "webui",
+  ]
+
   # mounts for both agent and webui
-  common_volume_mounts = [
+  common_volume_mounts = concat([
     {
       name      = "hermes-home"
       mountPath = local.config_envs.HERMES_HOME
+      subPath   = "mount"
     },
     {
       name      = "ca-trust-bundle"
@@ -55,21 +67,18 @@ locals {
       subPath   = "tls.key"
       readOnly  = true
     },
+    ], [
+    for _, p in local.overlay_paths :
     {
       name      = "tmpfs"
-      mountPath = "${local.config_envs.HERMES_HOME}/logs"
-      subPath   = "logs"
-    },
-    {
-      name      = "tmpfs"
-      mountPath = "${local.config_envs.HERMES_HOME}/webui"
-      subPath   = "webui"
-    },
-  ]
+      mountPath = "${local.config_envs.HERMES_HOME}/${p}"
+      subPath   = p
+    }
+  ])
 
   # mount configs here to copy on init
   home_copy_path = "/var/tmp/hermes/config"
-  configs = {
+  config_files = {
     ssh_known_hosts = {
       path    = ".ssh/known_hosts"
       content = "@cert-authority * ${chomp(var.ssh_ca.public_key_openssh)}"
@@ -139,7 +148,7 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = {
-    for k, v in local.configs :
+    for k, v in local.config_files :
     k => v.content
   }
 }
@@ -342,8 +351,6 @@ chown ${local.agent_envs.HERMES_UID}:${local.agent_envs.HERMES_GID} .
 
 runuser -p -u hermes -- bash <<EOT
 set -x
-rm -f \
-  config.yaml.bak-* .env.bak-*
 
 # Symlink sqlite DBs to litestream replication path
 %{for _, d in distinct([for _, db in local.litestream_targets : dirname(db) if dirname(db) != "."])}mkdir -p ${d}
@@ -352,21 +359,18 @@ rm -f \
 %{endfor~}
 
 # Config.yaml and .env need to be writeable. Copy from mount to hermes home.
-%{for _, d in distinct([for _, f in local.configs : dirname(f.path) if dirname(f.path) != "."])}mkdir -p ${d}
+%{for _, d in distinct([for _, f in local.config_files : dirname(f.path) if dirname(f.path) != "."])}mkdir -p ${d}
 %{endfor~}
-%{for _, f in local.configs}cp -afL ${local.home_copy_path}/${f.path} ${f.path}
+%{for _, f in local.config_files}cp -afL ${local.home_copy_path}/${f.path} ${f.path}
 %{endfor~}
 
 # Update permissions for ssh files
-chmod 600 \
-  ${local.configs.ssh_private_key.path} \
-  ${local.configs.ssh_known_hosts.path} \
-  ${local.configs.ssh_cert.path}
+chmod -R 600 .ssh/*
 EOT
 EOF
         ]
         volumeMounts = concat(local.common_volume_mounts, [
-          for k, v in local.configs :
+          for k, v in local.config_files :
           {
             name      = "config"
             mountPath = "${local.home_copy_path}/${v.path}"
@@ -390,7 +394,8 @@ EOF
             value = tostring(v)
           }
         ]
-        volumeMounts = local.common_volume_mounts
+        volumeMounts = concat(local.common_volume_mounts, [
+        ])
         ports = [
           {
             containerPort = local.config_envs.API_SERVER_PORT
@@ -439,6 +444,11 @@ EOF
             name      = "agent"
             mountPath = local.webui_envs.HERMES_WEBUI_AGENT_DIR
             subPath   = "opt/hermes"
+          },
+          {
+            name      = "tmpfs"
+            mountPath = "/home/hermeswebui/.ssh"
+            subPath   = ".ssh"
           },
         ])
         ports = [
