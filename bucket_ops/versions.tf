@@ -29,7 +29,7 @@ terraform {
     }
     helm = {
       source  = "opentofu/helm"
-      version = "3.2.0"
+      version = "3.3.0"
     }
     ct = {
       source  = "coreos/ct"
