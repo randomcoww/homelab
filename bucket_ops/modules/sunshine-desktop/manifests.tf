@@ -191,7 +191,8 @@ module "service" {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
   }
   spec = {
-    type = "LoadBalancer"
+    type                  = "LoadBalancer"
+    externalTrafficPolicy = "Local"
     ports = concat([
       for name, port in local.tcp_ports :
       {
