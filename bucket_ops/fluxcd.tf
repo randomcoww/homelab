@@ -180,6 +180,7 @@ resource "helm_release" "fluxcd-bucket" {
           generate-backup-disk     = []
           zot                      = []
           inference-extension-crds = []
+          gateway-api-crds         = []
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
