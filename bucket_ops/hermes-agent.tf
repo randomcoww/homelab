@@ -86,6 +86,12 @@ module "hermes-agent" {
     browser = {
       camofox_url = "$${CAMOFOX_URL}"
     }
+    timeouts = {
+      tools = {
+        concurrent_batch = 600
+        sequential_call  = 600
+      }
+    }
     mcp_servers = {
       kubernetes = {
         url = "https://${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}:${local.kubernetes-mcp_port}/mcp"
