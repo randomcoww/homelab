@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-kubelet-csr-approver" {
             chart = {
               spec = {
                 chart   = "kubelet-csr-approver"
-                version = "1.2.14" # renovate: datasource=helm depName=kubelet-csr-approver registryUrl=https://postfinance.github.io/kubelet-csr-approver
+                version = "1.2.15" # renovate: datasource=helm depName=kubelet-csr-approver registryUrl=https://postfinance.github.io/kubelet-csr-approver
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "kubelet-csr-approver"
