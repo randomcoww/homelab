@@ -70,7 +70,8 @@ resource "helm_release" "cilium" {
         confPath = local.kubernetes.cni_config_path
       }
       gatewayAPI = {
-        enabled = true
+        enabled               = true
+        externalTrafficPolicy = "Local"
       }
       bgpControlPlane = {
         enabled = true
