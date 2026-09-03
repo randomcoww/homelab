@@ -16,9 +16,9 @@ output "manifest" {
         type = "RollingUpdate"
       }, var.strategy)
       selector = {
-        matchLabels = merge({
+        matchLabels = {
           app = var.app
-        }, var.labels)
+        }
       }
       template = {
         metadata = {

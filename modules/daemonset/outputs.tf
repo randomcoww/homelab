@@ -12,9 +12,9 @@ output "manifest" {
     }
     spec = merge({
       selector = {
-        matchLabels = merge({
+        matchLabels = {
           app = var.app
-        }, var.labels)
+        }
       }
       template = {
         metadata = {
