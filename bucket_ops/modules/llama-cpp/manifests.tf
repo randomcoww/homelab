@@ -3,7 +3,7 @@ locals {
   models_path  = "/models"
   config_file  = "/var/lib/llama-cpp/config.yaml"
   models = [
-    for k, image in var.models :
+    for k, image in var.image_volumes :
     {
       key   = k
       image = image.image
@@ -109,6 +109,10 @@ module "statefulset" {
   replicas  = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
+  }
+  labels = {
+    for _, m in keys(lookup(var.llama_swap_config, "models", {})) :
+    "model-${m}" => "true"
   }
   template_spec = {
     resourceClaims = [

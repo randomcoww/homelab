@@ -13,7 +13,7 @@ module "llama-cpp" {
       tag        = "unified-vulkan-2026-08-31.1788200486@sha256:873b6873e5e3ddfae3be8642ed54def5dcb1a61043e203d0360893f07a0dc144" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
   }
-  models = merge([
+  image_volumes = merge([
     for _, image in [
       {
         repository = "zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"

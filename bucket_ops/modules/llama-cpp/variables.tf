@@ -30,7 +30,7 @@ variable "images" {
   })
 }
 
-variable "models" {
+variable "image_volumes" {
   type = map(object({
     image = string
     file  = string
