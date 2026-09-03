@@ -336,6 +336,9 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 spec = {
                   scrapeInterval = "30s"
                   replicaCount   = 2
+                  extraArgs = {
+                    "promscrape.maxScrapeSize" = "64MB"
+                  }
                   globalScrapeMetricRelabelConfigs = [
                     {
                       action = "labeldrop"
@@ -383,6 +386,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                     limits = {
                       memory = "256Mi"
+                      cpu    = "1"
                     }
                   }
                 }
