@@ -42,42 +42,6 @@ module "secret" {
   })
 }
 
-module "httproute" {
-  source    = "../../../modules/httproute"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  spec = {
-    parentRefs = [
-      merge({
-        kind = "Gateway"
-      }, var.gateway_ref),
-    ]
-    hostnames = [
-      var.ingress_hostname,
-    ]
-    rules = [
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/"
-            }
-          },
-        ]
-        backendRefs = [
-          {
-            name = module.service.name
-            port = var.service_port
-          },
-        ]
-      },
-    ]
-  }
-}
-
 module "service" {
   source    = "../../../modules/service"
   name      = var.name
@@ -105,7 +69,7 @@ module "statefulset" {
   app       = var.name
   release   = var.release
   affinity  = var.affinity
-  replicas  = 1
+  replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
@@ -115,10 +79,9 @@ module "statefulset" {
   }
   template_spec = {
     resourceClaims = [
-      {
-        name              = "gpu"
-        resourceClaimName = var.gpu_resource_claim
-      },
+      merge(var.gpu_resource_claim_ref, {
+        name = "gpu"
+      }),
     ]
     resources = merge({
       requests = {

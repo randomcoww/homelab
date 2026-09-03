@@ -1,6 +1,7 @@
 locals {
   resource_claims = {
     amd-gpu-gfx1151 = "amd-gpu-gfx1151"
+    amd-gpu-gfx90c  = "amd-gpu-gfx90c"
   }
 }
 
@@ -22,8 +23,6 @@ resource "minio_s3_object" "fluxcd-resource-claims" {
                   name = local.resource_claims.amd-gpu-gfx1151
                   exactly = {
                     deviceClassName = "gpu.amd.com"
-                    allocationMode  = "ExactCount"
-                    count           = 1
                     selectors = [
                       {
                         cel = {
@@ -36,6 +35,37 @@ resource "minio_s3_object" "fluxcd-resource-claims" {
                   }
                 },
               ]
+            }
+          }
+        },
+        {
+          apiVersion = "resource.k8s.io/v1"
+          kind       = "ResourceClaimTemplate"
+          metadata = {
+            name      = local.resource_claims.amd-gpu-gfx90c
+            namespace = "default"
+          }
+          spec = {
+            spec = { # spec is repeated intentionally
+              devices = {
+                requests = [
+                  {
+                    name = local.resource_claims.amd-gpu-gfx90c
+                    exactly = {
+                      deviceClassName = "gpu.amd.com"
+                      selectors = [
+                        {
+                          cel = {
+                            expression = <<-EOF
+                            device.attributes["gpu.amd.com"].deviceID == "0x15e7"
+                            EOF
+                          }
+                        },
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         },

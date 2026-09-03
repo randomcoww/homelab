@@ -11,6 +11,11 @@ variable "release" {
   default = "0.1.0"
 }
 
+variable "replicas" {
+  type    = number
+  default = 1
+}
+
 variable "llama_swap_config" {
   type    = any
   default = {}
@@ -37,6 +42,10 @@ variable "image_volumes" {
   }))
 }
 
+variable "service_port" {
+  type = number
+}
+
 variable "api_keys" {
   type    = list(string)
   default = []
@@ -52,18 +61,6 @@ variable "resources" {
   default = {}
 }
 
-variable "gpu_resource_claim" {
-  type = string
-}
-
-variable "service_port" {
-  type = number
-}
-
-variable "ingress_hostname" {
-  type = string
-}
-
-variable "gateway_ref" {
-  type = any
+variable "gpu_resource_claim_ref" {
+  type = map(string)
 }

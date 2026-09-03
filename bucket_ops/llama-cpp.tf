@@ -1,6 +1,5 @@
 locals {
   llama-cpp_port      = 8080
-  llama-cpp_name      = "llama-cpp"
   llama-cpp_namespace = "default"
 }
 
@@ -11,7 +10,7 @@ resource "random_password" "llama-cpp-auth-token" {
 
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
-  name      = local.llama-cpp_name
+  name      = "llama-cpp"
   namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
@@ -146,37 +145,15 @@ module "llama-cpp" {
     "AMD_VULKAN_ICD"        = "RADV"
     "RADV_PERFTEST"         = "sam"
   }
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "beta.amd.com/gpu.cu-count"
-                operator = "Gt"
-                values = [
-                  "16",
-                ]
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
-  service_port     = local.llama-cpp_port
-  ingress_hostname = local.endpoints.llama-cpp.hostname
-  gateway_ref = {
-    name      = local.services.cilium.name
-    namespace = local.services.cilium.namespace
-  }
+  service_port = local.llama-cpp_port
   resources = {
     requests = {
       memory = "64Gi"
     }
   }
-  gpu_resource_claim = local.resource_claims.amd-gpu-gfx1151
+  gpu_resource_claim_ref = {
+    resourceClaimName = local.resource_claims.amd-gpu-gfx1151 # using resourceClaim (not template) to share GPU with Sunshine
+  }
 }
 
 resource "minio_s3_object" "fluxcd-llama-cpp" {
@@ -205,8 +182,7 @@ resource "minio_s3_object" "fluxcd-llama-cpp" {
 
 output "llama-cpp" {
   value = {
-    base_url = "https://${local.endpoints.llama-cpp.hostname}/v1"
-    api_key  = random_password.llama-cpp-auth-token.result
+    api_key = random_password.llama-cpp-auth-token.result
   }
   sensitive = true
 }

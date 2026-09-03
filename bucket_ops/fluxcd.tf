@@ -168,6 +168,7 @@ resource "helm_release" "fluxcd-bucket" {
           authelia                 = ["dragonfly-operator", "lldap"]
           gha-runner               = []
           llama-cpp                = ["resource-claims"]
+          llama-cpp-small          = ["resource-claims"]
           camofox-browser          = []
           searxng                  = []
           kubernetes-mcp           = []

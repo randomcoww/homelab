@@ -170,9 +170,6 @@ locals {
       hostname = "stump.${local.domains.public}"
       tunnel   = true
     }
-    llama-cpp = {
-      hostname = "llama.${local.domains.public}"
-    }
     hermes-agent = {
       hostname = "hermes-agent.${local.domains.public}"
     }
