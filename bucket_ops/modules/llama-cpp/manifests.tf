@@ -1,7 +1,6 @@
 locals {
-  service_port = 8080
-  models_path  = "/models"
-  config_file  = "/var/lib/llama-cpp/config.yaml"
+  models_path = "/models"
+  config_file = "/var/lib/llama-cpp/config.yaml"
   models = [
     for k, image in var.image_volumes :
     {
@@ -71,7 +70,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.service_port
+            port = var.service_port
           },
         ]
       },
@@ -90,9 +89,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.service_port
+        port       = var.service_port
         protocol   = "TCP"
-        targetPort = local.service_port
+        targetPort = var.service_port
       },
     ]
   }
@@ -135,7 +134,7 @@ module "statefulset" {
           "--config",
           "${local.config_file}",
           "--listen",
-          "0.0.0.0:${local.service_port}",
+          "0.0.0.0:${var.service_port}",
         ]
         volumeMounts = concat([
           {
@@ -182,12 +181,12 @@ module "statefulset" {
         }
         ports = [
           {
-            containerPort = local.service_port
+            containerPort = var.service_port
           },
         ]
         livenessProbe = {
           httpGet = {
-            port = local.service_port
+            port = var.service_port
             path = "/health"
           }
           initialDelaySeconds = 10
@@ -195,7 +194,7 @@ module "statefulset" {
         }
         readinessProbe = {
           httpGet = {
-            port = local.service_port
+            port = var.service_port
             path = "/health"
           }
         }

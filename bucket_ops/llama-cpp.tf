@@ -1,3 +1,9 @@
+locals {
+  llama-cpp_port      = 8080
+  llama-cpp_name      = "llama-cpp"
+  llama-cpp_namespace = "default"
+}
+
 resource "random_password" "llama-cpp-auth-token" {
   length           = 32
   override_special = "-_"
@@ -5,8 +11,8 @@ resource "random_password" "llama-cpp-auth-token" {
 
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
-  name      = "llama-cpp"
-  namespace = "default" # must be in same namespace as sunshine to share GPU
+  name      = local.llama-cpp_name
+  namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
       repository = "zot.cluster.internal/randomcoww/llama-swap-ffmpeg"
@@ -159,6 +165,7 @@ module "llama-cpp" {
       }
     }
   }
+  service_port     = local.llama-cpp_port
   ingress_hostname = local.endpoints.llama-cpp.hostname
   gateway_ref = {
     name      = local.services.cilium.name

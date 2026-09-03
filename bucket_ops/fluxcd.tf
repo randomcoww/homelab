@@ -182,8 +182,8 @@ resource "helm_release" "fluxcd-bucket" {
           inference-extension-crds = []
           gateway-api-crds         = []
           agentgateway-crds        = []
-          agentgateway-crs         = ["agentgateway-crds"]
           agentgateway             = ["agentgateway-crds"]
+          inference-gateway        = ["inference-extension-crds", "agentgateway-crds"]
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"

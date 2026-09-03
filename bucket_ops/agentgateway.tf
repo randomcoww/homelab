@@ -1,6 +1,11 @@
 locals {
   agentgateway_name      = "agentgateway"
   agentgateway_namespace = "agentgateway-system"
+  agentgateway_models = [
+    "qwen-3-8-27b",
+    "granite-4-2-3b",
+    "whisper-large-v3-turbo",
+  ]
 }
 
 resource "minio_s3_object" "fluxcd-agentgateway" {

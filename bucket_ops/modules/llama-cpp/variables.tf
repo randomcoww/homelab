@@ -56,6 +56,10 @@ variable "gpu_resource_claim" {
   type = string
 }
 
+variable "service_port" {
+  type = number
+}
+
 variable "ingress_hostname" {
   type = string
 }
