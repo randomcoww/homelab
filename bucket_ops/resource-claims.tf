@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-resource-claims" {
                       {
                         cel = {
                           expression = <<-EOF
-                          device.capacity["gpu.amd.com"].memory.isGreaterThan(quantity("60Gi"))
+                          device.attributes["gpu.amd.com"].deviceID == "0x1586"
                           EOF
                         }
                       },
