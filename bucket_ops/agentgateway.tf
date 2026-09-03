@@ -1,3 +1,8 @@
+locals {
+  agentgateway_name      = "agentgateway"
+  agentgateway_namespace = "agentgateway-system"
+}
+
 resource "minio_s3_object" "fluxcd-agentgateway" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
@@ -6,8 +11,8 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "OCIRepository"
           metadata = {
-            name      = local.services.agentgateway.name
-            namespace = local.services.agentgateway.namespace
+            name      = local.agentgateway_name
+            namespace = local.agentgateway_namespace
           }
           spec = {
             interval = "15m"
@@ -21,18 +26,18 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = local.services.agentgateway.name
-            namespace = local.services.agentgateway.namespace
+            name      = local.agentgateway_name
+            namespace = local.agentgateway_namespace
           }
           spec = {
             interval = "15m"
             timeout  = "5m"
             chartRef = {
               kind      = "OCIRepository"
-              name      = local.services.agentgateway.name
-              namespace = local.services.agentgateway.namespace
+              name      = local.agentgateway_name
+              namespace = local.agentgateway_namespace
             }
-            releaseName = local.services.agentgateway.name
+            releaseName = local.agentgateway_name
             install = {
               createNamespace = true
               remediation = {
@@ -72,7 +77,7 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
           apiVersion = "v1"
           kind       = "Namespace"
           metadata = {
-            name = local.services.agentgateway.namespace
+            name = local.agentgateway_namespace
             annotations = {
               "kustomize.toolkit.fluxcd.io/prune" = "disabled"
             }

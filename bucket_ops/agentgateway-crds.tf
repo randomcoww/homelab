@@ -6,8 +6,8 @@ resource "minio_s3_object" "fluxcd-agentgateway-crds" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "OCIRepository"
           metadata = {
-            name      = "${local.services.agentgateway.name}-crds"
-            namespace = local.services.agentgateway.namespace
+            name      = "${local.agentgateway_name}-crds"
+            namespace = local.agentgateway_namespace
           }
           spec = {
             interval = "15m"
@@ -21,18 +21,18 @@ resource "minio_s3_object" "fluxcd-agentgateway-crds" {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = "${local.services.agentgateway.name}-crds"
-            namespace = local.services.agentgateway.namespace
+            name      = "${local.agentgateway_name}-crds"
+            namespace = local.agentgateway_namespace
           }
           spec = {
             interval = "15m"
             timeout  = "5m"
             chartRef = {
               kind      = "OCIRepository"
-              name      = "${local.services.agentgateway.name}-crds"
-              namespace = local.services.agentgateway.namespace
+              name      = "${local.agentgateway_name}-crds"
+              namespace = local.agentgateway_namespace
             }
-            releaseName = "${local.services.agentgateway.name}-crds"
+            releaseName = "${local.agentgateway_name}-crds"
             install = {
               createNamespace = true
               remediation = {
@@ -57,7 +57,7 @@ resource "minio_s3_object" "fluxcd-agentgateway-crds" {
           apiVersion = "v1"
           kind       = "Namespace"
           metadata = {
-            name = local.services.agentgateway.namespace
+            name = local.agentgateway_namespace
             annotations = {
               "kustomize.toolkit.fluxcd.io/prune" = "disabled"
             }

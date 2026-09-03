@@ -194,6 +194,9 @@ locals {
     hindsight = {
       hostname = "hindsight.${local.domains.public}"
     }
+    agentgateway = {
+      hostname = "agentgateway.${local.domains.public}"
+    }
   }
 
   # All host exposed ports - do not overlap! #

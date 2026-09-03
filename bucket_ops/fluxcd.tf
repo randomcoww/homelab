@@ -171,16 +171,19 @@ resource "helm_release" "fluxcd-bucket" {
           camofox-browser          = []
           searxng                  = []
           kubernetes-mcp           = []
-          hindsight                = ["cloudnative-pg"]
+          hindsight                = ["gateway-api-crds", "cloudnative-pg"] # uses gateway-api externalAuth
           hermes-agent             = ["juicefs-csi-driver"]
           stump                    = ["mountpoint-s3-csi", "juicefs-csi-driver"]
-          navidrome                = ["mountpoint-s3-csi"]
-          hostapd                  = ["node-feature-discovery", "device-plugin"]
+          navidrome                = ["gateway-api-crds", "mountpoint-s3-csi"]                       # uses gateway-api externalAuth
+          hostapd                  = ["gateway-api-crds", "node-feature-discovery", "device-plugin"] # uses gateway-api externalAuth
           sunshine-desktop         = ["device-plugin", "resource-claims"]
           generate-backup-disk     = []
           zot                      = []
           inference-extension-crds = []
           gateway-api-crds         = []
+          agentgateway-crds        = []
+          agentgateway-crs         = ["agentgateway-crds"]
+          agentgateway             = ["agentgateway-crds"]
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
