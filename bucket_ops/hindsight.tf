@@ -17,7 +17,7 @@ module "hindsight" {
   }
   extra_secrets = {
     HINDSIGHT_API_LLM_API_KEY  = random_password.llama-cpp-auth-token.result
-    HINDSIGHT_API_LLM_BASE_URL = "https://${local.endpoints.llama-cpp.hostname}/v1"
+    HINDSIGHT_API_LLM_BASE_URL = "https://${local.endpoints.agentgateway.hostname}/v1"
   }
   ca_issuer_name = local.cert_issuers.ca_internal
   service_port   = local.hindsight_port

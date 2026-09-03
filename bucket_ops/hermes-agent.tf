@@ -276,7 +276,7 @@ module "hermes-agent" {
     }
   }
   extra_config_envs = { # set in hermes agent .env file
-    OPENAI_BASE_URL                     = "https://${local.endpoints.llama-cpp.hostname}/v1"
+    OPENAI_BASE_URL                     = "https://${local.endpoints.agentgateway.hostname}/v1"
     OPENAI_API_KEY                      = random_password.llama-cpp-auth-token.result
     SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
     CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
@@ -300,7 +300,7 @@ module "hermes-agent" {
     HERMES_DASHBOARD_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"             # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.hostname}"         # only used if HERMES_DASHBOARD=true
-    GROQ_BASE_URL                       = "https://${local.endpoints.llama-cpp.hostname}/v1"         # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
+    GROQ_BASE_URL                       = "https://${local.endpoints.agentgateway.hostname}/v1"      # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
     GROQ_API_KEY                        = random_password.llama-cpp-auth-token.result
     STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
     # hindsight #
