@@ -14,6 +14,13 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           }
           spec = {
             gatewayClassName = "agentgateway"
+            infrastructure = {
+              parametersRef = {
+                name  = "${local.agentgateway_name}-config"
+                group = "agentgateway.dev"
+                kind  = "AgentgatewayParameters"
+              }
+            }
             listeners = [
               {
                 allowedRoutes = {
@@ -46,6 +53,21 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                 }
               },
             ]
+          }
+        },
+        {
+          apiVersion = "agentgateway.dev/v1alpha1"
+          kind       = "AgentgatewayParameters"
+          metadata = {
+            name      = "${local.agentgateway_name}-config"
+            namespace = local.agentgateway_namespace
+          }
+          spec = {
+            deployment = {
+              spec = {
+                replicas = 2
+              }
+            }
           }
         },
         {
