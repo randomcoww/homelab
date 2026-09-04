@@ -63,7 +63,7 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
                 enabled = false
               }
               inferenceExtension = {
-                enabled = true
+                enabled = false
               }
               istio = {
                 enabled = false

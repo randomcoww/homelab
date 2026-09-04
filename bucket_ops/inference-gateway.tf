@@ -3,6 +3,7 @@ locals {
     "qwen-3-8-27b",
     "granite-4-2-3b",
   ]
+  inference-gateway_audio_model = "whisper-large-v3-turbo"
 }
 
 resource "random_password" "inference-gateway-api-key" {
@@ -129,7 +130,26 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
             hostnames = [
               local.endpoints.agentgateway.hostname,
             ]
-            rules = [
+            rules = concat([
+              {
+                matches = [
+                  {
+                    path = {
+                      type  = "PathPrefix"
+                      value = "/v1/audio"
+                    }
+                  },
+                ]
+                backendRefs = [
+                  {
+                    name      = "model-${local.inference-gateway_audio_model}"
+                    namespace = local.llama-cpp_namespace
+                    group     = "agentgateway.dev"
+                    kind      = "AgentgatewayBackend"
+                  }
+                ]
+              }
+              ], [
               for _, model in local.inference-gateway_chat_models :
               {
                 matches = [
@@ -156,7 +176,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                   }
                 ]
               }
-            ]
+            ])
           }
         },
         {
@@ -175,7 +195,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               },
             ]
             to = [
-              for _, model in local.inference-gateway_chat_models :
+              for _, model in concat(local.inference-gateway_chat_models, [local.inference-gateway_audio_model]) :
               {
                 group = "agentgateway.dev"
                 kind  = "AgentgatewayBackend"
@@ -186,7 +206,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
         },
         ], [
 
-        for _, model in local.inference-gateway_chat_models :
+        for _, model in concat(local.inference-gateway_chat_models, [local.inference-gateway_audio_model]) :
         {
           apiVersion = "v1"
           kind       = "Service"
@@ -235,6 +255,53 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
             }
           }
         }
+        ], [
+
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name      = "${local.agentgateway_name}-api-key"
+            namespace = local.llama-cpp_namespace
+          }
+          type = "Opaque"
+          stringData = {
+            Authorization = random_password.inference-gateway-api-key.result
+          }
+        },
+        {
+          apiVersion = "agentgateway.dev/v1alpha1"
+          kind       = "AgentgatewayBackend"
+          metadata = {
+            name      = "model-${local.inference-gateway_audio_model}"
+            namespace = local.llama-cpp_namespace
+          }
+          spec = {
+            ai = {
+              provider = {
+                openai = {
+                  model = local.inference-gateway_audio_model
+                }
+                host = "model-${local.inference-gateway_audio_model}.${local.llama-cpp_namespace}"
+                port = local.llama-cpp_port
+              }
+            }
+            policies = {
+              ai = {
+                routes = {
+                  "/v1/audio/transcriptions" = "Passthrough"
+                  "/v1/models"               = "Passthrough"
+                  "*"                        = "Passthrough"
+                }
+              }
+              auth = {
+                secretRef = {
+                  name = "${local.agentgateway_name}-api-key"
+                }
+              }
+            }
+          }
+        },
       ]) :
       yamlencode(m)
     ])
