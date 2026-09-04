@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-agentgateway-crds" {
             interval = "15m"
             url      = "oci://ghcr.io/agentgateway/charts/agentgateway-crds"
             ref = {
-              tag = "v1.5.0" # renovate: datasource=docker depName=ghcr.io/agentgateway/charts/agentgateway-crds depType=helm_regex
+              tag = "v2.2.1" # renovate: datasource=docker depName=ghcr.io/agentgateway/charts/agentgateway-crds depType=helm_regex
             }
           }
         },
