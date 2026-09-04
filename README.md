@@ -212,7 +212,13 @@ tofu -chdir=bucket_ops output lldap
 Agentgateway API key:
 
 ```bash
-tofu -chdir=bucket_ops output inference-gateway-api-key
+tofu -chdir=bucket_ops output llama-cpp-api-key
+```
+
+Hermes Agent API key:
+
+```bash
+tofu -chdir=bucket_ops output hermes-agent-api-key
 ```
 
 Internal registry:

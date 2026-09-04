@@ -3,6 +3,11 @@ locals {
   llama-cpp_namespace = "default"
 }
 
+resource "random_password" "llama-cpp-api-key" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "llama-cpp" {
   source    = "./modules/llama-cpp"
   name      = "llama-cpp"
@@ -46,7 +51,7 @@ module "llama-cpp" {
     }
   ]...)
   api_keys = [
-    random_password.inference-gateway-api-key.result,
+    random_password.llama-cpp-api-key.result,
   ]
   llama_swap_config = {
     includeAliasesInList = true
@@ -171,4 +176,11 @@ resource "minio_s3_object" "fluxcd-llama-cpp" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
+}
+
+# outputs
+
+output "llama-cpp-api-key" {
+  value     = random_password.llama-cpp-api-key.result
+  sensitive = true
 }

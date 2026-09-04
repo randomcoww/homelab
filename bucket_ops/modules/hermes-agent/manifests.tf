@@ -29,7 +29,7 @@ locals {
     HERMES_WEBUI_STATE_DIR            = "${local.config_envs.HERMES_HOME}/webui"
     HERMES_WEBUI_DEFAULT_WORKSPACE    = "${local.config_envs.HERMES_HOME}/workspace"
     HERMES_WEBUI_AGENT_DIR            = "/opt/hermes"
-    HERMES_WEBUI_CHAT_BACKEND         = "gateway"
+    HERMES_WEBUI_CHAT_BACKEND         = "local" # params below are only used in gateway mode
     HERMES_WEBUI_GATEWAY_BASE_URL     = "http://127.0.0.1:${local.config_envs.API_SERVER_PORT}"
     HERMES_WEBUI_GATEWAY_USE_RUNS_API = true
     SSL_CERT_FILE                     = "/etc/ssl/certs/ca-certificates.crt"

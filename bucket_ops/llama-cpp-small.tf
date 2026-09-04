@@ -27,7 +27,7 @@ module "llama-cpp-small" {
     }
   ]...)
   api_keys = [
-    random_password.inference-gateway-api-key.result,
+    random_password.llama-cpp-api-key.result,
   ]
   llama_swap_config = {
     includeAliasesInList = true

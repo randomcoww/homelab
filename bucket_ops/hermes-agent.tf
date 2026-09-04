@@ -38,6 +38,11 @@ resource "minio_iam_user_policy_attachment" "hermes-agent" {
   policy_name = minio_iam_policy.hermes-agent.id
 }
 
+resource "random_password" "hermes-agent-api-key" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "hermes-agent" {
   source    = "./modules/hermes-agent"
   name      = "hermes-agent"
@@ -271,14 +276,14 @@ module "hermes-agent" {
   }
   extra_config_envs = { # set in hermes agent .env file
     OPENAI_BASE_URL                     = "https://${local.endpoints.agentgateway.hostname}/v1"
-    OPENAI_API_KEY                      = random_password.inference-gateway-api-key.result
+    OPENAI_API_KEY                      = random_password.llama-cpp-api-key.result
     SEARXNG_URL                         = "http://${local.searxng_name}.${local.searxng_namespace}:${local.searxng_port}"
     CAMOFOX_URL                         = "http://${local.camofox-browser_name}.${local.camofox-browser_namespace}:${local.camofox-browser_port}"
     CAMOFOX_API_KEY                     = random_password.camofox-browser-auth-token.result
     HERMES_TIMEZONE                     = local.timezone
     GITHUB_TOKEN                        = var.github_mcp_token
     API_SERVER_MODEL_NAME               = "hermes-agent"
-    API_SERVER_KEY                      = random_password.inference-gateway-api-key.result
+    API_SERVER_KEY                      = random_password.hermes-agent-api-key.result
     SLACK_BOT_TOKEN                     = var.slack_bot_token
     SLACK_APP_TOKEN                     = var.slack_app_token
     SLACK_ALLOWED_USERS                 = var.slack_allowed_users
@@ -295,7 +300,7 @@ module "hermes-agent" {
     HERMES_DASHBOARD_OIDC_ISSUER        = "https://${local.endpoints.authelia.hostname}"             # only used if HERMES_DASHBOARD=true
     HERMES_DASHBOARD_PUBLIC_URL         = "https://${local.endpoints.hermes-agent.hostname}"         # only used if HERMES_DASHBOARD=true
     GROQ_BASE_URL                       = "https://${local.endpoints.agentgateway.hostname}/v1"      # passing this in as groq may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_API_KEY                        = random_password.inference-gateway-api-key.result
+    GROQ_API_KEY                        = random_password.llama-cpp-api-key.result
     STT_GROQ_MODEL                      = "whisper-large-v3-turbo"
     # hindsight #
     HINDSIGHT_API_URL      = "http://${local.hindsight_name}-api.${local.hindsight_namespace}:${local.hindsight_port}"
@@ -311,7 +316,7 @@ module "hermes-agent" {
     "TZ" = local.timezone
   }
   extra_webui_envs = { # unique env passed to hermes webui container
-    HERMES_WEBUI_GATEWAY_API_KEY = random_password.inference-gateway-api-key.result
+    HERMES_WEBUI_GATEWAY_API_KEY = random_password.hermes-agent-api-key.result
     # TODO: enable OIDC after https://github.com/nesquena/hermes-webui/pull/6164 https://github.com/nesquena/hermes-webui/pull/6286
     # HERMES_WEBUI_OIDC_CLIENT_ID     = local.authelia_oidc_clients.hermes-dashboard.client_id
     # HERMES_WEBUI_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.hermes-dashboard.client_secret
@@ -353,4 +358,11 @@ resource "minio_s3_object" "fluxcd-hermes-agent" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
+}
+
+# outputs
+
+output "hermes-agent-api-key" {
+  value     = random_password.hermes-agent-api-key.result
+  sensitive = true
 }

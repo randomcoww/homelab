@@ -6,11 +6,6 @@ locals {
   inference-gateway_audio_model = "whisper-large-v3-turbo"
 }
 
-resource "random_password" "inference-gateway-api-key" {
-  length           = 32
-  override_special = "-_"
-}
-
 resource "minio_s3_object" "fluxcd-inference-gateway" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
@@ -266,7 +261,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           }
           type = "Opaque"
           stringData = {
-            Authorization = random_password.inference-gateway-api-key.result
+            Authorization = random_password.llama-cpp-api-key.result
           }
         },
         {
@@ -322,11 +317,4 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
-}
-
-# outputs
-
-output "inference-gateway-api-key" {
-  value     = random_password.inference-gateway-api-key.result
-  sensitive = true
 }

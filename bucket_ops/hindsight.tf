@@ -16,7 +16,7 @@ module "hindsight" {
     HINDSIGHT_API_LLM_TIMEOUT            = "900"
   }
   extra_secrets = {
-    HINDSIGHT_API_LLM_API_KEY  = random_password.inference-gateway-api-key.result
+    HINDSIGHT_API_LLM_API_KEY  = random_password.llama-cpp-api-key.result
     HINDSIGHT_API_LLM_BASE_URL = "https://${local.endpoints.agentgateway.hostname}/v1"
   }
   ca_issuer_name = local.cert_issuers.ca_internal
