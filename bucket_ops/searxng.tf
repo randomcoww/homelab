@@ -40,9 +40,11 @@ module "searxng" {
     }
     outgoing = {
       proxies = {
+        /* Residential proxy
         "all://:" = [
           "https://${var.scrape_proxy_username}:${var.scrape_proxy_password}@${regex(local.domain_regex, var.scrape_proxy_server).hostname}:${regex(local.domain_regex, var.scrape_proxy_server).port}",
         ]
+        */
       }
     }
   }

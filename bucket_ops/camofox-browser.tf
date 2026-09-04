@@ -20,10 +20,12 @@ module "camofox-browser" {
     }
   }
   extra_envs = {
+    /* Residential proxy
     PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname
     PROXY_PORT         = regex(local.domain_regex, var.scrape_proxy_server).port
     PROXY_USERNAME     = var.scrape_proxy_username
     PROXY_PASSWORD     = var.scrape_proxy_password
+    */
     CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
     CAMOFOX_PORT       = local.camofox-browser_port
   }

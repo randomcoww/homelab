@@ -55,9 +55,6 @@ TF_VAR_github_mcp_token=$GITHUB_MCP_TOKEN
 TF_VAR_smtp_host=smtp.gmail.com
 TF_VAR_smtp_username=$GMAIL_USER
 TF_VAR_smtp_password=$GMAIL_PASSWORD
-TF_VAR_scrape_proxy_server=$THORDATA_SERVER
-TF_VAR_scrape_proxy_username=$THORDATA_USERNAME
-TF_VAR_scrape_proxy_password=$THORDATA_PASSWORD
 TF_VAR_ssh_client_key_id=$(whoami)
 TF_VAR_ssh_client_public_key_openssh=$(cat $HOME/.ssh/id_ecdsa.pub)
 TF_VAR_slack_bot_token=$SLACK_BOT_TOKEN
@@ -212,16 +209,10 @@ LDAP admin:
 tofu -chdir=bucket_ops output lldap
 ```
 
-llama.cpp OpenAI compatible endpoint:
+Agentgateway API key:
 
 ```bash
-tofu -chdir=bucket_ops output llama-cpp
-```
-
-Hermes Agent OpenAI compatible endpoint:
-
-```bash
-tofu -chdir=bucket_ops output hermes-agent
+tofu -chdir=bucket_ops output agentgateway-api-token
 ```
 
 Internal registry:
