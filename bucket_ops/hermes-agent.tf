@@ -258,7 +258,6 @@ module "hermes-agent" {
         "product-price-monitor",
         "session-librarian",
         "arxiv",
-        "blocked-page-recovery",
         "blogwatcher",
         "competitor-news-monitor",
         "grounded-citations",
