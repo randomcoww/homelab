@@ -1,7 +1,7 @@
 data "http" "gateway-api-crds-yaml" {
   url = join("/", [
     "https://github.com/kubernetes-sigs/gateway-api/releases/download",
-    "v1.6.1", # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
+    "v1.6.2", # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
     "experimental-install.yaml",
   ])
   request_headers = {
