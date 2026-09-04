@@ -1,6 +1,18 @@
+locals {
+  inference-gateway_chat_models = [
+    "qwen-3-8-27b",
+    "granite-4-2-3b",
+  ]
+}
+
+resource "random_password" "inference-gateway-api-key" {
+  length           = 32
+  override_special = "-_"
+}
+
 resource "minio_s3_object" "fluxcd-inference-gateway" {
   for_each = {
-    "manifest.yaml" = join("\n---\n", concat([
+    "manifest.yaml" = join("\n---\n", [
       for _, m in concat([
         {
           apiVersion = "gateway.networking.k8s.io/v1"
@@ -118,13 +130,13 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               local.endpoints.agentgateway.hostname,
             ]
             rules = [
-              for _, model in local.agentgateway_models :
+              for _, model in local.inference-gateway_chat_models :
               {
                 matches = [
                   {
                     path = {
                       type  = "PathPrefix"
-                      value = "/v1"
+                      value = "/v1/chat"
                     }
                     headers = [
                       {
@@ -163,7 +175,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               },
             ]
             to = [
-              for _, model in local.agentgateway_models :
+              for _, model in local.inference-gateway_chat_models :
               {
                 group = "agentgateway.dev"
                 kind  = "AgentgatewayBackend"
@@ -174,7 +186,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
         },
         ], [
 
-        for _, model in local.agentgateway_models :
+        for _, model in local.inference-gateway_chat_models :
         {
           apiVersion = "v1"
           kind       = "Service"
@@ -196,7 +208,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
         }
         ], [
 
-        for _, model in local.agentgateway_models :
+        for _, model in local.inference-gateway_chat_models :
         {
           apiVersion = "agentgateway.dev/v1alpha1"
           kind       = "AgentgatewayBackend"
@@ -225,7 +237,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
         }
       ]) :
       yamlencode(m)
-    ]))
+    ])
     "kustomization.yaml" = yamlencode({
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"
@@ -243,4 +255,11 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
+}
+
+# outputs
+
+output "inference-gateway-api-key" {
+  value     = random_password.inference-gateway-api-key.result
+  sensitive = true
 }

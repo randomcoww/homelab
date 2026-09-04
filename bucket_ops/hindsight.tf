@@ -11,12 +11,12 @@ module "hindsight" {
 
   extra_envs = {
     HINDSIGHT_API_LLM_MODEL              = "granite-4-2-3b"
-    HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "600" # default 300
+    HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "900" # default 300
     HINDSIGHT_API_REFLECT_MAX_ITERATIONS = "4"   # default 10
-    HINDSIGHT_API_LLM_TIMEOUT            = "600"
+    HINDSIGHT_API_LLM_TIMEOUT            = "900"
   }
   extra_secrets = {
-    HINDSIGHT_API_LLM_API_KEY  = random_password.llama-cpp-auth-token.result
+    HINDSIGHT_API_LLM_API_KEY  = random_password.inference-gateway-api-key.result
     HINDSIGHT_API_LLM_BASE_URL = "https://${local.endpoints.agentgateway.hostname}/v1"
   }
   ca_issuer_name = local.cert_issuers.ca_internal
