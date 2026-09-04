@@ -53,6 +53,12 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
               enable = false
             }
             values = {
+              controller = {
+                extraEnv = {
+                  CLUSTER_DOMAIN = local.domains.kubernetes
+                  TRUST_DOMAIN   = local.domains.kubernetes
+                }
+              }
               agentgatewayModels = {
                 enabled = false
               }
