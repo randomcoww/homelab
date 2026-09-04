@@ -141,9 +141,9 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                     namespace = local.llama-cpp_namespace
                     group     = "agentgateway.dev"
                     kind      = "AgentgatewayBackend"
-                  }
+                  },
                 ]
-              }
+              },
               ], [
               for _, model in local.inference-gateway_chat_models :
               {
@@ -168,7 +168,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                     namespace = local.llama-cpp_namespace
                     group     = "agentgateway.dev"
                     kind      = "AgentgatewayBackend"
-                  }
+                  },
                 ]
               }
             ])
