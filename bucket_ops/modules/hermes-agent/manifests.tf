@@ -89,16 +89,8 @@ locals {
         EOF
     }
     config = {
-      path = "config.yaml"
-      content = yamlencode(merge(var.extra_configs, {
-        mcp_servers = merge(lookup(var.extra_configs, "mcp_servers", {}), {
-          "${var.name}-litestream" = {
-            url             = "http://127.0.0.1:${local.litestream_mcp_port}"
-            timeout         = 300
-            connect_timeout = 30
-          }
-        })
-      }))
+      path    = "config.yaml"
+      content = var.extra_configs
     }
     env = {
       path    = ".env"
@@ -189,9 +181,11 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  labels = {
+    litestream-mcp = var.name
+  }
   spec = {
-    type      = "ClusterIP"
-    clusterIP = "None"
+    type = "ClusterIP"
     ports = [
       {
         name       = "webui"
@@ -204,6 +198,13 @@ module "service" {
         port       = local.config_envs.API_SERVER_PORT
         protocol   = "TCP"
         targetPort = local.config_envs.API_SERVER_PORT
+      },
+      {
+        name        = "mcp"
+        port        = local.litestream_mcp_port
+        protocol    = "TCP"
+        targetPort  = local.litestream_mcp_port
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }
@@ -272,7 +273,7 @@ module "litestream-overlay" {
     litestream = var.images.litestream
   }
   litestream_config = {
-    mcp-addr = "127.0.0.1:${local.litestream_mcp_port}"
+    mcp-addr = "0.0.0.0:${local.litestream_mcp_port}"
     dbs = [
       for _, db in local.litestream_targets :
       {

@@ -22,6 +22,8 @@ locals {
   juicefs_name              = "${var.name}-juicefs"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_username = "juicefs"
+
+  litestream_mcp_port = 3001
 }
 
 resource "random_password" "juicefs-postgres-password" {
@@ -77,15 +79,24 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  labels = {
+    litestream-mcp = var.name
+  }
   spec = {
-    type      = "ClusterIP"
-    clusterIP = "None"
+    type = "ClusterIP"
     ports = [
       {
         name       = var.name
         port       = local.envs.STUMP_PORT
         protocol   = "TCP"
         targetPort = local.envs.STUMP_PORT
+      },
+      {
+        name        = "mcp"
+        port        = local.litestream_mcp_port
+        protocol    = "TCP"
+        targetPort  = local.litestream_mcp_port
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }
@@ -138,6 +149,7 @@ module "litestream-overlay" {
     litestream = var.images.litestream
   }
   litestream_config = {
+    mcp-addr = "0.0.0.0:${local.litestream_mcp_port}"
     dbs = [
       {
         path                = local.db_file
@@ -164,6 +176,13 @@ module "litestream-overlay" {
   s3_secret_key_ref = {
     name = module.minio-user-secret.name
     key  = "AWS_SECRET_ACCESS_KEY"
+  }
+  litestream_container_params = {
+    ports = [
+      {
+        containerPort = local.litestream_mcp_port
+      },
+    ]
   }
 
   template_spec = {

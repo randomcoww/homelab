@@ -389,6 +389,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           }
           spec = {
             mcp = {
+              failureMode = "FailOpen"
               targets = [
                 {
                   name = local.victoria-metrics-mcp_name
@@ -431,6 +432,31 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                           },
                         ]
                       }
+                    }
+                  }
+                },
+                {
+                  name = "litestream"
+                  selector = {
+                    namespaces = {
+                      matchExpressions = [
+                        {
+                          key      = "kubernetes.io/metadata.name"
+                          operator = "In"
+                          values = [
+                            "default",
+                          ]
+                        },
+                      ]
+                    }
+                    services = {
+                      matchExpressions = [
+                        {
+                          key      = "litestream-mcp"
+                          operator = "In"
+                          operator = "Exists"
+                        },
+                      ]
                     }
                   }
                 },

@@ -23,6 +23,8 @@ locals {
     ND_SESSIONTIMEOUT          = "24h"
   })
   db_file = "${local.envs.ND_DATAFOLDER}/navidrome.db" # db name not configurable
+
+  litestream_mcp_port = 3001
 }
 
 module "service" {
@@ -31,15 +33,24 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  labels = {
+    litestream-mcp = var.name
+  }
   spec = {
-    type      = "ClusterIP"
-    clusterIP = "None"
+    type = "ClusterIP"
     ports = [
       {
         name       = var.name
         port       = local.envs.ND_PORT
         protocol   = "TCP"
         targetPort = local.envs.ND_PORT
+      },
+      {
+        name        = "mcp"
+        port        = local.litestream_mcp_port
+        protocol    = "TCP"
+        targetPort  = local.litestream_mcp_port
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }
@@ -118,6 +129,7 @@ module "litestream-overlay" {
     litestream = var.images.litestream
   }
   litestream_config = {
+    mcp-addr = "0.0.0.0:${local.litestream_mcp_port}"
     dbs = [
       {
         path                = local.db_file
@@ -145,6 +157,13 @@ module "litestream-overlay" {
   s3_secret_key_ref = {
     name = module.minio-user-secret.name
     key  = "AWS_SECRET_ACCESS_KEY"
+  }
+  litestream_container_params = {
+    ports = [
+      {
+        containerPort = local.litestream_mcp_port
+      },
+    ]
   }
 
   template_spec = {

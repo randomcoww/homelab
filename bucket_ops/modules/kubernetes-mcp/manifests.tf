@@ -13,10 +13,11 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = var.name
-        port       = var.service_port
-        protocol   = "TCP"
-        targetPort = var.service_port
+        name        = "mcp"
+        port        = var.service_port
+        protocol    = "TCP"
+        targetPort  = var.service_port
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }
