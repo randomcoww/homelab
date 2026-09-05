@@ -192,7 +192,7 @@ locals {
       hostname = "hindsight.${local.domains.public}"
     }
     agentgateway = {
-      hostname = "agentgateway.${local.domains.public}"
+      hostname = "agentgateway.${local.domains.kubernetes}"
     }
   }
 

@@ -19,7 +19,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
             name      = "${local.agentgateway_name}-proxy"
             namespace = local.agentgateway_namespace
             annotations = {
-              "cert-manager.io/cluster-issuer" = local.cert_issuers.acme_prod
+              "cert-manager.io/cluster-issuer" = local.cert_issuers.ca_internal
             }
           }
           spec = {
