@@ -90,7 +90,7 @@ locals {
     }
     config = {
       path    = "config.yaml"
-      content = var.extra_configs
+      content = yamlencode(var.extra_configs)
     }
     env = {
       path    = ".env"
