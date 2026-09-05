@@ -206,6 +206,26 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                   },
                 ]
               }
+
+              ], [
+              {
+                matches = [
+                  {
+                    path = {
+                      type  = "PathPrefix"
+                      value = "/mcp"
+                    }
+                  },
+                ]
+                backendRefs = [
+                  {
+                    name      = "${local.agentgateway_name}-mcp"
+                    namespace = local.agentgateway_namespace
+                    group     = "agentgateway.dev"
+                    kind      = "AgentgatewayBackend"
+                  },
+                ]
+              },
             ])
           }
         },
@@ -331,6 +351,40 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                   name = "${local.agentgateway_name}-api-key"
                 }
               }
+            }
+          }
+        },
+
+        # MCP
+        {
+          apiVersion = "agentgateway.dev/v1alpha1"
+          kind       = "AgentgatewayBackend"
+          metadata = {
+            name      = "${local.agentgateway_name}-mcp"
+            namespace = local.agentgateway_namespace
+          }
+          spec = {
+            mcp = {
+              targets = [
+                {
+                  name = local.victoria-metrics-mcp_name
+                  static = {
+                    host     = "${local.victoria-metrics-mcp_name}-victoria-metrics-mcp.${local.victoria-metrics_namespace}"
+                    port     = local.victoria-metrics-mcp_port
+                    path     = "/mcp"
+                    protocol = "StreamableHTTP"
+                  }
+                },
+                {
+                  name = local.victoria-logs-mcp_name
+                  static = {
+                    host     = "${local.victoria-logs-mcp_name}-victoria-logs-mcp.${local.victoria-metrics_namespace}"
+                    port     = local.victoria-logs-mcp_port
+                    path     = "/mcp"
+                    protocol = "StreamableHTTP"
+                  }
+                },
+              ]
             }
           }
         },
