@@ -1,7 +1,6 @@
 output "manifests" {
   value = concat([
     module.statefulset.manifest,
-    module.service.manifest,
     module.secret.manifest,
     ], [
     for _, m in [

@@ -42,25 +42,6 @@ module "secret" {
   })
 }
 
-module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  spec = {
-    type = "ClusterIP"
-    ports = [
-      {
-        name       = var.name
-        port       = var.service_port
-        protocol   = "TCP"
-        targetPort = var.service_port
-      },
-    ]
-  }
-}
-
 module "statefulset" {
   source = "../../../modules/statefulset"
 
