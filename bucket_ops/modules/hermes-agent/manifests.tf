@@ -190,7 +190,8 @@ module "service" {
   app       = var.name
   release   = var.release
   spec = {
-    type = "ClusterIP"
+    type      = "ClusterIP"
+    clusterIP = "None"
     ports = [
       {
         name       = "webui"
