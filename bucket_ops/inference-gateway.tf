@@ -10,6 +10,8 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
       for _, m in concat([
+
+        # agentgateway endpoint
         {
           apiVersion = "gateway.networking.k8s.io/v1"
           kind       = "Gateway"
@@ -109,6 +111,35 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           }
         },
         {
+          apiVersion = "agentgateway.dev/v1alpha1"
+          kind       = "AgentgatewayPolicy"
+          metadata = {
+            name      = "${local.agentgateway_name}-buffer"
+            namespace = local.agentgateway_namespace
+          }
+          spec = {
+            targetRefs = [
+              {
+                group = "gateway.networking.k8s.io"
+                kind  = "Gateway"
+                name  = "${local.agentgateway_name}-proxy"
+              },
+            ]
+            traffic = {
+              buffer = {
+                request = {
+                  maxBytes = "16Mi"
+                }
+                response = {
+                  maxBytes = "16Mi"
+                }
+              }
+            }
+          }
+        },
+
+        # route models and MCPs to gateway
+        {
           apiVersion = "gateway.networking.k8s.io/v1"
           kind       = "HTTPRoute"
           metadata = {
@@ -126,6 +157,9 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               local.endpoints.agentgateway.hostname,
             ]
             rules = concat([
+
+              ## Models ##
+
               {
                 matches = [
                   {
@@ -145,6 +179,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                 ]
               },
               ], [
+
               for _, model in local.inference-gateway_chat_models :
               {
                 matches = [
@@ -200,6 +235,8 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           }
         },
         ], [
+
+        ## Models ##
 
         for _, model in concat(local.inference-gateway_chat_models, [local.inference-gateway_audio_model]) :
         {
