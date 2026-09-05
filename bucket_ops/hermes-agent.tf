@@ -93,14 +93,10 @@ module "hermes-agent" {
       }
     }
     mcp_servers = {
-      kubernetes = {
-        url = "https://${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}:${local.kubernetes-mcp_port}/mcp"
-        client_cert = [
-          "$${INTERNAL_CLIENT_CERT_PATH}",
-          "$${INTERNAL_CLIENT_KEY_PATH}",
-        ]
+      agentgateway = {
+        url             = "https://${local.endpoints.agentgateway.hostname}/mcp"
         timeout         = 300
-        connect_timeout = 30
+        connect_timeout = 90
       }
       alpaca = {
         command = "uvx"
@@ -125,16 +121,6 @@ module "hermes-agent" {
             "index-data",
           ])
         }
-        timeout         = 300
-        connect_timeout = 30
-      }
-      victoria-metrics = {
-        url             = "http://${local.victoria-metrics-mcp_name}-victoria-metrics-mcp.${local.victoria-metrics_namespace}:${local.victoria-metrics-mcp_port}/mcp"
-        timeout         = 300
-        connect_timeout = 30
-      }
-      victoria-logs = {
-        url             = "http://${local.victoria-logs-mcp_name}-victoria-logs-mcp.${local.victoria-metrics_namespace}:${local.victoria-logs-mcp_port}/mcp"
         timeout         = 300
         connect_timeout = 30
       }

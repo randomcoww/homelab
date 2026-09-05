@@ -8,9 +8,6 @@ locals {
     HERMES_STREAM_STALE_TIMEOUT = 1800
     HERMES_CRON_TIMEOUT         = 1800
     GATEWAY_ALLOW_ALL_USERS     = true
-    # custom vars #
-    INTERNAL_CLIENT_CERT_PATH = "/opt/tls/.certs/mcp-client.crt"
-    INTERNAL_CLIENT_KEY_PATH  = "/opt/tls/.certs/mcp-client.key"
   })
   agent_envs = merge({
     HERMES_UID            = 10000
@@ -56,18 +53,6 @@ locals {
     {
       name      = "ca-trust-bundle"
       mountPath = local.agent_envs.SSL_CERT_FILE
-      readOnly  = true
-    },
-    {
-      name      = "internal-client-tls"
-      mountPath = local.config_envs.INTERNAL_CLIENT_CERT_PATH
-      subPath   = "tls.crt"
-      readOnly  = true
-    },
-    {
-      name      = "internal-client-tls"
-      mountPath = local.config_envs.INTERNAL_CLIENT_KEY_PATH
-      subPath   = "tls.key"
       readOnly  = true
     },
     ], [
@@ -508,24 +493,6 @@ EOF
         name = "${var.name}-litestream-data"
         emptyDir = {
           medium = "Memory"
-        }
-      },
-      {
-        name = "internal-client-tls"
-        csi = {
-          driver   = "csi.cert-manager.io"
-          readOnly = true
-          volumeAttributes = {
-            "csi.cert-manager.io/issuer-name"   = var.ca_issuer_name
-            "csi.cert-manager.io/issuer-kind"   = "ClusterIssuer"
-            "csi.cert-manager.io/key-algorithm" = "ECDSA"
-            "csi.cert-manager.io/key-size"      = "521"
-            "csi.cert-manager.io/key-usages" = join(",", [
-              "digital signature",
-              "key encipherment",
-            ])
-            "csi.cert-manager.io/fs-group" : tostring(local.agent_envs.HERMES_GID)
-          }
         }
       },
       {

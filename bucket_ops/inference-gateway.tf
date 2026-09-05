@@ -357,6 +357,30 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
 
         # MCP
         {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Certificate"
+          metadata = {
+            name      = "${local.agentgateway_name}-mcp-client-tls"
+            namespace = local.agentgateway_namespace
+          }
+          spec = {
+            secretName = "${local.agentgateway_name}-mcp-client-tls"
+            isCA       = false
+            privateKey = {
+              algorithm = "ECDSA"
+              size      = 521
+            }
+            commonName = "${local.agentgateway_name}-mcp"
+            usages = [
+              "client auth",
+            ]
+            issuerRef = {
+              name = local.cert_issuers.ca_internal
+              kind = "ClusterIssuer"
+            }
+          }
+        },
+        {
           apiVersion = "agentgateway.dev/v1alpha1"
           kind       = "AgentgatewayBackend"
           metadata = {
@@ -382,6 +406,32 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                     port     = local.victoria-logs-mcp_port
                     path     = "/mcp"
                     protocol = "StreamableHTTP"
+                  }
+                },
+                {
+                  name = local.kubernetes-mcp_name
+                  static = {
+                    host     = "${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}"
+                    port     = local.kubernetes-mcp_port
+                    path     = "/mcp"
+                    protocol = "StreamableHTTP"
+                    policies = {
+                      tls = {
+                        sni = "${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}"
+                        caCertificateRefs = [
+                          {
+                            kind = "Secret"
+                            name = "${local.agentgateway_name}-mcp-client-tls"
+                          },
+                        ]
+                        mtlsCertificateRef = [
+                          {
+                            kind = "Secret"
+                            name = "${local.agentgateway_name}-mcp-client-tls"
+                          },
+                        ]
+                      }
+                    }
                   }
                 },
               ]
