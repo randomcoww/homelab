@@ -193,7 +193,6 @@ module "service" {
   spec = {
     type                  = "LoadBalancer"
     externalTrafficPolicy = "Local"
-    clusterIP             = "None"
     ports = concat([
       for name, port in local.tcp_ports :
       {
