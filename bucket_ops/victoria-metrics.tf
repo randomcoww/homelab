@@ -295,7 +295,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                         memory = "256Mi"
                       }
                       limits = {
-                        memory = "256Mi"
+                        memory = "384Mi"
                       }
                     }
                   }
