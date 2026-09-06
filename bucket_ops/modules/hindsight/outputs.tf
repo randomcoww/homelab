@@ -51,10 +51,12 @@ output "manifests" {
           }
           values = {
             api = {
+              replicaCount = 2
               service = {
                 targetPort = var.service_port
               }
               env = merge({
+                SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt"
               }, var.extra_envs)
               secrets = merge({
               }, var.extra_secrets)
@@ -63,6 +65,11 @@ output "manifests" {
                   name      = "pg-tls"
                   mountPath = local.client_tls_path
                 },
+                {
+                  name      = "ca-trust-bundle"
+                  mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                  readOnly  = true
+                },
               ]
               extraVolumes = [
                 {
@@ -70,6 +77,13 @@ output "manifests" {
                   secret = {
                     secretName  = "${var.name}-pg-client-tls"
                     defaultMode = 384
+                  }
+                },
+                {
+                  name = "ca-trust-bundle"
+                  hostPath = {
+                    path = "/etc/ssl/certs/ca-certificates.crt"
+                    type = "File"
                   }
                 },
               ]
