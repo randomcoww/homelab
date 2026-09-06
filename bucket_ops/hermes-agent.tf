@@ -88,8 +88,8 @@ module "hermes-agent" {
     }
     timeouts = {
       tools = {
-        concurrent_batch = 600
-        sequential_call  = 600
+        concurrent_batch = 900
+        sequential_call  = 900
       }
     }
     mcp_servers = {
@@ -131,46 +131,46 @@ module "hermes-agent" {
     }
     auxiliary = {
       title_generation = {
-        timeout          = 600
+        timeout          = 900
         provider         = "custom"
         model            = "granite-4-2-3b"
         reasoning_effort = "low"
       }
       # vision = {
-      #   timeout  = 600
+      #   timeout  = 900
       #   provider = "custom"
       #   model    = "granite-4-2-3b"
       # }
       compression = {
-        timeout  = 600
+        timeout  = 900
         provider = "custom"
         model    = "granite-4-2-3b"
       }
       approval = {
-        timeout          = 600
+        timeout          = 900
         provider         = "custom"
         model            = "granite-4-2-3b"
         reasoning_effort = "low"
       }
       web_extract = {
-        timeout          = 600
+        timeout          = 900
         provider         = "custom"
         model            = "granite-4-2-3b"
         reasoning_effort = "low"
       }
       triage_specifier = {
-        timeout  = 600
+        timeout  = 900
         provider = "custom"
         model    = "granite-4-2-3b"
       }
       profile_describer = {
-        timeout          = 600
+        timeout          = 900
         provider         = "custom"
         model            = "granite-4-2-3b"
         reasoning_effort = "low"
       }
       curator = {
-        timeout  = 600
+        timeout  = 900
         provider = "custom"
         model    = "granite-4-2-3b"
       }
