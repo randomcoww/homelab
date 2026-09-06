@@ -1,7 +1,7 @@
 module "llama-cpp-small" {
   source    = "./modules/llama-cpp"
   name      = "llama-cpp-small"
-  replicas  = 2
+  replicas  = 3
   namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
