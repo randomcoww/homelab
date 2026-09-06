@@ -29,13 +29,6 @@ module "llama-cpp" {
         }
       },
       {
-        repository = "zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0"
-        tag        = "v1788247923@sha256:4174ba613c266d09fa2fa4c854e948b28c10d067a7ce71966b56bc88c92059d5" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0
-        files = {
-          granite-4-2-3b = "granite-4.2-3b-Q8_0.gguf"
-        }
-      },
-      {
         repository = "zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
         tag        = "v1787900300@sha256:3a5b69ec71b585ac016b190ebcdbae1ac4ac19b3e3f393c31c08c709b851429a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
         files = {
@@ -86,24 +79,6 @@ module "llama-cpp" {
           }
         }
       }
-      granite-4-2-3b = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${granite-4-2-3b} \
-          --ctx-size 131072 \
-          --jinja \
-          --top-p 0.95 \
-          --no-context-shift
-        EOF
-        filters = {
-          stripParams = "temperature"
-          setParamsByID = {
-            "$${MODEL_ID}" = {
-              temperature = 1.0
-            }
-          }
-        }
-      }
       whisper-large-v3-turbo = {
         checkEndpoint = "/v1/audio/transcriptions/"
         cmd           = <<-EOF
@@ -127,14 +102,13 @@ module "llama-cpp" {
         persistent = true
         members = [
           "whisper-large-v3-turbo",
-          "granite-4-2-3b",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "granite-4-2-3b",
+          "whisper-large-v3-turbo",
           "qwen-3-8-27b",
         ]
       }

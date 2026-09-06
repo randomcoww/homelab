@@ -42,8 +42,8 @@ module "secret" {
   })
 }
 
-module "deployment" {
-  source = "../../../modules/deployment"
+module "statefulset" {
+  source = "../../../modules/statefulset"
 
   name      = var.name
   namespace = var.namespace
