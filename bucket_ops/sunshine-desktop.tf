@@ -5,11 +5,11 @@ module "sunshine-desktop" {
   images = {
     sunshine-desktop = {
       repository = "zot.cluster.internal/randomcoww/sunshine-desktop"
-      tag        = "v2026.516.143833.1788202106@sha256:f1f7f1e8e87e7ee81130b85000a29ae1933d19e2454cb9a2f16e1d94c22e5012" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/sunshine-desktop
+      tag        = "v2026.906.222525.1788804911@sha256:1b606fcda671fdcec46a1794632adf9cc9ed30389fc16eb4121af7eb7d8b3c37" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/sunshine-desktop
     }
     nginx = {
       repository = "docker.io/nginxinc/nginx-unprivileged"
-      tag        = "1.31.5-alpine@sha256:aa8c9087d36d93e9d650c5365f883b421e8214aedbad24ade52b844c583358f1" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
+      tag        = "1.31.5-alpine@sha256:2ddec616f1cb58bcac057aa388f28cb81e35137641ef4226d321714499329bd1" # renovate: datasource=docker depName=docker.io/nginxinc/nginx-unprivileged
     }
   }
   user               = "sunshine"

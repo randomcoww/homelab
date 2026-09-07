@@ -37,7 +37,7 @@ module "mountpoint-s3-csi" {
   images = {
     mountpoint-s3-csi = {
       repository = "zot.cluster.internal/randomcoww/mountpoint-s3-csi"
-      tag        = "v2.7.0.1788200585@sha256:e78d1fb009d5fa806cec05c95a22da647397e7d9b449502a119718f69349f948" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/mountpoint-s3-csi
+      tag        = "v2.8.0.1788799897@sha256:8b0a9434d32df0e21c49834b4f62ccc69aa67e950c9039bdd87559f3801f11ab" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/mountpoint-s3-csi
     }
   }
   kubelet_root_path = local.kubernetes.kubelet_root_path
