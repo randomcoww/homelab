@@ -1,12 +1,4 @@
-locals {
-  inference-gateway_chat_models = [
-    "qwen-3-8-27b",
-    "granite-4-2-3b",
-  ]
-  inference-gateway_audio_model = "whisper-large-v3-turbo"
-}
-
-resource "minio_s3_object" "fluxcd-inference-gateway" {
+resource "minio_s3_object" "fluxcd-agentgateway-crs" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
       for _, m in concat([
@@ -171,7 +163,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
                 ]
                 backendRefs = [
                   {
-                    name      = "model-${local.inference-gateway_audio_model}"
+                    name      = "model-${local.agentgateway_audio_model}"
                     namespace = local.llama-cpp_namespace
                     group     = "agentgateway.dev"
                     kind      = "AgentgatewayBackend"
@@ -180,7 +172,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               },
               ], [
 
-              for _, model in local.inference-gateway_chat_models :
+              for _, model in local.agentgateway_chat_models :
               {
                 matches = [
                   {
@@ -245,7 +237,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
               },
             ]
             to = [
-              for _, model in concat(local.inference-gateway_chat_models, [local.inference-gateway_audio_model]) :
+              for _, model in concat(local.agentgateway_chat_models, [local.agentgateway_audio_model]) :
               {
                 group = "agentgateway.dev"
                 kind  = "AgentgatewayBackend"
@@ -258,7 +250,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
 
         ## Models ##
 
-        for _, model in concat(local.inference-gateway_chat_models, [local.inference-gateway_audio_model]) :
+        for _, model in concat(local.agentgateway_chat_models, [local.agentgateway_audio_model]) :
         {
           apiVersion = "v1"
           kind       = "Service"
@@ -280,7 +272,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
         }
         ], [
 
-        for _, model in local.inference-gateway_chat_models :
+        for _, model in local.agentgateway_chat_models :
         {
           apiVersion = "agentgateway.dev/v1alpha1"
           kind       = "AgentgatewayBackend"
@@ -325,16 +317,16 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
           apiVersion = "agentgateway.dev/v1alpha1"
           kind       = "AgentgatewayBackend"
           metadata = {
-            name      = "model-${local.inference-gateway_audio_model}"
+            name      = "model-${local.agentgateway_audio_model}"
             namespace = local.llama-cpp_namespace
           }
           spec = {
             ai = {
               provider = {
                 openai = {
-                  model = local.inference-gateway_audio_model
+                  model = local.agentgateway_audio_model
                 }
-                host = "model-${local.inference-gateway_audio_model}.${local.llama-cpp_namespace}"
+                host = "model-${local.agentgateway_audio_model}.${local.llama-cpp_namespace}"
                 port = local.llama-cpp_port
               }
             }
@@ -477,7 +469,7 @@ resource "minio_s3_object" "fluxcd-inference-gateway" {
   }
 
   bucket_name  = "fluxcd"
-  object_name  = "inference-gateway/${each.key}"
+  object_name  = "agentgateway-crs/${each.key}"
   content_type = "application/yaml"
   content      = each.value
 
