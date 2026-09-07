@@ -24,6 +24,7 @@ module "daemonset" {
           mkdir -p ${local.backup_bind_mount_path}
 
           cleanup() {
+            local exit_code=$?
             if mountpoint -q ${local.backup_bind_mount_path}; then
               sync
               umount ${local.backup_bind_mount_path}
@@ -34,11 +35,12 @@ module "daemonset" {
               sync
               rm ${local.backup_temp_image_path}
             fi
+            exit $exit_code
           }
           trap cleanup EXIT
 
           # Only exists in network boot environment. Exit otherwise
-          image_url=$(xargs -n1 -a /proc/cmdline | grep ^${var.liveiso_url_karg}= | sed -r 's/^${var.liveiso_url_karg}=//')
+          image_url=$(xargs -n1 -a /proc/cmdline | { grep ^${var.liveiso_url_karg}= || true; } | sed -r 's/^${var.liveiso_url_karg}=//')
           if [ -z "$image_url" ]; then
             exit 0
           fi
