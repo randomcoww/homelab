@@ -107,7 +107,7 @@ module "hermes-agent" {
           ALPACA_API_KEY     = "$${ALPACA_API_KEY}"
           ALPACA_SECRET_KEY  = "$${ALPACA_SECRET_KEY}"
           ALPACA_PAPER_TRADE = "true"
-          ALPACA_TOOLSETS = join(",", [
+          ALPACA_TOOLSETS = join(",", sort([
             "account",
             "trading",
             "watchlists",
@@ -119,7 +119,7 @@ module "hermes-agent" {
             "news",
             "fixed-income-data",
             "index-data",
-          ])
+          ]))
         }
         timeout         = 300
         connect_timeout = 30
