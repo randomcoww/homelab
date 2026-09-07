@@ -136,11 +136,11 @@ module "hermes-agent" {
         model            = "granite-4-2-3b"
         reasoning_effort = "low"
       }
-      # vision = {
-      #   timeout  = 900
-      #   provider = "custom"
-      #   model    = "granite-4-2-3b"
-      # }
+      vision = {
+        timeout  = 900
+        provider = "custom"
+        model    = "qwen-3-8-27b"
+      }
       compression = {
         timeout  = 900
         provider = "custom"
