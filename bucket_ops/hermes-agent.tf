@@ -129,52 +129,33 @@ module "hermes-agent" {
     memory = {
       provider = "hindsight"
     }
-    auxiliary = {
-      title_generation = {
-        timeout          = 900
-        provider         = "custom"
-        model            = "granite-4-2-3b"
-        reasoning_effort = "low"
-      }
-      vision = {
-        timeout  = 900
-        provider = "custom"
-        model    = "qwen-3-8-27b"
-      }
-      compression = {
-        timeout  = 900
-        provider = "custom"
-        model    = "granite-4-2-3b"
-      }
-      approval = {
-        timeout          = 900
-        provider         = "custom"
-        model            = "granite-4-2-3b"
-        reasoning_effort = "low"
-      }
-      web_extract = {
-        timeout          = 900
-        provider         = "custom"
-        model            = "granite-4-2-3b"
-        reasoning_effort = "low"
-      }
-      triage_specifier = {
+    auxiliary = merge({
+      for _, t in [
+        "title_generation",
+        "compression",
+        "approval",
+        "web_extract",
+        "triage_specifier",
+        "profile_describer",
+        "curator",
+      ] :
+      t => {
         timeout  = 900
         provider = "custom"
         model    = "granite-4-2-3b"
       }
-      profile_describer = {
-        timeout          = 900
-        provider         = "custom"
-        model            = "granite-4-2-3b"
-        reasoning_effort = "low"
-      }
-      curator = {
+      }, {
+      for _, t in [
+        "vision",
+        "mcp",
+        "skills_hub",
+        "kanban_decomposer",
+      ] :
+      t => {
         timeout  = 900
-        provider = "custom"
-        model    = "granite-4-2-3b"
+        provider = "auto"
       }
-    }
+    })
     group_sessions_per_user = false
     platforms = {
       slack = {
