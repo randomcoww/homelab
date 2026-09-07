@@ -11,10 +11,10 @@ module "hindsight" {
 
   extra_envs = {
     HINDSIGHT_API_LLM_MODEL              = "granite-4-2-3b"
+    HINDSIGHT_API_LLM_TIMEOUT            = "1800"
     HINDSIGHT_API_REFLECT_LLM_MODEL      = "qwen-3-8-27b"
-    HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "900" # default 300
-    HINDSIGHT_API_REFLECT_MAX_ITERATIONS = "4"   # default 10
-    HINDSIGHT_API_LLM_TIMEOUT            = "900"
+    HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "1800" # default 300
+    HINDSIGHT_API_REFLECT_MAX_ITERATIONS = "4"    # default 10
   }
   extra_secrets = {
     HINDSIGHT_API_LLM_API_KEY  = random_password.llama-cpp-api-key.result
