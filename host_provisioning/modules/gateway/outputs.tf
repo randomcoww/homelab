@@ -88,7 +88,7 @@ output "ignition_snippet" {
             # Use VIP with network netmask as virtual addr to intentionally create a prefix route
             inline = <<-EOF
               vrrp_instance gateway {
-                preempt
+                nopreempt
                 state BACKUP
                 advert_int 0.2
                 virtual_router_id ${var.vrrp_network_config.vrrp_router_id}
@@ -102,6 +102,7 @@ output "ignition_snippet" {
                 }
                 notify_master "${var.keepalived_path}/master.sh"
                 notify_backup "${var.keepalived_path}/backup.sh"
+                notify_fault "${var.keepalived_path}/backup.sh"
               }
               EOF
           }
