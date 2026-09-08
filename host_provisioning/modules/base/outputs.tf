@@ -21,7 +21,15 @@ output "ignition_snippet" {
           mask = true
         },
         {
-          name = "fwupd.service"
+          name = "fwupd.service" # doesn't work in live mode without UEFI partition
+          mask = true
+        },
+        {
+          name = "fwupd-refresh.service"
+          mask = true
+        },
+        {
+          name = "fwupd-refresh.timer"
           mask = true
         },
         {
