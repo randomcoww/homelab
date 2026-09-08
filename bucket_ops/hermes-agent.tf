@@ -50,11 +50,11 @@ module "hermes-agent" {
   images = {
     hermes-agent = {
       repository = "docker.io/nousresearch/hermes-agent"
-      tag        = "v2026.8.31@sha256:64923faeae267792bf9bf87fe3b4c4869e35004e360c7df01730ad801b74d524" # renovate: datasource=docker depName=docker.io/nousresearch/hermes-agent
+      tag        = "v2026.9.7@sha256:63bfb6d732f49a55d453e801057273785cc61e0f6ee43db3fa2f2a79846301b7" # renovate: datasource=docker depName=docker.io/nousresearch/hermes-agent
     }
     hermes-webui = {
       repository = "ghcr.io/nesquena/hermes-webui"
-      tag        = "0.52.264@sha256:1cbd42331e2046706230310e5fa0db537860536b87e7011630d4d4b6eebab2e2" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
+      tag        = "0.52.275@sha256:3dffecc51cf3c5f4b1d60bb2f631b52d953911ef527a791f156cc40fb11fde1d" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
     }
     litestream = {
       repository = "docker.io/litestream/litestream"
