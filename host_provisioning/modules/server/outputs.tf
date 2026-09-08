@@ -20,6 +20,13 @@ output "ignition_snippet" {
                 WantedBy=network-online.target
                 EOF
             },
+            {
+              name     = "10-oom-protection.conf"
+              contents = <<-EOF
+                [Service]
+                OOMScoreAdjust=-1000
+                EOF
+            },
           ]
         },
         {
@@ -42,6 +49,13 @@ output "ignition_snippet" {
                 ExecReload=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -f ${var.haproxy_path} -c
                 Restart=always
                 RestartSec=3
+                EOF
+            },
+            {
+              name     = "10-oom-protection.conf"
+              contents = <<-EOF
+                [Service]
+                OOMScoreAdjust=-1000
                 EOF
             },
           ]
@@ -67,6 +81,16 @@ output "ignition_snippet" {
                 Environment=KEEPALIVED_OPTIONS="-D -P"
                 Restart=always
                 RestartSec=3
+                EOF
+            },
+            {
+              name     = "10-oom-protection.conf"
+              contents = <<-EOF
+                [Service]
+                OOMScoreAdjust=-1000
+                CPUSchedulingPolicy=rr
+                CPUSchedulingPriority=99
+                CPUSchedulingResetOnFork=true
                 EOF
             },
           ]

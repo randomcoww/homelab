@@ -24,6 +24,15 @@ output "ignition_snippet" {
         {
           name    = "systemd-networkd.service"
           enabled = true
+          dropins = [
+            {
+              name     = "10-oom-protection.conf"
+              contents = <<-EOF
+                [Service]
+                OOMScoreAdjust=-1000
+                EOF
+            },
+          ]
         },
         {
           name    = "systemd-networkd-wait-online.service"

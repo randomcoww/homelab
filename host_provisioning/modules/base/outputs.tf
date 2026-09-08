@@ -165,6 +165,16 @@ output "ignition_snippet" {
               EOF
           }
         },
+        {
+          path = "/etc/systemd/system/system.slice.d/10-oom-protection.conf"
+          mode = 420
+          contents = {
+            inline = <<-EOF
+              [Slice]
+              MemoryMin=2G
+              EOF
+          }
+        },
         # Disable speaker #
         {
           path = "/etc/modprobe.d/10-blacklist-pcspk.conf"
