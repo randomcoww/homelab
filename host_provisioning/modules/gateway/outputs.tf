@@ -95,7 +95,8 @@ vrrp_instance gateway {
   priority 100
   unicast_src_ip ${cidrhost(var.vrrp_network_config.prefix, var.host_netnum)}
   unicast_peer {
-%{for _, netnum in var.member_netnums}%{if netnum != var.host_netnum}    ${cidrhost(var.vrrp_network_config.prefix, netnum)}%{endif}
+%{~for _, netnum in var.member_netnums}
+    ${cidrhost(var.vrrp_network_config.prefix, netnum)}
 %{endfor~}
   }
   virtual_ipaddress {
