@@ -52,3 +52,7 @@ variable "service_prefix" {
 variable "keepalived_path" {
   type = string
 }
+
+variable "member_netnums" {
+  type = map(number)
+}

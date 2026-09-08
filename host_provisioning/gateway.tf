@@ -15,4 +15,10 @@ module "gateway" {
   bgp_prefix          = each.value.networks.node.prefix
   service_prefix      = each.value.networks.service.prefix
   keepalived_path     = local.keepalived_config_path
+
+  member_netnums = {
+    # target all gateways minus self if this is on a gateway instance
+    for host_key, host in local.members.gateway :
+    host_key => host.netnum if each.value.netnum != host.netnum
+  }
 }

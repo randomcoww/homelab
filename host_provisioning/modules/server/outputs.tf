@@ -88,9 +88,6 @@ output "ignition_snippet" {
               contents = <<-EOF
                 [Service]
                 OOMScoreAdjust=-1000
-                CPUSchedulingPolicy=rr
-                CPUSchedulingPriority=99
-                CPUSchedulingResetOnFork=true
                 EOF
             },
           ]
@@ -223,6 +220,8 @@ EOF
                 nftables keepalived
                 enable_script_security
                 script_user root
+                vrrp_rt_priority 99
+                vrrp_no_swap
               }
               include ${var.keepalived_path}/*.conf
               EOF

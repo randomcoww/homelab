@@ -63,8 +63,6 @@ output "ignition_snippet" {
             inline = <<-EOF
               #!/bin/bash
               networkctl reconfigure "${var.wan_network_config.interface}"
-              ip rule add to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
-              ip route add default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
               EOF
           }
         },
@@ -76,8 +74,6 @@ output "ignition_snippet" {
             inline = <<-EOF
               #!/bin/bash
               ip link set dev "${var.wan_network_config.interface}" down
-              ip rule del to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
-              ip route del default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
               EOF
           }
         },
@@ -87,24 +83,35 @@ output "ignition_snippet" {
           contents = {
             # Use VIP with network netmask as virtual addr to intentionally create a prefix route
             inline = <<-EOF
-              vrrp_instance gateway {
-                nopreempt
-                state BACKUP
-                advert_int 0.2
-                virtual_router_id ${var.vrrp_network_config.vrrp_router_id}
-                interface ${var.vrrp_network_config.interface}
-                no_accept
-                use_vmac
-                vmac_xmit_base
-                priority 100
-                virtual_ipaddress {
-                  ${var.vrrp_network_config.vips.vrrp}/${var.vrrp_network_config.cidr}
-                }
-                notify_master "${var.keepalived_path}/master.sh"
-                notify_backup "${var.keepalived_path}/backup.sh"
-                notify_fault "${var.keepalived_path}/backup.sh"
-              }
-              EOF
+vrrp_instance gateway {
+  nopreempt
+  state BACKUP
+  advert_int 1
+  virtual_router_id ${var.vrrp_network_config.vrrp_router_id}
+  interface ${var.vrrp_network_config.interface}
+  no_accept
+  use_vmac
+  vmac_xmit_base
+  priority 100
+  unicast_src_ip ${cidrhost(var.vrrp_network_config.prefix, var.host_netnum)}
+  unicast_peer {
+%{for _, netnum in var.member_netnums}%{if netnum != var.host_netnum}    ${cidrhost(var.vrrp_network_config.prefix, netnum)}%{endif}
+%{endfor~}
+  }
+  virtual_ipaddress {
+    ${var.vrrp_network_config.vips.vrrp}/${var.vrrp_network_config.cidr}
+  }
+  virtual_rules {
+    to all lookup ${var.wan_network_config.table_id} priority ${var.wan_network_config.table_priority}
+  }
+  virtual_routes {
+    default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
+  }
+  notify_master "${var.keepalived_path}/master.sh"
+  notify_backup "${var.keepalived_path}/backup.sh"
+  notify_fault "${var.keepalived_path}/backup.sh"
+}
+EOF
           }
         },
         # bird
