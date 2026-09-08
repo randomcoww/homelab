@@ -21,6 +21,14 @@ output "ignition_snippet" {
           mask = true
         },
         {
+          name = "fwupd.service"
+          mask = true
+        },
+        {
+          name = "gssproxy.service"
+          mask = true
+        },
+        {
           name    = "chronyd.service"
           enabled = true
         },
