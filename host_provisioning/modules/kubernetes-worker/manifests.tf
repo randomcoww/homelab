@@ -21,7 +21,6 @@ locals {
         apiVersion               = "kubelet.config.k8s.io/v1beta1"
         containerRuntimeEndpoint = "unix://${var.crio_socket}"
         cgroupDriver             = "systemd"
-        cgroupsPerQOS            = false
         authentication = {
           anonymous = {
             enabled = false
@@ -67,10 +66,18 @@ locals {
         containerLogMaxSize  = "10Mi"
         containerLogMaxFiles = 2
         evictionHard = {
-          "memory.available"   = "2%"
-          "nodefs.available"   = "2%"
-          "imagefs.available"  = "2%"
-          "imagefs.inodesFree" = "2%"
+          "memory.available"   = "512Mi"
+          "nodefs.available"   = "2%" # not tracked properly because /var/lib/kubelet is not mounted
+          "imagefs.available"  = "2%" # not tracked properly because /var/lib/kubelet is not mounted
+          "imagefs.inodesFree" = "2%" # not tracked properly because /var/lib/kubelet is not mounted
+        }
+        systemReserved = {
+          cpu    = "500m"
+          memory = "1Gi"
+        }
+        kubeReserved = {
+          cpu    = "500m"
+          memory = "1Gi"
         }
         registerNode           = true
         failSwapOn             = false
