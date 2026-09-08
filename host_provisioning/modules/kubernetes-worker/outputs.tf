@@ -177,6 +177,9 @@ output "ignition_snippet" {
               [crio.runtime]
               cgroup_manager="systemd"
 
+              [crio.runtime.runtimes.crun]
+              monitor_cgroup="pod"
+
               [crio.api]
               listen="${var.crio_socket}"
 
