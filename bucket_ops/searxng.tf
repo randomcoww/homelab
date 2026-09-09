@@ -19,11 +19,13 @@ module "searxng" {
     SEARXNG_PORT = local.searxng_port
   }
   searxng_settings = {
-    use_default_settings = {
-    }
-    general = {
-      debug = true
-    }
+    use_default_settings = true
+    engines = [
+      {
+        name   = "google cse"
+        weight = 2.0
+      },
+    ]
     search = {
       autocomplete = ""
       safe_search  = 0
@@ -33,8 +35,8 @@ module "searxng" {
       ]
     }
     outgoing = {
-      request_timeout     = 4
-      extra_proxy_timeout = 10
+      request_timeout     = 4.0
+      extra_proxy_timeout = 10.0
       proxies = {
         "all://:" = [
           "https://${var.scrape_proxy_username}:${var.scrape_proxy_password}@${regex(local.domain_regex, var.scrape_proxy_server).hostname}:${regex(local.domain_regex, var.scrape_proxy_server).port}",
