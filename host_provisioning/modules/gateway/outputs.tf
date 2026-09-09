@@ -73,7 +73,7 @@ output "ignition_snippet" {
             # take down wan interface on transition to slave
             inline = <<-EOF
               #!/bin/bash
-              ip link set dev "${var.wan_network_config.interface}" down
+              networkctl down "${var.wan_network_config.interface}"
               EOF
           }
         },
@@ -89,7 +89,7 @@ vrrp_instance gateway {
   advert_int 1
   virtual_router_id ${var.vrrp_network_config.vrrp_router_id}
   interface ${var.vrrp_network_config.interface}
-  no_accept
+  accept
   use_vmac
   vmac_xmit_base
   priority 100
