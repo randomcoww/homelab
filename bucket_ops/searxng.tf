@@ -20,12 +20,6 @@ module "searxng" {
   }
   searxng_settings = {
     use_default_settings = {
-      engines = {
-        keep_only = [
-          "google",
-          "duckduckgo",
-        ]
-      }
     }
     general = {
       debug = true
@@ -39,12 +33,12 @@ module "searxng" {
       ]
     }
     outgoing = {
+      request_timeout     = 4
+      extra_proxy_timeout = 10
       proxies = {
-        /* Residential proxy
         "all://:" = [
           "https://${var.scrape_proxy_username}:${var.scrape_proxy_password}@${regex(local.domain_regex, var.scrape_proxy_server).hostname}:${regex(local.domain_regex, var.scrape_proxy_server).port}",
         ]
-        */
       }
     }
   }
