@@ -83,7 +83,8 @@ module "service" {
     litestream-mcp = var.name
   }
   spec = {
-    type = "ClusterIP"
+    type      = "ClusterIP"
+    clusterIP = "None"
     ports = [
       {
         name       = var.name
