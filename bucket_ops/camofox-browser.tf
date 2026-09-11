@@ -16,7 +16,7 @@ module "camofox-browser" {
   images = {
     camofox-browser = {
       repository = "ghcr.io/jo-inc/camofox-browser"
-      tag        = "1.14.0@sha256:86c79eed8a6b3a78859f73bc70d6003c5566b85e969354ec454524b28197ffce" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
+      tag        = "1.15.0@sha256:e32beb2a6c958126bc2eb0882dedd97880bd822c0c15ea5b24cff558400664ae" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
     }
   }
   extra_envs = {

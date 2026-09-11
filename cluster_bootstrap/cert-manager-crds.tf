@@ -2,7 +2,7 @@ data "http" "cert-manager-crds-yaml" {
   url = join("", [
     "https://github.com/cert-manager/cert-manager/releases/download/v",
     trim(
-      "1.21.1", # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+      "1.21.2", # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
       "v",
     ),
     "/cert-manager.crds.yaml",
