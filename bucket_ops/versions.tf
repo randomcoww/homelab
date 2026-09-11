@@ -21,7 +21,7 @@ terraform {
     }
     random = {
       source  = "opentofu/random"
-      version = "3.9.0"
+      version = "3.9.1"
     }
     kubernetes = {
       source  = "opentofu/kubernetes"
