@@ -1,7 +1,7 @@
 data "http" "inference-extension-crds-yaml" {
   url = join("/", [
     "https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/download",
-    "v1.6.0", # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api-inference-extension
+    "v1.6.1", # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api-inference-extension
     "v1-manifests.yaml",
   ])
   request_headers = {
