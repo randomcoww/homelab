@@ -12,7 +12,7 @@ module "searxng" {
   images = {
     searxng = {
       repository = "ghcr.io/searxng/searxng"
-      tag        = "latest@sha256:e084201aa606fafce2151c8dc2844c9c3309025e90fbe7163b4f5e5183e474f0" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
+      tag        = "latest@sha256:1f3720f59a0361592dc942e4be50e0ebb63c112d915883fcb78a011995fffb47" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
     }
   }
   extra_envs = {
