@@ -35,6 +35,7 @@ output "manifests" {
           "kaniko" = [
             "container-builds",
             "etcd-wrapper",
+            "ipxe-presign",
           ]
           "kaniko-high-memory" = [
             "container-builds",
