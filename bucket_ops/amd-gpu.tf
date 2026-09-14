@@ -82,7 +82,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
             chart = {
               spec = {
                 chart   = "device-metrics-exporter-charts"
-                version = "v1.5.1" # renovate: datasource=helm depName=device-metrics-exporter-charts registryUrl=https://rocm.github.io/device-metrics-exporter
+                version = "v1.5.2" # renovate: datasource=helm depName=device-metrics-exporter-charts registryUrl=https://rocm.github.io/device-metrics-exporter
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "amd-gpu-metrics-exporter"

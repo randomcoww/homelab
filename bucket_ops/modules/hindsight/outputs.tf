@@ -15,7 +15,7 @@ output "manifests" {
           interval = "15m"
           url      = "oci://ghcr.io/vectorize-io/charts/hindsight"
           ref = {
-            tag = "0.9.2" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
+            tag = "0.10.0" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
           }
         }
       },
