@@ -31,6 +31,7 @@ output "manifests" {
             "container-builds",
             "fedora-coreos-config-custom",
             "etcd-wrapper",
+            "ipxe-presign",
           ]
           "kaniko" = [
             "container-builds",
