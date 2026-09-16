@@ -16,7 +16,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           }
           spec = {
             interval = "15m"
-            url      = "https://k8s-gateway.github.io/k8s_gateway"
+            url      = "https://k8s-gateway.kryptonian.kapsi.fi"
           }
         },
         {
@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
             chart = {
               spec = {
                 chart   = "k8s-gateway"
-                version = "3.7.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
+                version = "3.7.3" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.kryptonian.kapsi.fi
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.k8s-gateway_name
