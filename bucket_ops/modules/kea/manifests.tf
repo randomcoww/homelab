@@ -100,7 +100,8 @@ module "secret" {
                 {
                   client-class = "iPXE-UEFI"
                   name         = "boot-file-name"
-                  supersede    = "'${var.ipxe_script_base_url}' + hexstring(pkt4.mac, '-')"
+                  supersede    = "'${var.ipxe_script_base_url}'"
+                  # supersede    = "'${var.ipxe_script_base_url}' + hexstring(pkt4.mac, '-')" # populate mac from Kea
                 },
               ]
             }

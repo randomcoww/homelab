@@ -36,10 +36,11 @@ locals {
         enable_netnum = true
         vips = {
           # do not overlap with host netnums!
-          apiserver   = 2
-          k8s-gateway = 33
-          minio       = 34
-          zot         = 36
+          apiserver    = 2
+          k8s-gateway  = 33
+          minio        = 34
+          ipxe-presign = 35
+          zot          = 36
         }
       }
       # Etcd peering

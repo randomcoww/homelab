@@ -23,7 +23,7 @@ module "kea" {
     ipxe_tftp = local.host_ports.ipxe_tftp
   }
   ipxe_boot_file_name  = "ipxe.efi"
-  ipxe_script_base_url = "https://${local.networks.service.vips.minio}:${local.service_ports.minio}/boot/ipxe-"
+  ipxe_script_base_url = "https://${local.networks.service.vips.ipxe-presign}:${local.ipxe-presign_port}/boot.ipxe"
   dhcp_networks = [
     {
       config = local.networks.lan
