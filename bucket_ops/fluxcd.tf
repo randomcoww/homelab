@@ -161,6 +161,7 @@ resource "helm_release" "fluxcd-bucket" {
           reloader               = []
           victoria-metrics       = []
           kea                    = []
+          ipxe-presign           = []
           juicefs-csi-driver     = ["cloudnative-pg"]
           mountpoint-s3-csi      = []
           cloudflare-tunnel      = []
