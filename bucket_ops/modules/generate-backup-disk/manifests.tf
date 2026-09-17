@@ -21,6 +21,22 @@ module "daemonset" {
           "-c",
           <<-EOF
           set -xe -o pipefail
+
+          # Exit if not network booted
+          if ! grep -q ignition.config.url /proc/cmdline; then
+            exit 0
+          fi
+
+          # Find disk labeled fedora-coreos-*, exit if not found
+          disk=$(lsblk -J -o LABEL,TRAN,NAME | jq -r '
+            .blockdevices[]?
+            | select(.tran == "usb")
+            | select(.label | startswith("fedora-coreos-"))
+            | .name' | head -n 1)
+          if [ -z "$disk" ]; then
+            exit 0
+          fi
+
           mkdir -p ${local.backup_bind_mount_path}
 
           cleanup() {
@@ -39,21 +55,15 @@ module "daemonset" {
           }
           trap cleanup EXIT
 
-          # Only exists in network boot environment. Exit otherwise
-          image_url=$(xargs -n1 -a /proc/cmdline | { grep ^${var.liveiso_url_karg}= || true; } | sed -r 's/^${var.liveiso_url_karg}=//')
+          image_url=$(xargs -n1 -a /proc/cmdline | grep ^${var.liveiso_url_karg}= | sed -r 's/^${var.liveiso_url_karg}=//')
           if [ -z "$image_url" ]; then
-            exit 0
-          fi
-
-          # TODO: This uses the first USB device. Might want to control this better
-          disk=$(lsblk -ndo kname /dev/disk/by-id/usb-* | head -1)
-          if [ -z "$disk" ]; then
             exit 1
           fi
 
           # This mounts to /dev to another filesystem. It allows coreos-installer to treat the USB disk as ISO9660 image file
           bindfs --block-devices-as-files /dev ${local.backup_bind_mount_path}
 
+          # Compare build tag of image with current run
           backup_tag=$(coreos-installer iso kargs show ${local.backup_bind_mount_path}/$disk | xargs -n1 | grep '^${var.cosa_build_tag_karg}' | sed -r 's/^${var.cosa_build_tag_karg}=//')
           current_tag=$(xargs -n1 -a /proc/cmdline | grep '^${var.cosa_build_tag_karg}' | sed -r 's/^${var.cosa_build_tag_karg}=//')
           if [ "$backup_tag" != "$current_tag" ]; then
@@ -64,7 +74,13 @@ module "daemonset" {
             exit 0
           fi
 
-          # Compare ignition
+          # Check if image has no embedded ignition
+          if ! coreos-installer iso ignition show ${local.backup_bind_mount_path}/$disk > /dev/null; then
+            cat /run/ignition.json | coreos-installer iso ignition embed ${local.backup_bind_mount_path}/$disk -f
+            exit 0
+          fi
+
+          # Ignition present - compare image ignition with current run
           backup_ign=$(coreos-installer iso ignition show ${local.backup_bind_mount_path}/$disk | sha256sum | awk '{print $1}')
           current_ign=$(cat /run/ignition.json | sha256sum | awk '{print $1}')
           if [ "$backup_ign" != "$current_ign" ]; then
@@ -79,6 +95,10 @@ module "daemonset" {
           {
             name      = "dev-disk"
             mountPath = "/dev/disk"
+          },
+          {
+            name      = "run-udev"
+            mountPath = "/run/udev"
           },
           {
             name      = "ignition"
@@ -114,6 +134,13 @@ module "daemonset" {
         name = "dev-disk"
         hostPath = {
           path = "/dev/disk"
+          type = "Directory"
+        }
+      },
+      {
+        name = "run-udev"
+        hostPath = {
+          path = "/run/udev"
           type = "Directory"
         }
       },
