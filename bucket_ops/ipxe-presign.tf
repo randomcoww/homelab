@@ -20,22 +20,74 @@ locals {
       build_tag = tag
     }
   }
-  current_netboot_image = local.netboot_images.default
+  netboot_current_image = local.netboot_images.default
 
-  netboot_config = {
-    for mac, host in merge([
-      for key, host in local.hosts : {
+  netboot_common_profile = {
+    kernelURL = "${local.netboot_base_url}/${local.netboot_current_image.kernel}"
+    initrdURLs = [
+      "${local.netboot_base_url}/${local.netboot_current_image.initrd}",
+    ]
+    kargs = sort([
+      "rd.neednet=1",
+      "ip=dhcp",
+      "ignition.firstboot",
+      "ignition.platform.id=metal",
+      "coreos.no_persist_ip",
+      "initrd=${basename(local.netboot_current_image.initrd)}",
+      "ignition.config.url={{ presign `ignition-$${mac:hexhyp}` }}",
+      "coreos.live.rootfs_url=${local.netboot_base_url}/${local.netboot_current_image.rootfs}",
+      "rd.driver.blacklist=nouveau,nova_core",
+      "modprobe.blacklist=nouveau,nova_core",
+      "selinux=0",
+      "amd_iommu=off", # memory performance for LLM
+      "${local.netboot_custom_kargs.liveiso_url}=${local.netboot_base_url}/${local.netboot_current_image.liveiso}",
+      "${local.netboot_custom_kargs.build_tag}=${local.netboot_current_image.build_tag}",
+    ])
+  }
+
+  netboot_host_profiles = {
+    for host_key, ign in data.ct_config.ignition :
+    host_key => {
+      kargs = sort(lookup(local.hosts[host_key], "boot_args", []))
+    }
+  }
+
+  netboot_host_digest = {
+    for host_key, profile in local.netboot_host_profiles :
+    host_key => sha256("${join(" ", concat(
+      [
+        data.ct_config.ignition[host_key].rendered,
+        local.netboot_common_profile.kernelURL,
+      ],
+      local.netboot_common_profile.initrdURLs,
+      local.netboot_common_profile.kargs,
+      profile.kargs,
+    ))}")
+  }
+
+  netboot_host_mac = {
+    for mac, host_key in merge([
+      for host_key, host in local.hosts : {
         for _, iface in lookup(host, "wired_interfaces", []) :
-        iface.match_mac => host if contains(keys(iface), "match_mac")
+        iface.match_mac => host_key if contains(keys(iface), "match_mac")
       }
     ]...) :
-    mac => merge(local.current_netboot_image, {
-      key = host.key
-      netboot_args = sort(concat(host.boot_args, [
-        "${local.netboot_custom_kargs.digest}=${sha256("${join(" ", concat([local.current_netboot_image.kernel], host.boot_args))} ${data.ct_config.ignition[host.key].rendered}")}",
-      ]))
-    })
+    mac => host_key
   }
+}
+
+# Add resources to bucket
+
+data "ct_config" "ignition" {
+  for_each = data.terraform_remote_state.host.outputs.ignition_snippets
+
+  content = yamlencode({
+    variant = "fcos"
+    version = local.butane_version
+  })
+  pretty_print = false
+  strict       = true
+  snippets     = sort(each.value)
 }
 
 resource "minio_s3_bucket" "ipxe-presign" {
@@ -75,31 +127,16 @@ resource "minio_iam_user_policy_attachment" "ipxe-presign" {
   policy_name = minio_iam_policy.ipxe-presign.id
 }
 
-# Add resources to bucket
-
-data "ct_config" "ignition" {
-  for_each = data.terraform_remote_state.host.outputs.ignition_snippets
-
-  content = yamlencode({
-    variant = "fcos"
-    version = local.butane_version
-  })
-  pretty_print = false
-  strict       = true
-  snippets     = sort(each.value)
-}
+## Host boot config by mac ##
 
 # ignition-<mac> files read by ipxe
 resource "minio_s3_object" "ignition" {
-  for_each = {
-    for mac, boot in local.netboot_config :
-    mac => data.ct_config.ignition[boot.key].rendered
-  }
+  for_each = local.netboot_host_mac
 
   bucket_name  = "ipxe-presign"
   object_name  = "ignition-${each.key}"
   content_type = "application/json"
-  content      = each.value
+  content      = data.ct_config.ignition[each.value].rendered
 
   depends_on = [
     minio_s3_bucket.ipxe-presign,
@@ -126,36 +163,17 @@ module "ipxe-presign" {
     allowedClientCNs = ["gha", "kea"]
     presignTTL       = "240s" # one node hangs for around 2 minutes during network boot
     profiles = concat([
-      {
-        kernelURL = "${local.netboot_base_url}/${local.current_netboot_image.kernel}"
-        initrdURLs = [
-          "${local.netboot_base_url}/${local.current_netboot_image.initrd}",
-        ]
-        kargs = [
-          "rd.neednet=1",
-          "ip=dhcp",
-          "ignition.firstboot",
-          "ignition.platform.id=metal",
-          "coreos.no_persist_ip",
-          "initrd=${basename(local.current_netboot_image.initrd)}",
-          "ignition.config.url={{ presign `ignition-$${mac:hexhyp}` }}",
-          "coreos.live.rootfs_url=${local.netboot_base_url}/${local.current_netboot_image.rootfs}",
-          "rd.driver.blacklist=nouveau,nova_core",
-          "modprobe.blacklist=nouveau,nova_core",
-          "selinux=0",
-          "amd_iommu=off", # memory performance for LLM
-          "${local.netboot_custom_kargs.liveiso_url}=${local.netboot_base_url}/${local.current_netboot_image.liveiso}",
-          "${local.netboot_custom_kargs.build_tag}=${local.current_netboot_image.build_tag}",
-        ]
-      },
+      local.netboot_common_profile,
       ], [
-      for mac, host in local.netboot_config :
-      {
+      for mac, host in local.netboot_host_mac :
+      merge(local.netboot_host_profiles[host], {
         selector = {
           "mac:hexhyp" = [mac],
         }
-        kargs = host.netboot_args
-      }
+        kargs = concat(local.netboot_host_profiles[host].kargs, [
+          "${local.netboot_custom_kargs.digest}=${local.netboot_host_digest[host]}"
+        ])
+      })
     ])
   }
   minio_user = minio_iam_user.ipxe-presign
@@ -181,4 +199,10 @@ resource "minio_s3_object" "fluxcd-ipxe-presign" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
+}
+
+# outputs
+
+output "netboot-host-digest" {
+  value = local.netboot_host_digest
 }
