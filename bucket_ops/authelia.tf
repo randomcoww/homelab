@@ -67,7 +67,7 @@ module "authelia" {
     authelia = {
       registry   = "ghcr.io/authelia"
       repository = "authelia"
-      tag        = "4.39.27@sha256:40005803cd4e2eaeea4418517e9e9c7f515b55b31071a02829341ca2e50ca7c0" # renovate: datasource=docker depName=ghcr.io/authelia/authelia
+      tag        = "4.39.28@sha256:bd97cff4fcbf715b5ff1f9ae286afbe6033afce385302520b0368122d43a6f54" # renovate: datasource=docker depName=ghcr.io/authelia/authelia
     }
   }
   ca_issuer_name = local.cert_issuers.ca_internal
