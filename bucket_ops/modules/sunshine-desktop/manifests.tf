@@ -124,7 +124,7 @@ locals {
     MESA_SHADER_CACHE_MAX_SIZE = "12G"
     AMD_USERQ                  = 1
     ENABLE_LAYER_MESA_ANTI_LAG = 1
-    # WLR_RENDERER               = "vulkan" # TODO: track https://github.com/LizardByte/Sunshine/issues/4050 https://github.com/LizardByte/Sunshine/issues/5258
+    WLR_RENDERER               = "vulkan"
   }, var.extra_envs)
 }
 
