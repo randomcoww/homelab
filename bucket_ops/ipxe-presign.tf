@@ -3,7 +3,6 @@ locals {
 
   netboot_base_url = "https://${local.networks.service.vips.minio}:${local.service_ports.minio}/boot"
   netboot_custom_kargs = {
-    ipxe_url    = "custom.ipxe_url"
     liveiso_url = "custom.liveiso_url"
     digest      = "custom.digest"
     build_tag   = "custom.build_tag"
@@ -125,7 +124,7 @@ module "ipxe-presign" {
     s3Endpoint       = "https://${local.networks.service.vips.minio}:${local.service_ports.minio}"
     s3Bucket         = "ipxe-presign"
     allowedClientCNs = ["gha", "kea"]
-    presignTTL       = "60s"
+    presignTTL       = "240s" # one node hangs for around 2 minutes during network boot
     profiles = concat([
       {
         kernelURL = "${local.netboot_base_url}/${local.current_netboot_image.kernel}"
