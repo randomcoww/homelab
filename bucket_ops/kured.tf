@@ -26,10 +26,12 @@ module "kured" {
   #!/bin/bash
   set -xe -o pipefail
 
+  # include standard check
   if [ -f /var/run/reboot-required ]; then
     exit 0
   fi
-  if [ -z $(xargs -n1 -a /proc/cmdline | grep ^${local.netboot_custom_kargs.liveiso_url}=) ]; then
+  # check if booted over network
+  if ! grep -q ignition.config.url /proc/cmdline; then
     exit 0
   fi
   exit 1
