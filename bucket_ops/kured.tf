@@ -26,13 +26,19 @@ module "kured" {
   #!/bin/bash
   set -xe -o pipefail
 
-  # include standard check
-  if [ -f /var/run/reboot-required ]; then
+  # Check if booted over network
+  if ! grep -q 'ignition.config.url=' /proc/cmdline; then
     exit 0
   fi
-  # check if booted over network
-  if ! grep -q ignition.config.url /proc/cmdline; then
-    exit 0
+
+  # Compare target digest written by remote_exec
+  if [ -f /var/run/reboot-required ] && grep -q '${local.netboot_custom_kargs.digest}=' /proc/cmdline; then
+    target_digest=$(cat /var/run/reboot-required)
+    current_digest=$(xargs -n1 -a /proc/cmdline | grep '^${local.netboot_custom_kargs.digest}=' | sed -r 's/^${local.netboot_custom_kargs.digest}=//')
+
+    if [ "$target_digest" != "$current_digest" ]; then
+      exit 0
+    fi
   fi
   exit 1
   EOF
