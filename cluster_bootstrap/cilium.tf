@@ -126,7 +126,7 @@ resource "helm_release" "cilium" {
       }
       operator = {
         extraArgs = [
-          "--proxy-stream-idle-timeout-seconds=1800", # avoids hermes agent <-> llama.cpp timeout
+          "--proxy-stream-idle-timeout-seconds=3600", # avoids hermes agent <-> llama.cpp timeout
         ]
         prometheus = {
           enabled = true
