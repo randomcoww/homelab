@@ -23,7 +23,7 @@ module "daemonset" {
           set -xe -o pipefail
 
           # Exit if not network booted
-          if ! grep -q ignition.config.url /proc/cmdline; then
+          if ! grep -q 'ignition.config.url=' /proc/cmdline; then
             exit 0
           fi
 
@@ -55,7 +55,7 @@ module "daemonset" {
           }
           trap cleanup EXIT
 
-          image_url=$(xargs -n1 -a /proc/cmdline | grep ^${var.liveiso_url_karg}= | sed -r 's/^${var.liveiso_url_karg}=//')
+          image_url=$(xargs -n1 -a /proc/cmdline | grep '^${var.liveiso_url_karg}=' | sed -r 's/^${var.liveiso_url_karg}=//')
           if [ -z "$image_url" ]; then
             exit 1
           fi
@@ -65,7 +65,7 @@ module "daemonset" {
 
           # Compare build tag of image with current run
           backup_tag=$(coreos-installer iso kargs show ${local.backup_bind_mount_path}/$disk | xargs -n1 | grep '^${var.cosa_build_tag_karg}' | sed -r 's/^${var.cosa_build_tag_karg}=//')
-          current_tag=$(xargs -n1 -a /proc/cmdline | grep '^${var.cosa_build_tag_karg}' | sed -r 's/^${var.cosa_build_tag_karg}=//')
+          current_tag=$(xargs -n1 -a /proc/cmdline | grep '^${var.cosa_build_tag_karg}=' | sed -r 's/^${var.cosa_build_tag_karg}=//')
           if [ "$backup_tag" != "$current_tag" ]; then
             curl -fsSL --remove-on-error $image_url --output ${local.backup_temp_image_path}
             cat /run/ignition.json | coreos-installer iso ignition embed ${local.backup_temp_image_path}
