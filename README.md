@@ -120,7 +120,7 @@ tofu -chdir=cluster_bootstrap init -upgrade && \
 tofu -chdir=cluster_bootstrap apply
 ```
 
-Create MinIO objects and FluxCD kustomizations. This includes iPXE and ignition for network booting. This may trigger Kured to reboot nodes.
+Create MinIO objects and FluxCD kustomizations. This includes iPXE and ignition for network booting.
 
 ```bash
 tofu -chdir=bucket_ops init -upgrade && \
