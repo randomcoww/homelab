@@ -100,7 +100,6 @@ module "authelia" {
 
   reference_grant_namespaces = [
     "default",
-    "hostnet",
     "ai",
   ]
 }

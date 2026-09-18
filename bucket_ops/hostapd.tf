@@ -109,7 +109,7 @@ module "hostapd" {
 module "hostapd-qrcode" {
   source    = "./modules/qrcode"
   name      = "hostapd-qrcode"
-  namespace = "hostnet"
+  namespace = "default"
   replicas  = 2
   images = {
     qrcode = {
