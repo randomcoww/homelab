@@ -15,8 +15,8 @@ module "minio" {
   timeout   = local.kubernetes.helm_release_timeout
   images = {
     minio = {
-      repository = "docker.io/pgsty/minio"
-      tag        = "RELEASE.2026-08-04T00-00-00Z@sha256:b6bfe7239bfc83fb90d31612d9704d86039dd714f7904b3f1ad68f211e602372" # renovate: datasource=docker depName=docker.io/pgsty/minio
+      repository = "docker.io/pgsty/silo"
+      tag        = "RELEASE.2026-09-16T00-00-00Z@sha256:635197cb9f36d01bee221d34d1c7d7960f6a95c48b0b6c01d99cd13bdae51a46" # renovate: datasource=docker depName=docker.io/pgsty/silo
     }
   }
   service_port = local.service_ports.minio

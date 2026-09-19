@@ -45,7 +45,8 @@
     },
     {
       "matchPackageNames": [
-        "docker.io/pgsty/minio"
+        "docker.io/pgsty/minio",
+        "docker.io/pgsty/silo"
       ],
       "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T(?<build>\\d{2}-\\d{2}-\\d{2})Z$"
     },
