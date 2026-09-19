@@ -2,8 +2,7 @@ locals {
   agentgateway_name      = "agentgateway"
   agentgateway_namespace = "agentgateway-system"
   agentgateway_chat_models = [
-    "qwen-3-8-27b",
-    "granite-4-2-3b",
+    "qwen-3-8-flash-next",
   ]
   agentgateway_audio_model = "whisper-large-v3-turbo"
 }

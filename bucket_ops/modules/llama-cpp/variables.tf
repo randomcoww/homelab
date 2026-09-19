@@ -36,9 +36,10 @@ variable "images" {
 }
 
 variable "image_volumes" {
-  type = map(object({
+  type = list(object({
     image = string
     file  = string
+    path  = string
   }))
 }
 

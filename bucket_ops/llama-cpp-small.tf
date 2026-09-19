@@ -9,23 +9,25 @@ module "llama-cpp-small" {
       tag        = "unified-vulkan-2026-09-10.1789405863@sha256:a5dde84c97bcaebd27cf4fca666d8b66a241ccd1f46cdb6700c2786e5f00b988" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-ffmpeg
     }
   }
-  image_volumes = merge([
+  image_volumes = flatten(concat([
     for _, image in [
       {
         repository = "zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0"
         tag        = "v1788247923@sha256:4174ba613c266d09fa2fa4c854e948b28c10d067a7ce71966b56bc88c92059d5" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0
-        files = {
-          granite-4-2-3b = "granite-4.2-3b-Q8_0.gguf"
-        }
+        files = [
+          {
+            file = "granite-4.2-3b-Q8_0.gguf"
+            path = "granite-4-2-3b"
+          },
+        ]
       },
-      ] : {
-      for key, file in image.files :
-      key => {
+      ] : [
+      for _, file in image.files :
+      merge(file, {
         image = "${image.repository}:${image.tag}"
-        file  = file
-      }
-    }
-  ]...)
+      })
+    ]
+  ]))
   api_keys = [
     random_password.llama-cpp-api-key.result,
   ]
@@ -39,16 +41,9 @@ module "llama-cpp-small" {
           --ctx-size 131072 \
           --jinja \
           --top-p 0.95 \
+          --temperature 1.0 \
           --no-context-shift
         EOF
-        filters = {
-          stripParams = "temperature"
-          setParamsByID = {
-            "$${MODEL_ID}" = {
-              temperature = 1.0
-            }
-          }
-        }
       }
     }
     groups = {

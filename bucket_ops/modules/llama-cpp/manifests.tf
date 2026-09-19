@@ -1,14 +1,6 @@
 locals {
   models_path = "/models"
   config_file = "/var/lib/llama-cpp/config.yaml"
-  models = [
-    for k, image in var.image_volumes :
-    {
-      key   = k
-      image = image.image
-      file  = image.file
-    }
-  ]
 }
 
 module "secret" {
@@ -28,8 +20,8 @@ module "secret" {
           --load-mode none
         EOF
         }, {
-        for _, v in local.models :
-        "${v.key}" => "${local.models_path}/${v.key}/${v.file}"
+        for _, v in var.image_volumes :
+        "${v.path}" => "${local.models_path}/${v.path}/${v.file}"
       })
       apiKeys = [
         for i, k in var.api_keys :
@@ -92,10 +84,10 @@ module "statefulset" {
             readOnly  = true
           },
           ], [
-          for _, v in local.models :
+          for _, v in var.image_volumes :
           {
-            name      = v.key
-            mountPath = "${local.models_path}/${v.key}"
+            name      = v.path
+            mountPath = "${local.models_path}/${v.path}"
           }
         ])
         env = concat([
@@ -159,9 +151,9 @@ module "statefulset" {
         }
       },
       ], [
-      for _, v in local.models :
+      for _, v in var.image_volumes :
       {
-        name = v.key
+        name = v.path
         image = {
           reference = v.image
         }

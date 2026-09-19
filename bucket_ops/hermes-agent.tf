@@ -66,7 +66,7 @@ module "hermes-agent" {
   extra_configs = {
     agent = {
       tool_use_enforcement = true
-      reasoning_effort     = "medium"
+      reasoning_effort     = "xhigh"
       max_turns            = 300
     }
     stt = {
@@ -74,7 +74,7 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default        = "qwen-3-8-27b"
+      default        = "qwen-3-8-flash-next"
       provider       = "custom"
       base_url       = "$${OPENAI_BASE_URL}"
       api_key        = "$${OPENAI_API_KEY}"
@@ -142,7 +142,7 @@ module "hermes-agent" {
       t => {
         timeout  = 900
         provider = "custom"
-        model    = "granite-4-2-3b"
+        model    = "qwen-3-8-flash-next" # TODO: offload to smaller model
       }
       }, {
       for _, t in [
