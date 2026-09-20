@@ -2,6 +2,7 @@ module "sunshine-desktop" {
   source    = "./modules/sunshine-desktop"
   name      = "sunshine-desktop"
   namespace = "default" # must be in same namespace as llama.cpp to share GPU
+  replicas  = 1
   images = {
     sunshine-desktop = {
       repository = "zot.cluster.internal/randomcoww/sunshine-desktop"

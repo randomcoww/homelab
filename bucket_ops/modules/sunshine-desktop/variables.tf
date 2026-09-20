@@ -12,6 +12,11 @@ variable "release" {
   default = "0.1.0"
 }
 
+variable "replicas" {
+  type    = number
+  default = 1
+}
+
 variable "images" {
   type = object({
     sunshine-desktop = object({

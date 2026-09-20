@@ -288,7 +288,7 @@ module "statefulset" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  replicas  = 1
+  replicas  = var.replicas
   affinity  = var.affinity
   annotations = {
     "checksum/secret"                     = sha256(module.secret.manifest)
@@ -324,7 +324,7 @@ module "statefulset" {
     ]
     resources = {
       requests = {
-        memory = "16Gi"
+        memory = "8Gi"
       }
     }
     containers = [
