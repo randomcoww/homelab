@@ -18,7 +18,7 @@ module "secret" {
           --port $${PORT} \
           --flash-attn on \
           --load-mode none
-        EOF
+          EOF
         }, {
         for _, v in var.image_volumes :
         "${v.path}" => "${local.models_path}/${v.path}/${v.file}"
@@ -47,8 +47,15 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   labels = {
-    for _, m in keys(lookup(var.llama_swap_config, "models", {})) :
-    "model-${m}" => "true"
+    # Grab model names configured as primary, setParamsByID, and aliases in llama-swap
+    for _, alias in distinct(flatten([
+      for k, m in lookup(var.llama_swap_config, "models", {}) :
+      concat([k], lookup(m, "aliases", []), [
+        for _, a in keys(try(m.filters.setParamsByID, {})) :
+        replace(a, "$${MODEL_ID}", k)
+      ])
+    ])) :
+    "model-${alias}" => "true"
   }
   template_spec = {
     resourceClaims = [

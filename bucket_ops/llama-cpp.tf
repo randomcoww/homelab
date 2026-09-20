@@ -82,7 +82,7 @@ module "llama-cpp" {
               presence_penalty = 0.0
               reasoning_effort = "xhigh"
             }
-            "$${MODEL_ID}:low" = {
+            "$${MODEL_ID}-low" = {
               temperature      = 0.7
               top_p            = 0.80
               top_k            = 20
