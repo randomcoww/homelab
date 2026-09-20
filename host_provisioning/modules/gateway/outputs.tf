@@ -62,7 +62,7 @@ output "ignition_snippet" {
             # DHCP routes won't recover unless reconfigure is called
             inline = <<-EOF
               #!/bin/bash
-              networkctl reconfigure "${var.wan_network_config.interface}"
+              ip link set dev "${var.wan_network_config.interface}" arp on
               EOF
           }
         },
@@ -73,7 +73,7 @@ output "ignition_snippet" {
             # take down wan interface on transition to slave
             inline = <<-EOF
               #!/bin/bash
-              networkctl down "${var.wan_network_config.interface}"
+              ip link set dev "${var.wan_network_config.interface}" arp off
               EOF
           }
         },
@@ -167,7 +167,7 @@ EOF
           contents = {
             inline = <<-EOF
               [Link]
-              ActivationPolicy=passive
+              ARP=false
 
               [DHCPv4]
               ClientIdentifier=mac
