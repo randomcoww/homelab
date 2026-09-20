@@ -46,7 +46,7 @@ module "stump" {
   images = {
     stump = {
       repository = "docker.io/aaronleopold/stump"
-      tag        = "0.1.7@sha256:6ebe13e0a6f6337afcebd0cc3efd46bf2bc0ad1f914253a75de57d2e133b6d34" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
+      tag        = "0.1.9@sha256:8e39a00ee2beb45c475b4b844f5ea41a0c2a694cf12ccf0ac086d656dfb5627e" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
     }
     litestream = {
       repository = "docker.io/litestream/litestream"

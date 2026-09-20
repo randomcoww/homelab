@@ -53,7 +53,7 @@ resource "helm_release" "fluxcd" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "2.19.0"
+  version          = "2.19.1"
   timeout          = local.kubernetes.helm_release_timeout
   max_history      = 2
   values = [
