@@ -3,7 +3,8 @@ locals {
   agentgateway_namespace = "agentgateway-system"
   agentgateway_chat_models = [
     "qwen-3-8-flash-next",
-    "qwen-3-8-flash-next-low",
+    "qwen-3-8-flash-next-medium",
+    "qwen-3-8-flash-next-none",
   ]
   agentgateway_audio_model = "whisper-large-v3-turbo"
 }

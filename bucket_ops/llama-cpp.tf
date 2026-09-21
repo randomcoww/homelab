@@ -95,14 +95,23 @@ module "llama-cpp" {
               presence_penalty = 0.0
               reasoning_effort = "xhigh"
             }
-            "$${MODEL_ID}-low" = {
+            "$${MODEL_ID}-medium" = {
               temperature      = 0.7
               top_p            = 0.80
               top_k            = 20
               min_p            = 0.0
               repeat_penalty   = 1.0
               presence_penalty = 1.5
-              reasoning_effort = "low"
+              reasoning_effort = "medium"
+            }
+            "$${MODEL_ID}-none" = {
+              temperature      = 0.7
+              top_p            = 0.80
+              top_k            = 20
+              min_p            = 0.0
+              repeat_penalty   = 1.0
+              presence_penalty = 1.5
+              reasoning_effort = "none"
             }
           }
         }

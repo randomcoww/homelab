@@ -142,7 +142,7 @@ module "hermes-agent" {
       t => {
         timeout  = 900
         provider = "custom"
-        model    = "qwen-3-8-flash-next-low" # TODO: offload to smaller model
+        model    = "qwen-3-8-flash-next-none" # TODO: offload to smaller model
       }
       }, {
       for _, t in [
