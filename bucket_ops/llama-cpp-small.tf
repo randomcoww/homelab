@@ -12,12 +12,12 @@ module "llama-cpp-small" {
   image_volumes = flatten(concat([
     for _, image in [
       {
-        repository = "zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0"
-        tag        = "v1788247923@sha256:4174ba613c266d09fa2fa4c854e948b28c10d067a7ce71966b56bc88c92059d5" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/granite-4.2-3b-q8-0
+        repository = "zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
+        tag        = "v1787900300@sha256:3a5b69ec71b585ac016b190ebcdbae1ac4ac19b3e3f393c31c08c709b851429a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
         files = [
           {
-            file = "granite-4.2-3b-Q8_0.gguf"
-            path = "granite-4-2-3b"
+            file = "ggml-large-v3-turbo-q8_0.bin"
+            path = "whisper-large-v3-turbo"
           },
         ]
       },
@@ -34,16 +34,20 @@ module "llama-cpp-small" {
   llama_swap_config = {
     includeAliasesInList = true
     models = {
-      granite-4-2-3b = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${granite-4-2-3b} \
-          --ctx-size 131072 \
-          --jinja \
-          --top-p 0.95 \
-          --temperature 1.0 \
-          --no-context-shift
+      whisper-large-v3-turbo = {
+        checkEndpoint = "/v1/audio/transcriptions/"
+        cmd           = <<-EOF
+        whisper-server \
+          --port $${PORT} \
+          -m $${whisper-large-v3-turbo} \
+          --convert \
+          --language auto \
+          --request-path /v1/audio/transcriptions \
+          --inference-path ""
         EOF
+        aliases = [
+          "whisper-1",
+        ]
       }
     }
     groups = {
@@ -52,14 +56,14 @@ module "llama-cpp-small" {
         exclusive  = false
         persistent = true
         members = [
-          "granite-4-2-3b",
+          "whisper-large-v3-turbo",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "granite-4-2-3b",
+          "whisper-large-v3-turbo",
         ]
       }
     }
