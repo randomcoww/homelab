@@ -12,7 +12,7 @@ module "hindsight" {
   extra_envs = {
     HINDSIGHT_API_LLM_MODEL              = "qwen-3-8-flash-next-low"
     HINDSIGHT_API_LLM_TIMEOUT            = "1800"
-    HINDSIGHT_API_REFLECT_LLM_MODEL      = "qwen-3-8-flash-next"
+    HINDSIGHT_API_REFLECT_LLM_MODEL      = "qwen-3-8-flash-next-low"
     HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "1800" # default 300
     HINDSIGHT_API_REFLECT_MAX_ITERATIONS = "4"    # default 10
   }
