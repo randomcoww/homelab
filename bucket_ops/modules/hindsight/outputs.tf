@@ -15,7 +15,7 @@ output "manifests" {
           interval = "15m"
           url      = "oci://ghcr.io/vectorize-io/charts/hindsight"
           ref = {
-            tag = "0.10.0" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
+            tag = "0.10.1" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
           }
         }
       },
@@ -250,7 +250,7 @@ output "manifests" {
                 image = {
                   reference = join(":", [
                     "ghcr.io/cloudnative-pg/pgvector",
-                    "0.8.6-18-trixie@sha256:e34760aa297241decfa10c83bd2a46cf41fbc413c92925a4f9515e7990fbc262", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
+                    "0.8.6-18-trixie@sha256:a5725c5d7a243f1bf43178c2a7e5479f964b46dbab0324b59eb7de57ea308110", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
                   ])
                 }
               },
