@@ -14,7 +14,7 @@ module "secret" {
       macros = merge({
         model_path  = local.models_path
         default_cmd = <<-EOF
-          llama-server \
+          /unsloth/llama-server \
           --port $${PORT} \
           --flash-attn on \
           --load-mode none

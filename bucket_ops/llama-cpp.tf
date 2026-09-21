@@ -15,8 +15,8 @@ module "llama-cpp" {
   namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
-      repository = "zot.cluster.internal/randomcoww/llama-swap-ffmpeg"
-      tag        = "unified-vulkan-2026-09-10.1789405863@sha256:a5dde84c97bcaebd27cf4fca666d8b66a241ccd1f46cdb6700c2786e5f00b988" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-ffmpeg
+      repository = "zot.cluster.internal/randomcoww/llama-swap-vulkan"
+      tag        = "v11030.20260920.1789970262@sha256:424a0147a652c1bf0393ed564b339a48817a983663c2b21d294ea4989307eb7a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-vulkan
     }
   }
   image_volumes = flatten(concat([
@@ -32,6 +32,16 @@ module "llama-cpp" {
           {
             file = "mmproj-BF16.gguf"
             path = "qwen-3-8-flash-next-mmproj"
+          },
+        ]
+      },
+      {
+        repository = "zot.cluster.internal/randomcoww/qwen3.8-flash-next-ud-q4-k-xl-mtp"
+        tag        = "v1789942614@sha256:0f0eb2238cfa510d2205af622cfd1e3353de3062aad8942ecca420d74cfb1e36" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-flash-next-ud-q4-k-xl-mtp
+        files = [
+          {
+            file = "mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
+            path = "qwen-3-8-flash-next-mtp"
           },
         ]
       },
@@ -68,6 +78,9 @@ module "llama-cpp" {
           --no-context-shift \
           --lazy-mode on \
           --image-min-tokens 1024 \
+          --spec-draft-model $${qwen-3-8-flash-next-mtp} \
+          --spec-type draft-mtp \
+          --spec-draft-n-max 5 \
           --mmproj $${qwen-3-8-flash-next-mmproj}
         EOF
         filters = {

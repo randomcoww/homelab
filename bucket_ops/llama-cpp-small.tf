@@ -5,8 +5,8 @@ module "llama-cpp-small" {
   namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
-      repository = "zot.cluster.internal/randomcoww/llama-swap-ffmpeg"
-      tag        = "unified-vulkan-2026-09-10.1789405863@sha256:a5dde84c97bcaebd27cf4fca666d8b66a241ccd1f46cdb6700c2786e5f00b988" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-ffmpeg
+      repository = "zot.cluster.internal/randomcoww/llama-swap-vulkan"
+      tag        = "v11030.20260920.1789970262@sha256:424a0147a652c1bf0393ed564b339a48817a983663c2b21d294ea4989307eb7a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-vulkan
     }
   }
   image_volumes = flatten(concat([
