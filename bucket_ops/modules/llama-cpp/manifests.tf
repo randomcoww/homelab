@@ -47,15 +47,19 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   labels = {
-    # Grab model names configured as primary, setParamsByID, and aliases in llama-swap
-    for _, alias in distinct(flatten([
-      for k, m in lookup(var.llama_swap_config, "models", {}) :
-      concat([k], lookup(m, "aliases", []), [
-        for _, a in keys(try(m.filters.setParamsByID, {})) :
-        replace(a, "$${MODEL_ID}", k)
-      ])
+    # if filters.setParamsByID is defined, apply templates across main and alias model names
+    # if not, just use main and alias model names
+    for _, key in distinct(flatten([
+      for name, m in lookup(var.llama_swap_config, "models", {}) :
+      try([
+        for _, id in keys(m.filters.setParamsByID) :
+        [
+          for _, alias in concat([name], lookup(m, "aliases", [])) :
+          replace(id, "$${MODEL_ID}", alias)
+        ]
+      ], concat([name], lookup(m, "aliases", [])))
     ])) :
-    "model-${alias}" => "true"
+    "model-${key}" => "true"
   }
   template_spec = {
     resourceClaims = [
