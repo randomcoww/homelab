@@ -122,9 +122,6 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                 request = {
                   maxBytes = "16Mi"
                 }
-                response = {
-                  maxBytes = "16Mi"
-                }
               }
             }
           }
