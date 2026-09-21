@@ -6,7 +6,7 @@ module "llama-cpp-small" {
   images = {
     llama-swap = {
       repository = "zot.cluster.internal/randomcoww/llama-swap-vulkan"
-      tag        = "v11030.20260920.1789970262@sha256:424a0147a652c1bf0393ed564b339a48817a983663c2b21d294ea4989307eb7a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-vulkan
+      tag        = "v11030.20260921.1790011929@sha256:c79babfc44c04cd384c7f297147ad24b5dae5ddfe271e60312aaff60cf5a68be" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/llama-swap-vulkan
     }
   }
   image_volumes = flatten(concat([
