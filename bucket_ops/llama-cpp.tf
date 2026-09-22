@@ -45,16 +45,6 @@ module "llama-cpp" {
           },
         ]
       },
-      {
-        repository = "zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0"
-        tag        = "v1787900300@sha256:3a5b69ec71b585ac016b190ebcdbae1ac4ac19b3e3f393c31c08c709b851429a" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/whisper-large-v3-turbo-q8-0
-        files = [
-          {
-            file = "ggml-large-v3-turbo-q8_0.bin"
-            path = "whisper-large-v3-turbo"
-          },
-        ]
-      },
       ] : [
       for _, file in image.files :
       merge(file, {
@@ -81,7 +71,13 @@ module "llama-cpp" {
           --spec-draft-model $${qwen-3-8-flash-next-mtp} \
           --spec-type draft-mtp \
           --spec-draft-n-max 5 \
-          --mmproj $${qwen-3-8-flash-next-mmproj}
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
+          --mmproj $${qwen-3-8-flash-next-mmproj} \
+          --parallel 1 \
+          --batch-size 4096 \
+          --ubatch-size 1024 \
+          --override-tensor 'per_layer_token_embd=CPU'
         EOF
         filters = {
           stripParams = "temperature,top_p,top_k,min_p,repeat_penalty,presence_penalty"
@@ -116,21 +112,6 @@ module "llama-cpp" {
           }
         }
       }
-      whisper-large-v3-turbo = {
-        checkEndpoint = "/v1/audio/transcriptions/"
-        cmd           = <<-EOF
-        whisper-server \
-          --port $${PORT} \
-          -m $${whisper-large-v3-turbo} \
-          --convert \
-          --language auto \
-          --request-path /v1/audio/transcriptions \
-          --inference-path ""
-        EOF
-        aliases = [
-          "whisper-1",
-        ]
-      }
     }
     groups = {
       persist = {
@@ -138,7 +119,6 @@ module "llama-cpp" {
         exclusive  = false
         persistent = true
         members = [
-          "whisper-large-v3-turbo",
         ]
       }
     }
