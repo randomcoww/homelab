@@ -42,6 +42,7 @@ module "navidrome" {
   source    = "./modules/navidrome"
   name      = "navidrome"
   namespace = "default"
+  replicas  = 0
   images = {
     navidrome = {
       repository = "ghcr.io/navidrome/navidrome"
