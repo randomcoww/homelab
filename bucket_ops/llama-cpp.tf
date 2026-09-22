@@ -70,14 +70,11 @@ module "llama-cpp" {
           --image-min-tokens 1024 \
           --spec-draft-model $${qwen-3-8-flash-next-mtp} \
           --spec-type draft-mtp \
-          --spec-draft-n-max 5 \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
-          --mmproj $${qwen-3-8-flash-next-mmproj} \
-          --parallel 1 \
+          --spec-draft-n-max 3 \
           --batch-size 4096 \
           --ubatch-size 1024 \
-          --override-tensor 'per_layer_token_embd=CPU'
+          --mmproj $${qwen-3-8-flash-next-mmproj} \
+          --parallel 1
         EOF
         filters = {
           stripParams = "temperature,top_p,top_k,min_p,repeat_penalty,presence_penalty"
