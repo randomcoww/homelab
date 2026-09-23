@@ -300,6 +300,11 @@ module "hermes-agent" {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
+  auth_backend_ref = {
+    name      = local.authelia_name
+    namespace = local.authelia_namespace
+    port      = 80
+  }
   minio_endpoint = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_bucket   = "hermes-agent"
   minio_user     = minio_iam_user.hermes-agent

@@ -67,6 +67,14 @@ variable "gateway_ref" {
   type = any
 }
 
+variable "auth_backend_ref" {
+  type = object({
+    name      = string
+    namespace = string
+    port      = number
+  })
+}
+
 variable "minio_endpoint" {
   type = string
 }

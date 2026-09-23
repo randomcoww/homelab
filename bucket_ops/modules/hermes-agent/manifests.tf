@@ -236,26 +236,36 @@ module "httproute" {
             }
           },
         ]
-        backendRefs = [
+        filters = [
           {
-            name = module.service.name
-            port = local.webui_envs.HERMES_WEBUI_PORT
-          },
-        ]
-      },
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/v1"
+            type = "ExternalAuth"
+            externalAuth = {
+              protocol   = "HTTP"
+              backendRef = var.auth_backend_ref
+              http = {
+                path = "/api/authz/ext-authz/"
+                allowedHeaders = [
+                  "accept",
+                  "cookie",
+                  "location",
+                  "authorization",
+                  "proxy-authorization",
+                  "x-forwarded-proto",
+                ]
+                allowedResponseHeaders = [
+                  "Remote-User",
+                  "Remote-Email",
+                  "Remote-Name",
+                  "Remote-Groups",
+                ]
+              }
             }
           },
         ]
         backendRefs = [
           {
             name = module.service.name
-            port = local.config_envs.API_SERVER_PORT
+            port = local.webui_envs.HERMES_WEBUI_PORT
           },
         ]
       },
