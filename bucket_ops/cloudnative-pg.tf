@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
             chart = {
               spec = {
                 chart   = "cloudnative-pg"
-                version = "0.29.0" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
+                version = "0.29.1" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "cloudnative-pg"
