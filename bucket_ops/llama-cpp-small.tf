@@ -1,7 +1,7 @@
 module "llama-cpp-small" {
   source    = "./modules/llama-cpp"
   name      = "llama-cpp-small"
-  replicas  = 0
+  replicas  = 1
   namespace = local.llama-cpp_namespace # must be in same namespace as sunshine to share GPU
   images = {
     llama-swap = {
@@ -76,7 +76,10 @@ module "llama-cpp-small" {
   service_port = local.llama-cpp_port
   resources = {
     requests = {
-      memory = "6Gi"
+      memory = "2Gi"
+    }
+    limits = {
+      memory = "2Gi"
     }
   }
   gpu_resource_claim_ref = {
