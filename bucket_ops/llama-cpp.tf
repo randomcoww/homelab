@@ -135,7 +135,10 @@ module "llama-cpp" {
   service_port = local.llama-cpp_port
   resources = {
     requests = {
-      memory = "96Gi"
+      memory = "112Gi"
+    }
+    limits = {
+      memory = "112Gi"
     }
   }
   gpu_resource_claim_ref = {

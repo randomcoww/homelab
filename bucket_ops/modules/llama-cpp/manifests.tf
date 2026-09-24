@@ -72,6 +72,7 @@ module "statefulset" {
         memory = "16Gi"
       }
     }, var.resources)
+    priorityClassName = "system-cluster-critical"
     containers = [
       {
         name  = var.name
