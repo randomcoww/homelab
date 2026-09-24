@@ -45,6 +45,20 @@ module "llama-cpp" {
           },
         ]
       },
+      {
+        repository = "zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
+        tag        = "v1790288239@sha256:75c1e3d012fa0bcdc777c458daa950a18916690c29e8f81fd377931053341747" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
+        files = [
+          {
+            file = "Qwen3.8-27B-UD-Q8_K_XL.gguf"
+            path = "qwen-3-8-27b"
+          },
+          {
+            file = "mmproj-BF16.gguf"
+            path = "qwen-3-8-27b-mmproj"
+          },
+        ]
+      },
       ] : [
       for _, file in image.files :
       merge(file, {
@@ -58,6 +72,54 @@ module "llama-cpp" {
   llama_swap_config = {
     includeAliasesInList = true
     models = {
+      qwen-3-8-27b = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${qwen-3-8-27b} \
+          --ctx-size 262144 \
+          --jinja \
+          --reasoning-preserve \
+          --no-context-shift \
+          --image-min-tokens 1024 \
+          --spec-type draft-mtp \
+          --spec-draft-n-max 3 \
+          --batch-size 4096 \
+          --ubatch-size 1024 \
+          --mmproj $${qwen-3-8-27b-mmproj}
+        EOF
+        filters = {
+          stripParams = "temperature,top_p,top_k,min_p,repeat_penalty,presence_penalty"
+          setParamsByID = {
+            "$${MODEL_ID}" = {
+              temperature      = 1.0
+              top_p            = 0.95
+              top_k            = 20
+              min_p            = 0.0
+              repeat_penalty   = 1.0
+              presence_penalty = 0.0
+              reasoning_effort = "xhigh"
+            }
+            "$${MODEL_ID}-medium" = {
+              temperature      = 0.7
+              top_p            = 0.80
+              top_k            = 20
+              min_p            = 0.0
+              repeat_penalty   = 1.0
+              presence_penalty = 1.5
+              reasoning_effort = "medium"
+            }
+            "$${MODEL_ID}-none" = {
+              temperature      = 0.7
+              top_p            = 0.80
+              top_k            = 20
+              min_p            = 0.0
+              repeat_penalty   = 1.0
+              presence_penalty = 1.5
+              reasoning_effort = "none"
+            }
+          }
+        }
+      }
       qwen-3-8-flash-next = {
         cmd = <<-EOF
         $${default_cmd} \

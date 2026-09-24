@@ -12,6 +12,7 @@ module "daemonset" {
   release   = var.release
   affinity  = var.affinity
   template_spec = {
+    priorityClassName = "system-cluster-critical"
     initContainers = [
       {
         name  = var.name
