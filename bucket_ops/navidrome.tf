@@ -46,7 +46,7 @@ module "navidrome" {
   images = {
     navidrome = {
       repository = "ghcr.io/navidrome/navidrome"
-      tag        = "0.64.1@sha256:df22d661b8d0322c33754d999b567150df9e131a47ae53be71fed0154bf8cef5" # renovate: datasource=docker depName=ghcr.io/navidrome/navidrome
+      tag        = "0.64.2@sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52" # renovate: datasource=docker depName=ghcr.io/navidrome/navidrome
     }
     litestream = {
       repository = "docker.io/litestream/litestream"
