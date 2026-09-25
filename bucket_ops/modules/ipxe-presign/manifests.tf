@@ -54,9 +54,8 @@ module "deployment" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = {
-    "checksum/secret"                     = sha256(module.minio-user-secret.manifest)
-    "checksum/configmap"                  = sha256(module.configmap.manifest)
-    "secret.reloader.stakater.com/reload" = "${var.name}-tls"
+    "checksum/secret"    = sha256(module.minio-user-secret.manifest)
+    "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
     resources = {
@@ -145,16 +144,36 @@ module "deployment" {
         }
       },
       {
-        name = "tls"
-        secret = {
-          secretName = "${var.name}-tls"
-        }
-      },
-      {
         name = "ca-trust-bundle"
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
           type = "File"
+        }
+      },
+      {
+        name = "tls"
+        csi = {
+          driver   = "csi.cert-manager.io"
+          readOnly = true
+          volumeAttributes = {
+            "csi.cert-manager.io/issuer-name" = var.ca_issuer_name
+            "csi.cert-manager.io/issuer-kind" = "ClusterIssuer"
+            "csi.cert-manager.io/dns-names" = join(",", [
+              var.name,
+              "${var.name}.${var.namespace}",
+            ])
+            "csi.cert-manager.io/ip-sans" = join(",", [
+              "127.0.0.1",
+              var.service_ip,
+            ])
+            "csi.cert-manager.io/key-algorithm" = "RSA" # compatibility with iPXE
+            "csi.cert-manager.io/key-size"      = "4096"
+            "csi.cert-manager.io/key-usages" = join(",", [
+              "digital signature",
+              "key encipherment",
+              "server auth",
+            ])
+          }
         }
       },
     ]

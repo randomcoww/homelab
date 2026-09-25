@@ -6,41 +6,6 @@ output "manifests" {
     module.configmap.manifest,
     ], [
     for _, m in [
-      {
-        apiVersion = "cert-manager.io/v1"
-        kind       = "Certificate"
-        metadata = {
-          name      = "${var.name}-tls"
-          namespace = var.namespace
-        }
-        spec = {
-          secretName = "${var.name}-tls"
-          isCA       = false
-          privateKey = {
-            algorithm = "RSA"
-            size      = 4096
-          }
-          commonName = var.name
-          usages = [
-            "key encipherment",
-            "digital signature",
-            "server auth",
-          ]
-          ipAddresses = [
-            "127.0.0.1",
-            var.service_ip,
-          ]
-          dnsNames = [
-            var.name,
-            "${var.name}.${var.namespace}",
-          ]
-          issuerRef = {
-            name = var.ca_issuer_name
-            kind = "ClusterIssuer"
-          }
-        }
-      },
-
       # static service IP when using cilium
       {
         apiVersion = "cilium.io/v2"
