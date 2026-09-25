@@ -7,7 +7,7 @@ resource "helm_release" "prometheus-crds" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "32.0.0"
+  version          = "32.0.1"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
