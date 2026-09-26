@@ -27,7 +27,7 @@ locals {
     initrdURLs = [
       "${local.netboot_base_url}/${local.netboot_current_image.initrd}",
     ]
-    kargs = [
+    kargs = sort([
       "rd.neednet=1",
       "ip=dhcp",
       "ignition.firstboot",
@@ -41,13 +41,13 @@ locals {
       "amd_iommu=off", # memory performance for LLM
       "${local.netboot_custom_kargs.liveiso_url}=${local.netboot_base_url}/${local.netboot_current_image.liveiso}",
       "${local.netboot_custom_kargs.build_tag}=${local.netboot_current_image.build_tag}",
-    ]
+    ])
   }
 
   netboot_host_profiles = {
     for host_key, ign in data.ct_config.ignition :
     host_key => {
-      kargs = lookup(local.hosts[host_key], "boot_args", [])
+      kargs = sort(lookup(local.hosts[host_key], "boot_args", []))
     }
   }
 
