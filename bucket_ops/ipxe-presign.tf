@@ -166,10 +166,10 @@ module "ipxe-presign" {
       for mac, host in local.netboot_host_mac :
       merge(local.netboot_host_profiles[host], {
         selector = {
-          "mac:hexhyp" = [mac],
+          "mac:hexhyp" = [mac]
         }
         kargs = concat(local.netboot_host_profiles[host].kargs, [
-          "${local.netboot_custom_kargs.digest}=${local.netboot_host_digest[host]}"
+          "${local.netboot_custom_kargs.digest}=${local.netboot_host_digest[host]}",
         ])
       })
     ])
@@ -184,7 +184,7 @@ resource "minio_s3_object" "fluxcd-ipxe-presign" {
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"
       resources = [
-        "manifest.yaml"
+        "manifest.yaml",
       ]
     })
   }
