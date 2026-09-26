@@ -27,7 +27,7 @@ locals {
     initrdURLs = [
       "${local.netboot_base_url}/${local.netboot_current_image.initrd}",
     ]
-    kargs = sort([
+    kargs = [
       "rd.neednet=1",
       "ip=dhcp",
       "ignition.firstboot",
@@ -38,17 +38,16 @@ locals {
       "coreos.live.rootfs_url=${local.netboot_base_url}/${local.netboot_current_image.rootfs}",
       "rd.driver.blacklist=nouveau,nova_core",
       "modprobe.blacklist=nouveau,nova_core",
-      "selinux=0",
       "amd_iommu=off", # memory performance for LLM
       "${local.netboot_custom_kargs.liveiso_url}=${local.netboot_base_url}/${local.netboot_current_image.liveiso}",
       "${local.netboot_custom_kargs.build_tag}=${local.netboot_current_image.build_tag}",
-    ])
+    ]
   }
 
   netboot_host_profiles = {
     for host_key, ign in data.ct_config.ignition :
     host_key => {
-      kargs = sort(lookup(local.hosts[host_key], "boot_args", []))
+      kargs = lookup(local.hosts[host_key], "boot_args", [])
     }
   }
 
@@ -60,8 +59,7 @@ locals {
         local.netboot_common_profile.kernelURL,
       ],
       local.netboot_common_profile.initrdURLs,
-      local.netboot_common_profile.kargs,
-      profile.kargs,
+      sort(concat(local.netboot_common_profile.kargs, profile.kargs)),
     ))}")
   }
 
