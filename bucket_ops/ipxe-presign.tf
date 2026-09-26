@@ -148,7 +148,7 @@ module "ipxe-presign" {
   images = {
     ipxe-presign = {
       repository = "zot.cluster.internal/randomcoww/ipxe-presign"
-      tag        = "v0.2.2@sha256:6cea7c0b280893b12b5de0929a6b867074bce242733a9e4d04c73457f695e2c2" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe-presign
+      tag        = "v0.2.3@sha256:f672843a93d1875cfae32b032d7f4d5dafa21a421aeddcfed8409eac0cbc8a5f" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/ipxe-presign
     }
   }
   ca_issuer_name = local.cert_issuers.ca_internal
