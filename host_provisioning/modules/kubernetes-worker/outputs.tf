@@ -47,6 +47,8 @@ output "ignition_snippet" {
                 After=local-fs.target
 
                 [Service]
+                LoadCredential=node-bootstrap.kubeconfig:${local.kubeconfig_files["node-bootstrap.kubeconfig"].path}
+                LoadCredential=kubelet-config.yaml:${local.config_files["kubelet-config.yaml"].path}
                 ExecStartPre=/usr/bin/mkdir -p ${var.kubelet_root_path} ${var.static_pod_path} ${local.config_path}
                 ExecStart=
                 ExecStart=/usr/bin/kubelet \
@@ -55,8 +57,8 @@ output "ignition_snippet" {
                 --node-ip=${cidrhost(var.node_prefix, var.host_netnum)} \
                 --cert-dir=${local.config_path} \
                 --root-dir=${var.kubelet_root_path} \
-                --bootstrap-kubeconfig=${local.kubeconfig_files["node-bootstrap.kubeconfig"].path} \
-                --config=${local.config_files["kubelet-config.yaml"].path} \
+                --bootstrap-kubeconfig=%d/node-bootstrap.kubeconfig \
+                --config=%d/kubelet-config.yaml \
                 --kubeconfig=${local.config_path}/kubelet.kubeconfig \
                 --v=2
                 EOF
