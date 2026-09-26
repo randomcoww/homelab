@@ -1,5 +1,5 @@
 locals {
-  config_path = "${var.config_base_path}/${var.name}"
+  config_path = var.config_base_path
 
   kubeconfig_files = {
     for key, f in {
@@ -87,7 +87,7 @@ locals {
     } :
     key => {
       mode = 384
-      path = "${local.config_path}/${key}"
+      path = "${local.config_path}/pki/${key}"
       contents = {
         inline = f
       }

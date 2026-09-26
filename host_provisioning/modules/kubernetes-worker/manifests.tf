@@ -1,5 +1,5 @@
 locals {
-  config_path = "${var.config_base_path}/${var.name}"
+  config_path = var.config_base_path
 
   kubeconfig_files = {
     for key, f in {
@@ -29,7 +29,7 @@ locals {
             enabled = true
           }
           x509 = {
-            clientCAFile = local.pki_files["kubernetes-ca.crt"].path
+            clientCAFile = local.pki_files["kubelet-ca.crt"].path
           }
         }
         authorization = {
@@ -98,7 +98,7 @@ locals {
 
   pki_files = {
     for key, f in {
-      "kubernetes-ca.crt"  = var.kubernetes_ca.cert_pem
+      "kubelet-ca.crt"     = var.kubernetes_ca.cert_pem
       "crio-metrics.crt"   = tls_locally_signed_cert.crio-metrics.cert_pem
       "crio-metrics.key"   = tls_private_key.crio-metrics.private_key_pem
       "vlagent-ca.crt"     = var.vlagent_ca.cert_pem
@@ -107,7 +107,7 @@ locals {
     } :
     key => {
       mode = 384
-      path = "${local.config_path}/${key}"
+      path = "${local.config_path}/pki/${key}"
       contents = {
         inline = f
       }

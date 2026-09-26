@@ -113,7 +113,7 @@ locals {
   kubernetes = {
     cluster_name             = "prod-10"
     kubelet_root_path        = "/var/lib/kubelet"
-    static_pod_manifest_path = "/var/lib/kubelet/manifests"
+    static_pod_manifest_path = "/etc/kubernetes/manifests"
     containers_path          = "/var/lib/containers"
     cni_bin_path             = "/var/lib/cni/bin"
     cni_config_path          = "/etc/cni/net.d"
