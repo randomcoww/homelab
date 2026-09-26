@@ -16,7 +16,7 @@ locals {
 
   config_files = {
     for key, f in {
-      "kubelet.config" = yamlencode({
+      "kubelet-config.yaml" = yamlencode({
         kind                     = "KubeletConfiguration"
         apiVersion               = "kubelet.config.k8s.io/v1beta1"
         containerRuntimeEndpoint = "unix://${var.crio_socket}"

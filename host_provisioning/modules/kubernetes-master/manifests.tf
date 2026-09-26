@@ -17,7 +17,7 @@ locals {
 
   config_files = {
     for key, f in {
-      "scheduler.config" = yamlencode({
+      "scheduler-config.yaml" = yamlencode({
         kind       = "KubeSchedulerConfiguration"
         apiVersion = "kubescheduler.config.k8s.io/v1"
         clientConnection = {
@@ -27,7 +27,7 @@ locals {
           leaderElect = true
         }
       })
-      "encryption.config" = yamlencode({
+      "encryption-config.yaml" = yamlencode({
         apiVersion = "apiserver.config.k8s.io/v1"
         kind       = "EncryptionConfiguration"
         resources = [
@@ -168,7 +168,7 @@ module "apiserver" {
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
           "--tls-cert-file=${local.pki_files["apiserver.crt"].path}",
           "--tls-private-key-file=${local.pki_files["apiserver.key"].path}",
-          "--encryption-provider-config=${local.config_files["encryption.config"].path}",
+          "--encryption-provider-config=${local.config_files["encryption-config.yaml"].path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [
@@ -343,7 +343,7 @@ module "scheduler" {
         image = "${var.images.scheduler.repository}:${var.images.scheduler.tag}"
         command = compact(concat([
           "kube-scheduler",
-          "--config=${local.config_files["scheduler.config"].path}",
+          "--config=${local.config_files["scheduler-config.yaml"].path}",
           "--authentication-kubeconfig=${local.kubeconfig_files["scheduler.kubeconfig"].path}",
           "--authorization-kubeconfig=${local.kubeconfig_files["scheduler.kubeconfig"].path}",
           "--secure-port=${var.ports.scheduler}",

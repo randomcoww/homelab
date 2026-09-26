@@ -56,7 +56,7 @@ output "ignition_snippet" {
                 --cert-dir=${local.config_path} \
                 --root-dir=${var.kubelet_root_path} \
                 --bootstrap-kubeconfig=${local.kubeconfig_files["node-bootstrap.kubeconfig"].path} \
-                --config=${local.config_files["kubelet.config"].path} \
+                --config=${local.config_files["kubelet-config.yaml"].path} \
                 --kubeconfig=${local.config_path}/kubelet.kubeconfig \
                 --v=2
                 EOF
