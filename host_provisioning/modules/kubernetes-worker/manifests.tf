@@ -66,7 +66,7 @@ locals {
         containerLogMaxSize  = "10Mi"
         containerLogMaxFiles = 2
         evictionHard = {
-          "memory.available"   = "512Mi"
+          "memory.available"   = "4%"
           "nodefs.available"   = "2%" # not tracked properly because /var/lib/kubelet is not mounted
           "imagefs.available"  = "2%" # not tracked properly because /var/lib/kubelet is not mounted
           "imagefs.inodesFree" = "2%" # not tracked properly because /var/lib/kubelet is not mounted
