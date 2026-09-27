@@ -84,16 +84,16 @@ module "statefulset" {
           "--listen",
           "0.0.0.0:${var.service_port}",
         ]
+        securityContext = {
+          seLinuxOptions = {
+            type = "spc_t"
+          }
+        }
         volumeMounts = concat([
           {
             name      = "config"
             mountPath = local.config_file
             subPath   = basename(local.config_file)
-          },
-          {
-            name      = "ca-trust-bundle"
-            mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            readOnly  = true
           },
           ], [
           for _, v in var.image_volumes :
@@ -153,13 +153,6 @@ module "statefulset" {
         name = "config"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "ca-trust-bundle"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
         }
       },
       ], [
