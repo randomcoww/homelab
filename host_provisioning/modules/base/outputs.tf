@@ -313,6 +313,9 @@ output "ignition_snippet" {
 
               ;; systemd-nsresourced
               (allow systemd_nsresourced_t self (capability (net_admin)))
+
+              ;; haproxy for apiserver
+              (allow haproxy_t port_type (tcp_socket (name_connect)))
               EOF
           }
         },
