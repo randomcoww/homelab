@@ -35,6 +35,11 @@ resource "helm_release" "local-path-provisioner" {
           memory = "128Mi"
         }
       }
+      securityContext = {
+        seLinuxOptions = {
+          type = "spc_t"
+        }
+      }
     }),
   ]
   depends_on = [
