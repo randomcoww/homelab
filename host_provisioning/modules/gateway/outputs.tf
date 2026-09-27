@@ -121,41 +121,41 @@ EOF
           mode = 420
           contents = {
             inline = <<-EOF
-            # Bird peers sharing default gateway and apiserver
-            protocol bgp node {
-              debug all;
-              source address ${cidrhost(var.bgp_prefix, var.host_netnum)};
-              local port ${var.bgp_port} as ${var.bgp_as};
-              neighbor range ${var.bgp_prefix} port ${var.bgp_port} internal;
-              graceful restart;
-              direct;
-              rr client;
-              bfd {
-              };
-              ipv4 {
-                import all;
-                export all;
-                add paths tx; # allow propagating multiple routes for apiserver
-                table ${var.bird_cache_table.name}; # routes from cilium won't be pushed to k8s workers
-              };
-            }
+              # Bird peers sharing default gateway and apiserver
+              protocol bgp node {
+                debug all;
+                source address ${cidrhost(var.bgp_prefix, var.host_netnum)};
+                local port ${var.bgp_port} as ${var.bgp_as};
+                neighbor range ${var.bgp_prefix} port ${var.bgp_port} internal;
+                graceful restart;
+                direct;
+                rr client;
+                bfd {
+                };
+                ipv4 {
+                  import all;
+                  export all;
+                  add paths tx; # allow propagating multiple routes for apiserver
+                  table ${var.bird_cache_table.name}; # routes from cilium won't be pushed to k8s workers
+                };
+              }
 
-            # Cilium peers
-            protocol bgp service {
-              debug all;
-              source address ${cidrhost(var.service_prefix, var.host_netnum)};
-              local port ${var.bgp_port} as ${var.bgp_as};
-              neighbor range ${var.service_prefix} port ${var.bgp_port} as ${var.bgp_as_peer};
-              graceful restart;
-              direct;
-              bfd {
-              };
-              ipv4 {
-                import all;
-                export none;
-              };
-            }
-            EOF
+              # Cilium peers
+              protocol bgp service {
+                debug all;
+                source address ${cidrhost(var.service_prefix, var.host_netnum)};
+                local port ${var.bgp_port} as ${var.bgp_as};
+                neighbor range ${var.service_prefix} port ${var.bgp_port} as ${var.bgp_as_peer};
+                graceful restart;
+                direct;
+                bfd {
+                };
+                ipv4 {
+                  import all;
+                  export none;
+                };
+              }
+              EOF
           }
         },
         # Redundant interface for gateways.

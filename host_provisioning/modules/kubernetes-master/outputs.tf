@@ -46,8 +46,7 @@ output "ignition_snippet" {
       ]
     }
     storage = {
-      files = concat(
-        values(local.config_files),
+      files = concat(values(local.config_files),
         values(local.kubeconfig_files),
         values(local.pki_files), [
           for key, f in {
@@ -69,18 +68,17 @@ output "ignition_snippet" {
             overwrite = true
             contents = {
               inline = <<-EOF
-              table inet ${var.name} {
-                chain mark-for-accept {
-                  meta mark set meta mark | ${var.fw_mark}
+                table inet ${var.name} {
+                  chain mark-for-accept {
+                    meta mark set meta mark | ${var.fw_mark}
+                  }
+                  chain input {
+                    type filter hook input priority 0; policy accept;
+                    tcp dport ${var.ports.apiserver} jump mark-for-accept;
+                  }
                 }
-
-                chain input {
-                  type filter hook input priority 0; policy accept;
-                  tcp dport ${var.ports.apiserver} jump mark-for-accept;
-                }
-              }
-              ;
-              EOF
+                ;
+                EOF
             }
           },
 
@@ -93,20 +91,20 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              frontend ${var.name}
-                bind 0.0.0.0:${var.ports.apiserver}
-                mode tcp
-                default_backend ${var.name}
+                frontend ${var.name}
+                  bind 0.0.0.0:${var.ports.apiserver}
+                  mode tcp
+                  default_backend ${var.name}
 
-              backend ${var.name}
-                option httpchk GET /readyz HTTP/1.0
-                http-check expect status 200
-                mode tcp
-                balance leastconn
-                default-server verify none check-ssl rise 1 fall 2 maxconn 5000 maxqueue 5000 weight 100
-                server local 127.0.0.1:${var.ports.apiserver_backend} check
-                server cluster ${var.cluster_apiserver_ip}:443 check backup
-              EOF
+                backend ${var.name}
+                  option httpchk GET /readyz HTTP/1.0
+                  http-check expect status 200
+                  mode tcp
+                  balance leastconn
+                  default-server verify none check-ssl rise 1 fall 2 maxconn 5000 maxqueue 5000 weight 100
+                  server local 127.0.0.1:${var.ports.apiserver_backend} check
+                  server cluster ${var.cluster_apiserver_ip}:443 check backup
+                EOF
             }
           },
           {
@@ -114,13 +112,13 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              [Match]
-              Name=lo
+                [Match]
+                Name=lo
 
-              [Address]
-              Address=${var.apiserver_ip}/32
-              Scope=host
-              EOF
+                [Address]
+                Address=${var.apiserver_ip}/32
+                Scope=host
+                EOF
             }
           },
           {
@@ -128,15 +126,15 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              protocol direct {
-                interface "lo";
-                ipv4 {
-                  import all;
-                  export all;
-                  table ${var.bird_cache_table.name};
-                };
-              }
-              EOF
+                protocol direct {
+                  interface "lo";
+                  ipv4 {
+                    import all;
+                    export all;
+                    table ${var.bird_cache_table.name};
+                  };
+                }
+                EOF
             }
           },
         ]

@@ -108,8 +108,7 @@ output "ignition_snippet" {
       ]
     }
     storage = {
-      files = concat(
-        values(local.config_files),
+      files = concat(values(local.config_files),
         values(local.kubeconfig_files),
         values(local.pki_files), [
 
@@ -120,28 +119,28 @@ output "ignition_snippet" {
             overwrite = true
             contents = {
               inline = <<-EOF
-              table inet ${var.name} {
-                chain mark-for-accept {
-                  meta mark set meta mark | ${var.fw_mark}
-                }
+                table inet ${var.name} {
+                  chain mark-for-accept {
+                    meta mark set meta mark | ${var.fw_mark}
+                  }
 
-                chain input {
-                  type filter hook input priority 0; policy accept;
-                  tcp dport ${var.ports.kubelet} jump mark-for-accept;
-                  ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
-                  ip saddr ${var.node_prefix} jump mark-for-accept;
-                  ip daddr ${var.node_prefix} jump mark-for-accept;
-                }
+                  chain input {
+                    type filter hook input priority 0; policy accept;
+                    tcp dport ${var.ports.kubelet} jump mark-for-accept;
+                    ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
+                    ip saddr ${var.node_prefix} jump mark-for-accept;
+                    ip daddr ${var.node_prefix} jump mark-for-accept;
+                  }
 
-                chain forward {
-                  type filter hook forward priority 0; policy accept;
-                  ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
-                  ip saddr ${var.node_prefix} jump mark-for-accept;
-                  ip daddr ${var.node_prefix} jump mark-for-accept;
+                  chain forward {
+                    type filter hook forward priority 0; policy accept;
+                    ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
+                    ip saddr ${var.node_prefix} jump mark-for-accept;
+                    ip daddr ${var.node_prefix} jump mark-for-accept;
+                  }
                 }
-              }
-              ;
-              EOF
+                ;
+                EOF
             }
           },
           # inhibit shutdown for graceful node shutdown
@@ -150,9 +149,9 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              [Login]
-              InhibitDelayMaxSec=${var.graceful_shutdown_delay}
-              EOF
+                [Login]
+                InhibitDelayMaxSec=${var.graceful_shutdown_delay}
+                EOF
             }
           },
           # VLAgent journal ingestion - daemonset listens on hostPort
@@ -161,10 +160,10 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              [Upload]
-              URL=https://127.0.0.1:${var.ports.vlagent}/insert/journald
-              Compression=zstd:4 lz4:2
-              EOF
+                [Upload]
+                URL=https://127.0.0.1:${var.ports.vlagent}/insert/journald
+                Compression=zstd:4 lz4:2
+                EOF
             }
           },
           {
@@ -172,37 +171,37 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              [crio]
-              root="${var.container_storage_path}"
-              internal_repair=true
+                [crio]
+                root="${var.container_storage_path}"
+                internal_repair=true
 
-              [crio.runtime]
-              cgroup_manager="systemd"
+                [crio.runtime]
+                cgroup_manager="systemd"
 
-              [crio.runtime.runtimes.crun]
-              monitor_cgroup="pod"
+                [crio.runtime.runtimes.crun]
+                monitor_cgroup="pod"
 
-              [crio.api]
-              listen="${var.crio_socket}"
+                [crio.api]
+                listen="${var.crio_socket}"
 
-              [crio.image]
-              big_files_temporary_dir="${var.container_storage_path}"
-              pull_progress_timeout=0
+                [crio.image]
+                big_files_temporary_dir="${var.container_storage_path}"
+                pull_progress_timeout=0
 
-              [crio.network]
-              plugin_dirs=["/var/opt/cni/bin","${var.cni_bin_path}"]
-              network_dir="${var.cni_config_path}"
+                [crio.network]
+                plugin_dirs=["/var/opt/cni/bin","${var.cni_bin_path}"]
+                network_dir="${var.cni_config_path}"
 
-              [crio.metrics]
-              enable_metrics=true
-              metrics_port=${var.ports.crio_metrics}
-              metrics_host="${cidrhost(var.node_prefix, var.host_netnum)}"
-              metrics_cert="${local.pki_files["crio-metrics.crt"].path}"
-              metrics_key="${local.pki_files["crio-metrics.key"].path}"
+                [crio.metrics]
+                enable_metrics=true
+                metrics_port=${var.ports.crio_metrics}
+                metrics_host="${cidrhost(var.node_prefix, var.host_netnum)}"
+                metrics_cert="${local.pki_files["crio-metrics.crt"].path}"
+                metrics_key="${local.pki_files["crio-metrics.key"].path}"
 
-              [crio.tracing]
-              enable_tracing=false
-              EOF
+                [crio.tracing]
+                enable_tracing=false
+                EOF
             }
           },
 
@@ -212,10 +211,10 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              net.bridge.bridge-nf-call-iptables=0
-              net.bridge.bridge-nf-call-ip6tables=0
-              net.bridge.bridge-nf-call-arptables=0
-              EOF
+                net.bridge.bridge-nf-call-iptables=0
+                net.bridge.bridge-nf-call-ip6tables=0
+                net.bridge.bridge-nf-call-arptables=0
+                EOF
             }
           },
           # Image build dependency
@@ -224,8 +223,8 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              uinput
-              EOF
+                uinput
+                EOF
             }
           },
           # Sunshine desktop game performance
@@ -234,8 +233,8 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              ntsync
-              EOF
+                ntsync
+                EOF
             }
           },
 

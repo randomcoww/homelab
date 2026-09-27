@@ -21,8 +21,8 @@ output "ignition_snippet" {
             mode = 420
             contents = {
               inline = <<-EOF
-              net.ipv4.tcp_tw_reuse=1
-              EOF
+                net.ipv4.tcp_tw_reuse=1
+                EOF
             }
           },
           {
@@ -31,23 +31,23 @@ output "ignition_snippet" {
             overwrite = true
             contents = {
               inline = <<-EOF
-              table inet ${var.name} {
-                chain mark-for-accept {
-                  meta mark set meta mark | ${var.fw_mark}
-                }
+                table inet ${var.name} {
+                  chain mark-for-accept {
+                    meta mark set meta mark | ${var.fw_mark}
+                  }
 
-                chain input {
-                  type filter hook input priority 0; policy accept;
-                  tcp dport {${var.ports.etcd_client}, ${var.ports.etcd_peer}, ${var.ports.etcd_metrics}} jump mark-for-accept;
-                }
+                  chain input {
+                    type filter hook input priority 0; policy accept;
+                    tcp dport {${var.ports.etcd_client}, ${var.ports.etcd_peer}, ${var.ports.etcd_metrics}} jump mark-for-accept;
+                  }
 
-                chain forward {
-                  type filter hook forward priority 0; policy accept;
-                  tcp dport ${var.ports.etcd_metrics} jump mark-for-accept;
+                  chain forward {
+                    type filter hook forward priority 0; policy accept;
+                    tcp dport ${var.ports.etcd_metrics} jump mark-for-accept;
+                  }
                 }
-              }
-              ;
-              EOF
+                ;
+                EOF
             }
           },
       ])
