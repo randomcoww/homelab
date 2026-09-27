@@ -75,7 +75,6 @@ locals {
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
           "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
-          "selinux=0",
         ]
       }
 
@@ -153,7 +152,6 @@ locals {
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
           "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
-          "selinux=0",
         ]
       }
 
@@ -216,7 +214,6 @@ locals {
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
           "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
-          "selinux=0",
         ]
       }
 
@@ -293,7 +290,6 @@ locals {
           "mt7925e.disable_aspm=1",               # TODO: workaround for mt7925e stability
           "mt7925_common.disable_clc=1",          # TODO: workaround for mt7925e stability
           "swiotlb=65536",                        # TODO: workaround for mt7925e stability
-          "selinux=0",
         ]
       }
     } :
