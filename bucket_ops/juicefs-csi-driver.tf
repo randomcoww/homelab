@@ -57,6 +57,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             values = {
               kubeletDir = local.kubernetes.kubelet_root_path
               node = {
+                sidecarPrivileged = true # SELinux workaround https://juicefs.com/docs/csi/troubleshooting-cases/#registrar-selinux-socket-issue
                 extraVolumes = [
                   {
                     name = "juicefs-metadata-client-tls"

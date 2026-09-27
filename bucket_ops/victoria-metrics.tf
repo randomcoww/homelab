@@ -214,7 +214,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     {
                       name = "vlagent"
                       ports = [
-                        {
+                        { # override for default "http" config
                           containerPort = local.host_ports.vlagent
                           name          = "http"
                           protocol      = "TCP"
@@ -224,6 +224,11 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       ]
                     },
                   ]
+                  securityContext = {
+                    seLinuxOptions = {
+                      type = "spc_t" # allow hostPath mount to /var/lib/vlagent-data
+                    }
+                  }
                   extraArgs = {
                     "journald.streamFields" = "_HOSTNAME,_SYSTEMD_UNIT,_TRANSPORT"
                     tls                     = "true"
