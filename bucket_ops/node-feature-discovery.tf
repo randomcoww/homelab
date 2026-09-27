@@ -79,6 +79,11 @@ resource "minio_s3_object" "fluxcd-node-feature-discovery" {
                     ]
                   }
                 }
+                securityContext = {
+                  seLinuxOptions = {
+                    type = "spc_t"
+                  }
+                }
               }
             }
           }

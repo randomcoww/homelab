@@ -18,6 +18,7 @@ module "configmap" {
       serverCert    = "${local.tls_path}/tls.crt"
       serverKey     = "${local.tls_path}/tls.key"
       trustedCAs    = ["${local.tls_path}/ca.crt"]
+      s3TrustedCAs  = ["${local.tls_path}/ca.crt"]
     }))
   }
 }
@@ -92,10 +93,6 @@ module "deployment" {
               }
             }
           },
-          {
-            name  = "SSL_CERT_FILE"
-            value = "/etc/ssl/certs/ca-certificates.crt"
-          },
         ]
         volumeMounts = [
           {
@@ -106,11 +103,6 @@ module "deployment" {
           {
             name      = "tls"
             mountPath = local.tls_path
-          },
-          {
-            name      = "ca-trust-bundle"
-            mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            readOnly  = true
           },
         ]
         ports = [
@@ -141,13 +133,6 @@ module "deployment" {
         name = "config"
         configMap = {
           name = module.configmap.name
-        }
-      },
-      {
-        name = "ca-trust-bundle"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
         }
       },
       {
