@@ -101,6 +101,24 @@ output "ignition_snippet" {
           name = "zincati.service"
           mask = true
         },
+        {
+          name     = "selinux-rules.service"
+          enabled  = true
+          contents = <<-EOF
+            [Unit]
+            After=local-fs.target
+            Wants=local-fs.target
+            Before=network-pre.target systemd-networkd.service systemd-journal-upload.service
+
+            [Service]
+            Type=oneshot
+            ExecStart=/usr/bin/semodule -i /etc/selinux/custom.cil
+            RemainAfterExit=yes
+
+            [Install]
+            WantedBy=sysinit.target
+            EOF
+        },
       ]
     }
     storage = {
@@ -271,6 +289,30 @@ output "ignition_snippet" {
               AllowHibernation=no
               AllowSuspendThenHibernate=no
               AllowHybridSleep=no
+              EOF
+          }
+        },
+
+        # SELinux rules
+        {
+          mode = 384
+          path = "/etc/selinux/custom.cil"
+          contents = {
+            inline = <<-EOF
+              ;; keepalived with scripts
+              (allow keepalived_t keepalived_t (capability (ipc_lock)))
+              (allow keepalived_t iptables_t (process (noatsecure rlimitinh siginh)))
+              (allow keepalived_t ifconfig_exec_t (file (getattr execute execute_no_trans open read map)))
+              (allow keepalived_t etc_t (file (setattr execute execute_no_trans open read getattr)))
+
+              ;; systemd-journal-upload load credentials from /run/credentials
+              (allow systemd_journal_upload_t init_var_run_t (file (read open getattr)))
+
+              ;; systemd-networkd read memory pressure
+              (allow systemd_networkd_t cgroup_t (file (write open)))
+
+              ;; systemd-nsresourced
+              (allow systemd_nsresourced_t self (capability (net_admin)))
               EOF
           }
         },

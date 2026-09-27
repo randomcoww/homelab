@@ -202,6 +202,7 @@ EOF
             inline = <<-EOF
               [Link]
               ARP=true
+              Promiscuous=true
 
               [Network]
               MACVLAN=${iface.interface}
