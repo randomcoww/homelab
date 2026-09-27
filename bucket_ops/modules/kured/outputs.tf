@@ -85,21 +85,7 @@ output "manifests" {
             service = {
               create = true
             }
-            volumeMounts = [
-              {
-                name      = "ca-trust-bundle"
-                mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                readOnly  = true
-              },
-            ]
             volumes = [
-              {
-                name = "ca-trust-bundle"
-                hostPath = {
-                  path = "/etc/ssl/certs/ca-certificates.crt"
-                  type = "File"
-                }
-              },
               {
                 name = "config"
                 configMap = {
