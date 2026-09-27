@@ -107,7 +107,7 @@ locals {
     } :
     key => {
       mode = 384
-      path = "${local.config_path}/pki/${key}"
+      path = "/etc/pki/tls/private/${key}" # system path here instead of kubernetes/pki
       contents = {
         inline = f
       }
