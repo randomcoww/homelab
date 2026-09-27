@@ -171,6 +171,11 @@ output "manifests" {
               memory = "128Mi"
             }
           }
+          securityContext = {
+            seLinuxOptions = {
+              type = "spc_t"
+            }
+          }
           authentication = {
             clientCaCertSecret = {
               name = "${var.name}-redis-tls"
