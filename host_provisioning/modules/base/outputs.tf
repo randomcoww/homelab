@@ -303,7 +303,6 @@ output "ignition_snippet" {
               (allow keepalived_t keepalived_t (capability (ipc_lock)))
               (allow keepalived_t iptables_t (process (noatsecure rlimitinh siginh)))
               (allow keepalived_t ifconfig_exec_t (file (getattr execute execute_no_trans open read map)))
-              (allow keepalived_t etc_t (file (setattr execute execute_no_trans open read getattr)))
 
               ;; systemd-journal-upload load credentials from /run/credentials
               (allow systemd_journal_upload_t init_var_run_t (file (read open getattr)))
@@ -313,9 +312,6 @@ output "ignition_snippet" {
 
               ;; systemd-nsresourced
               (allow systemd_nsresourced_t self (capability (net_admin)))
-
-              ;; haproxy for apiserver
-              (allow haproxy_t port_type (tcp_socket (name_connect)))
               EOF
           }
         },

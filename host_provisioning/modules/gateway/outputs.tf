@@ -8,6 +8,19 @@ output "ignition_snippet" {
           name    = "nftables@gateway.service"
           enabled = true
         },
+        {
+          name    = "keepalived.service"
+          enabled = true
+          dropins = [
+            {
+              name     = "20-selinux-permissions.conf"
+              contents = <<-EOF
+                [Service]
+                ExecStartPre=/usr/bin/chcon -R -t keepalived_unconfined_script_exec_t ${local.keepalived_script_path}
+                EOF
+            },
+          ]
+        },
       ]
     }
     storage = {
@@ -54,12 +67,9 @@ output "ignition_snippet" {
           }
         },
         {
-          path = "${var.keepalived_path}/master.sh"
+          path = "${local.keepalived_script_path}/master.sh"
           mode = 448
           contents = {
-            # bring wan interface up on transition to master
-            # use same mac on WAN across all gateways
-            # DHCP routes won't recover unless reconfigure is called
             inline = <<-EOF
               #!/bin/bash
               ip link set dev "${var.wan_network_config.interface}" arp on
@@ -67,10 +77,9 @@ output "ignition_snippet" {
           }
         },
         {
-          path = "${var.keepalived_path}/backup.sh"
+          path = "${local.keepalived_script_path}/backup.sh"
           mode = 448
           contents = {
-            # take down wan interface on transition to slave
             inline = <<-EOF
               #!/bin/bash
               ip link set dev "${var.wan_network_config.interface}" arp off
@@ -108,9 +117,9 @@ vrrp_instance gateway {
   virtual_routes {
     default dev ${var.vrrp_network_config.interface} table ${var.bird_cache_table.table_id}
   }
-  notify_master "${var.keepalived_path}/master.sh"
-  notify_backup "${var.keepalived_path}/backup.sh"
-  notify_fault "${var.keepalived_path}/backup.sh"
+  notify_master "${local.keepalived_script_path}/master.sh"
+  notify_backup "${local.keepalived_script_path}/backup.sh"
+  notify_fault "${local.keepalived_script_path}/backup.sh"
 }
 EOF
           }

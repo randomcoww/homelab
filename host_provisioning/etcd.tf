@@ -41,6 +41,7 @@ module "etcd" {
   s3_resource_prefix   = "https://${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url}/${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}-"
   s3_access_key_id     = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id
   s3_secret_access_key = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.secret_access_key
+  config_base_path     = local.kubernetes.kubernetes_config_path
   static_pod_path      = local.kubernetes.static_pod_manifest_path
   data_storage_path    = "${local.kubernetes.containers_path}/etcd"
 }

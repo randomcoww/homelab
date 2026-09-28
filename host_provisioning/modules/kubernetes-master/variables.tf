@@ -135,8 +135,7 @@ variable "cluster_apiserver_ip" {
 }
 
 variable "config_base_path" {
-  type    = string
-  default = "/etc/kubernetes"
+  type = string
 }
 
 variable "static_pod_path" {

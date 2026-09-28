@@ -41,6 +41,7 @@ output "ignition_snippet" {
 
                 [Service]
                 ExecStartPre=
+                ExecStartPre=/usr/bin/setsebool haproxy_connect_any 1
                 ExecStart=
                 ExecReload=
                 ExecStartPre=/usr/bin/mkdir -p ${var.haproxy_path}

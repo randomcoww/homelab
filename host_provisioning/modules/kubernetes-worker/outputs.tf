@@ -63,6 +63,14 @@ output "ignition_snippet" {
                 --v=2
                 EOF
             },
+            # give permissions to path used by local-path-provisioner
+            {
+              name     = "20-selinux-permissions.conf"
+              contents = <<-EOF
+                [Service]
+                ExecStartPre=/usr/bin/chcon -t container_file_t ${var.local_path_provisioner_path}
+                EOF
+            },
           ]
         },
         {

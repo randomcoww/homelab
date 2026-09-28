@@ -68,6 +68,7 @@ module "kubernetes-master" {
   apiserver_ip             = local.networks.service.vips.apiserver
   apiserver_service_label  = local.services.apiserver.name
   cluster_apiserver_ip     = local.networks.kubernetes_service.vips.apiserver
+  config_base_path         = local.kubernetes.kubernetes_config_path
   static_pod_path          = local.kubernetes.static_pod_manifest_path
   feature_gates            = local.kubernetes.feature_gates
   bird_path                = local.bird_config_path

@@ -89,8 +89,7 @@ variable "static_pod_path" {
 }
 
 variable "config_base_path" {
-  type    = string
-  default = "/etc/kubernetes"
+  type = string
 }
 
 variable "data_storage_path" {

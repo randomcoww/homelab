@@ -67,8 +67,7 @@ variable "cluster_dns_ip" {
 }
 
 variable "config_base_path" {
-  type    = string
-  default = "/etc/kubernetes"
+  type = string
 }
 
 variable "kubelet_root_path" {
@@ -84,6 +83,10 @@ variable "feature_gates" {
 }
 
 variable "container_storage_path" {
+  type = string
+}
+
+variable "local_path_provisioner_path" {
   type = string
 }
 
