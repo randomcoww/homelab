@@ -59,13 +59,6 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
                   }
                 }
               }
-              manager = {
-                securityContext = {
-                  seLinuxOptions = {
-                    type = "spc_t" # Access io_uring
-                  }
-                }
-              }
             }
           }
         },

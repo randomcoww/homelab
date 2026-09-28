@@ -312,6 +312,19 @@ output "ignition_snippet" {
 
               ;; systemd-nsresourced
               (allow systemd_nsresourced_t self (capability (net_admin)))
+
+              ;; allow io_uring ring creation / anonymous inodes - dragonfly, github runners
+              (classpermission anon_inode_all_perms)
+              (classpermissionset anon_inode_all_perms (anon_inode (all)))
+              (allow container_t io_uring_t anon_inode_all_perms)
+
+              ; allow container_t full io_uring operations (sqpoll, override_creds, etc.) on itself
+              (classpermission io_uring_all_perms)
+              (classpermissionset io_uring_all_perms (io_uring (all)))
+              (allow container_t container_t io_uring_all_perms)
+
+              ;; allow char file from container process - mountpoint-csi
+              (allow container_t container_runtime_tmpfs_t (chr_file (read write open ioctl getattr)))
               EOF
           }
         },
