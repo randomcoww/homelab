@@ -53,6 +53,7 @@ locals {
     {
       name      = "ca-trust-bundle"
       mountPath = local.agent_envs.SSL_CERT_FILE
+      subPath   = "ca.crt"
       readOnly  = true
     },
     ], [
@@ -484,9 +485,8 @@ EOF
       },
       {
         name = "ca-trust-bundle"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
+        configMap = {
+          name = "trust-manager-ca-internal-bundle"
         }
       },
       {

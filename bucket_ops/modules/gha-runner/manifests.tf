@@ -43,6 +43,7 @@ locals {
             {
               name      = "ca-trust-bundle"
               mountPath = "/kaniko/ssl/certs/ca-certificates.crt"
+              subPath   = "ca.crt"
               readOnly  = true
             },
             # certs used by kaniko to upload to private registry and adding certs to iPXE
@@ -67,9 +68,8 @@ locals {
       volumes = [
         {
           name = "ca-trust-bundle"
-          hostPath = {
-            path = "/etc/ssl/certs/ca-certificates.crt"
-            type = "File"
+          configMap = {
+            name = "trust-manager-ca-internal-bundle"
           }
         },
         {
@@ -106,6 +106,7 @@ locals {
             {
               name      = "ca-trust-bundle"
               mountPath = "/etc/ssl/certs/ca-certificates.crt"
+              subPath   = "ca.crt"
               readOnly  = true
             },
           ]
@@ -114,9 +115,8 @@ locals {
       volumes = [
         {
           name = "ca-trust-bundle"
-          hostPath = {
-            path = "/etc/ssl/certs/ca-certificates.crt"
-            type = "File"
+          configMap = {
+            name = "trust-manager-ca-internal-bundle"
           }
         },
         {
@@ -186,6 +186,7 @@ locals {
             {
               name      = "ca-trust-bundle"
               mountPath = "/etc/ssl/certs/ca-certificates.crt"
+              subPath   = "ca.crt"
               readOnly  = true
             },
           ]
@@ -194,9 +195,8 @@ locals {
       volumes = [
         {
           name = "ca-trust-bundle"
-          hostPath = {
-            path = "/etc/ssl/certs/ca-certificates.crt"
-            type = "File"
+          configMap = {
+            name = "trust-manager-ca-internal-bundle"
           }
         },
       ]
@@ -265,6 +265,7 @@ locals {
             {
               name      = "ca-trust-bundle"
               mountPath = "/etc/ssl/certs/ca-certificates.crt"
+              subPath   = "ca.crt"
               readOnly  = true
             },
           ]
@@ -273,9 +274,8 @@ locals {
       volumes = [
         {
           name = "ca-trust-bundle"
-          hostPath = {
-            path = "/etc/ssl/certs/ca-certificates.crt"
-            type = "File"
+          configMap = {
+            name = "trust-manager-ca-internal-bundle"
           }
         },
       ]

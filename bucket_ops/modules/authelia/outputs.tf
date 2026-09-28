@@ -181,11 +181,6 @@ output "manifests" {
             name      = "${var.name}-redis-tls"
             namespace = var.namespace
           }
-          containerSecurityContext = {
-            seLinuxOptions = {
-              type = "spc_t"
-            }
-          }
         }
       },
 

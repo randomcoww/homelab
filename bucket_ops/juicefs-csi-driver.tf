@@ -109,9 +109,8 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                     volumes = [
                       {
                         name = "ca-trust-bundle"
-                        hostPath = {
-                          path = "/etc/ssl/certs/ca-certificates.crt"
-                          type = "File"
+                        configMap = {
+                          name = "trust-manager-ca-internal-bundle"
                         }
                       },
                       {
@@ -125,6 +124,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                       {
                         name      = "ca-trust-bundle"
                         mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                        subPath   = "ca.crt"
                         readOnly  = true
                       },
                       {

@@ -75,6 +75,7 @@ output "template_spec" {
           {
             name      = "${var.name}-litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -119,6 +120,7 @@ output "template_spec" {
           {
             name      = "${var.name}-litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -184,9 +186,8 @@ output "template_spec" {
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "${var.name}-litestream-ca-trust-bundle"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
+        configMap = {
+          name = "trust-manager-ca-internal-bundle"
         }
       },
     ])
