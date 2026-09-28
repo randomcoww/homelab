@@ -10,7 +10,7 @@ locals {
 
   netboot_images = {
     for name, tag in {
-      default = "44.20260916.20.1.1789598080" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "44.20260925.20.1.1790582074" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel    = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
