@@ -86,7 +86,7 @@ module "statefulset" {
         ]
         securityContext = {
           seLinuxOptions = {
-            type = "spc_t"
+            type = "spc_t" # dm-0 access for whisper and llama-server
           }
         }
         volumeMounts = concat([
