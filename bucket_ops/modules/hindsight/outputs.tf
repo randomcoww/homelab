@@ -51,7 +51,7 @@ output "manifests" {
           }
           values = {
             api = {
-              replicaCount = 1
+              replicaCount = 2
               service = {
                 targetPort = var.service_port
               }
@@ -90,7 +90,7 @@ output "manifests" {
             }
             worker = {
               enabled      = true
-              replicaCount = 2
+              replicaCount = 1
               # helm chart copies env and secrets from api
               extraVolumeMounts = [
                 {
