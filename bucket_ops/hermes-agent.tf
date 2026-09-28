@@ -46,6 +46,7 @@ resource "random_password" "hermes-agent-api-key" {
 module "hermes-agent" {
   source    = "./modules/hermes-agent"
   name      = "hermes-agent"
+  replicas  = 1
   namespace = "default"
   images = {
     hermes-agent = {
