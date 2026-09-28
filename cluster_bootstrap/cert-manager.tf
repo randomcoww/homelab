@@ -11,7 +11,6 @@ resource "helm_release" "cert-manager" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      replicaCount = 2
       deploymentAnnotations = {
         "certmanager.k8s.io/disable-validation" = "true"
       }
