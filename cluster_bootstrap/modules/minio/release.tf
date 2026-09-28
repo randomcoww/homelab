@@ -428,9 +428,6 @@ module "statefulset" {
       fsGroupChangePolicy = "OnRootMismatch"
       runAsGroup          = 1000
       runAsUser           = 1000
-      seLinuxOptions = {
-        type = "spc_t"
-      }
     }
     containers = [
       {
