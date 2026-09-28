@@ -21,6 +21,10 @@ locals {
                 "SETFCAP", # needed to build code-server and sunshine-desktop images
               ]
             }
+            seLinuxOptions = {
+              type  = "container_t"
+              level = "s0" # needed to mounting a local-path volume as subPath
+            }
           }
           env = [
             {
@@ -92,6 +96,12 @@ locals {
       containers = [
         {
           name = "$job"
+          securityContext = {
+            seLinuxOptions = {
+              type  = "container_t"
+              level = "s0" # needed to mounting a local-path volume as subPath
+            }
+          }
           env = [
             {
               name  = "INTERNAL_REGISTRY"
@@ -144,6 +154,10 @@ locals {
               add = [
                 "SETFCAP",
               ]
+            }
+            seLinuxOptions = {
+              type  = "container_t"
+              level = "s0" # needed to mounting a local-path volume as subPath
             }
           }
           resources = {
@@ -213,6 +227,12 @@ locals {
       containers = [
         {
           name = "$job"
+          securityContext = {
+            seLinuxOptions = {
+              type  = "container_t"
+              level = "s0" # needed to mounting a local-path volume as subPath
+            }
+          }
           env = [
             {
               name = "RENOVATE_TOKEN"
