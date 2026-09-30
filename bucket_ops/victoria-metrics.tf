@@ -548,7 +548,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             chart = {
               spec = {
                 chart   = "victoria-metrics-mcp"
-                version = "0.3.0" # renovate: datasource=helm depName=victoria-metrics-mcp registryUrl=https://victoriametrics.github.io/helm-charts
+                version = "0.4.0" # renovate: datasource=helm depName=victoria-metrics-mcp registryUrl=https://victoriametrics.github.io/helm-charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.victoria-metrics_name
@@ -606,7 +606,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             chart = {
               spec = {
                 chart   = "victoria-logs-mcp"
-                version = "0.1.0" # renovate: datasource=helm depName=victoria-logs-mcp registryUrl=https://victoriametrics.github.io/helm-charts
+                version = "0.2.0" # renovate: datasource=helm depName=victoria-logs-mcp registryUrl=https://victoriametrics.github.io/helm-charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.victoria-metrics_name
