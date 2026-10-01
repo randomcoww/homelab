@@ -495,6 +495,28 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   kube-state-metrics = {
                     enabled = false # requires kube-state-metrics selfMonitor
                   }
+                  vmcluster = {
+                    rules = {
+                      /*
+                      in vmcluster mode:
+                      vm_rows_inserted_total by job returns all inserts as vminsert jobs. vmstore returns 0 inserts.
+                      vm_slow_row_inserts_total returns all inserts as vmstore jobs.
+                      This causes a divide by 0 error for vmstore metrics.
+
+                      Change rules to drop "by (job)"
+                      */
+                      TooHighSlowInsertsRate = {
+                        spec = {
+                          expr = "(sum(rate(vm_slow_row_inserts_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))) > 0.05"
+                        }
+                      }
+                      TooHighChurnRate = {
+                        spec = {
+                          expr = "(sum(rate(vm_new_timeseries_created_total[5m])) / sum(rate(vm_rows_inserted_total[5m]))) > 0.10"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
