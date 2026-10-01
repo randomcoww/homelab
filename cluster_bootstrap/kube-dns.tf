@@ -6,7 +6,7 @@ resource "helm_release" "kube-dns" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "1.48.1"
+  version          = "1.48.2"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [

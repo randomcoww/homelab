@@ -19,7 +19,7 @@ output "manifests" {
           interval = "15m"
           url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
           ref = {
-            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set depType=helm_regex
+            tag = "0.15.0" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set depType=helm_regex
           }
         }
       },
@@ -160,7 +160,7 @@ output "manifests" {
           interval = "15m"
           url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
           ref = {
-            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
+            tag = "0.15.0" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
           }
         }
       },

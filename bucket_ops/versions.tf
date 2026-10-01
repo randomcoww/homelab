@@ -25,7 +25,7 @@ terraform {
     }
     kubernetes = {
       source  = "opentofu/kubernetes"
-      version = "3.2.1"
+      version = "3.3.0"
     }
     helm = {
       source  = "opentofu/helm"
