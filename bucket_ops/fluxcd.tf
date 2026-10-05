@@ -178,7 +178,6 @@ resource "helm_release" "fluxcd-bucket" {
           hindsight              = ["trust-manager-crs", "gateway-api-crds", "cloudnative-pg"] # uses gateway-api externalAuth
           hermes-agent           = ["trust-manager-crs", "juicefs-csi-driver"]
           stump                  = ["trust-manager-crs", "mountpoint-s3-csi", "juicefs-csi-driver"]
-          navidrome              = ["trust-manager-crs", "gateway-api-crds", "mountpoint-s3-csi"]  # uses gateway-api externalAuth
           hostapd                = ["gateway-api-crds", "node-feature-discovery", "device-plugin"] # uses gateway-api externalAuth
           sunshine-desktop       = ["device-plugin", "resource-claims"]
           generate-backup-disk   = ["trust-manager-crs"]
@@ -187,6 +186,7 @@ resource "helm_release" "fluxcd-bucket" {
           agentgateway-crds      = []
           agentgateway           = ["agentgateway-crds"]
           agentgateway-crs       = ["agentgateway-crds"]
+          # navidrome              = ["trust-manager-crs", "gateway-api-crds", "mountpoint-s3-csi"]  # uses gateway-api externalAuth
           # inference-extension-crds = []
         } :
         yamlencode({

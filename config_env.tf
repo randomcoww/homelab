@@ -167,7 +167,6 @@ locals {
     }
     navidrome = {
       hostname = "navidrome.${local.domains.public}"
-      tunnel   = true
     }
     stump = {
       hostname = "stump.${local.domains.public}"
