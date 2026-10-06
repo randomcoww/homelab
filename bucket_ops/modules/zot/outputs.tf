@@ -28,7 +28,7 @@ output "manifests" {
           chart = {
             spec = {
               chart   = "zot"
-              version = "0.1.126" # renovate: datasource=helm depName=zot registryUrl=http://zotregistry.dev/helm-charts
+              version = "0.1.127" # renovate: datasource=helm depName=zot registryUrl=http://zotregistry.dev/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
