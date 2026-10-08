@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
             chart = {
               spec = {
                 chart   = "k8s-gateway"
-                version = "3.7.4" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.kryptonian.kapsi.fi
+                version = "4.0.0" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.kryptonian.kapsi.fi
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.k8s-gateway_name
