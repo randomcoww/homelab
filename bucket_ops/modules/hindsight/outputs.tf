@@ -250,7 +250,7 @@ output "manifests" {
                 image = {
                   reference = join(":", [
                     "ghcr.io/cloudnative-pg/pgvector",
-                    "0.8.7-18-trixie@sha256:41d3480fdb7b57bd90f4ba7a38f50766d4c05fd64c69bcd99f87c5bd12e753a1", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
+                    "0.8.7-18-trixie@sha256:aa637d323d4f11df5f319228836b20254d9e9285a128b51f77ab0d10682ca76f", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
                   ])
                 }
               },
