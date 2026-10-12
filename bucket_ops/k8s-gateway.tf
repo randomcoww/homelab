@@ -56,13 +56,26 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
               enable = false
             }
             values = {
-              domain = "."
-              watchedResources = [
-                "Service",
-                "HTTPRoute",
-              ]
-              fallthrough = {
-                enabled = true
+              replicaCount = 2
+              serviceType  = "LoadBalancer"
+              serviceAccount = {
+                create = true
+              }
+              rbac = {
+                create = true
+              }
+              prometheus = {
+                service = {
+                  enabled = true
+                }
+                monitor = {
+                  enabled = true
+                }
+              }
+              service = {
+                annotations = {
+                  "lbipam.cilium.io/ips" = local.networks.service.vips.k8s-gateway
+                }
               }
               resources = {
                 requests = {
@@ -71,16 +84,6 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                 limits = {
                   memory = "256Mi"
                 }
-              }
-              service = {
-                type = "LoadBalancer"
-                labels = {
-                  app = local.k8s-gateway_name
-                }
-                annotations = {
-                  "lbipam.cilium.io/ips" = local.networks.service.vips.k8s-gateway
-                }
-                useTcp = true
               }
               affinity = {
                 podAntiAffinity = {
@@ -92,7 +95,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                             key      = "app.kubernetes.io/instance"
                             operator = "In"
                             values = [
-                              local.k8s-gateway_name,
+                              "k8s-gateway",
                             ]
                           },
                         ]
@@ -102,47 +105,76 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                   ]
                 }
               }
-              replicaCount = 3
-              extraZonePlugins = concat([
+              priorityClassName = "system-cluster-critical"
+              servers = [
                 {
-                  name = "health"
+                  zones = [
+                    {
+                      zone    = "."
+                      scheme  = "dns://"
+                      use_tcp = true
+                    },
+                  ]
+                  port = 53
+                  plugins = concat([
+                    {
+                      name = "errors"
+                    },
+                    {
+                      name = "health"
+                    },
+                    {
+                      name = "ready"
+                    },
+                    {
+                      name = "loop"
+                    },
+                    {
+                      name        = "log"
+                      configBlock = <<-EOF
+                      class error
+                      EOF
+                    },
+                    {
+                      name       = "prometheus"
+                      parameters = "0.0.0.0:${local.service_ports.coredns_metrics}"
+                    },
+                    {
+                      name        = "k8s_gateway"
+                      parameters  = local.domains.public
+                      configBlock = <<-EOF
+                      resources Service HTTPRoute
+                      fallthrough
+                      EOF
+                    },
+                    {
+                      name = "hosts"
+                      configBlock = join("\n", concat(compact([
+                        for _, host in local.hosts :
+                        try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.key}.${local.domains.kubernetes}", "")
+                        ]), [
+                        "fallthrough"
+                      ]))
+                    },
+                    ], [
+                    for tlshostname, ips in merge({
+                      for _, d in local.upstream_dns :
+                      d.hostname => d.ip...
+                    }) :
+                    {
+                      name = "forward"
+                      parameters = ". ${join(" ", [
+                        for _, ip in ips :
+                        "tls://${ip}"
+                      ])}"
+                      configBlock = <<-EOF
+                      tls_servername ${tlshostname}
+                      health_check 5s
+                      EOF
+                    }
+                  ])
                 },
-                {
-                  name = "ready"
-                },
-                {
-                  name = "loop"
-                },
-                {
-                  name       = "prometheus"
-                  parameters = "0.0.0.0:${local.service_ports.coredns_metrics}"
-                },
-                {
-                  name = "hosts"
-                  configBlock = join("\n", concat(compact([
-                    for _, host in local.hosts :
-                    try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.key}.${local.domains.kubernetes}", "")
-                    ]), [
-                    "fallthrough"
-                  ]))
-                },
-                ], [
-                for tlshostname, ips in merge({
-                  for _, d in local.upstream_dns :
-                  d.hostname => d.ip...
-                }) :
-                {
-                  name = "forward"
-                  parameters = ". ${join(" ", [
-                    for _, ip in ips :
-                    "tls://${ip}"
-                  ])}"
-                  configBlock = <<-EOF
-                  tls_servername ${tlshostname}
-                  health_check 5s
-                  EOF
-                }
-              ])
+              ]
             }
           }
         },

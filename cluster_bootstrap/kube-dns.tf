@@ -11,7 +11,7 @@ resource "helm_release" "kube-dns" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      replicaCount = 3
+      replicaCount = 2
       serviceType  = "ClusterIP"
       serviceAccount = {
         create = true
@@ -29,6 +29,14 @@ resource "helm_release" "kube-dns" {
       }
       service = {
         clusterIP = local.networks.kubernetes_service.vips.kube-dns
+      }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "256Mi"
+        }
       }
       affinity = {
         podAntiAffinity = {
@@ -62,6 +70,9 @@ resource "helm_release" "kube-dns" {
           ]
           port = 53
           plugins = concat([
+            {
+              name = "errors"
+            },
             {
               name = "health"
             },
