@@ -9,14 +9,17 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
+          kind       = "OCIRepository"
           metadata = {
             name      = local.k8s-gateway_name
             namespace = local.k8s-gateway_namespace
           }
           spec = {
             interval = "15m"
-            url      = "https://k8s-gateway.kryptonian.kapsi.fi"
+            url      = "oci://codeberg.org/k8s-gateway/charts/k8s-gateway"
+            ref = {
+              tag = "4.0.1" # renovate: datasource=docker depName=codeberg.org/k8s-gateway/charts/k8s-gateway depType=helm_regex
+            }
           }
         },
         {
@@ -29,16 +32,10 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "k8s-gateway"
-                version = "4.0.1" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.kryptonian.kapsi.fi
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = local.k8s-gateway_name
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = local.k8s-gateway_name
+              namespace = local.k8s-gateway_namespace
             }
             releaseName = local.k8s-gateway_name
             install = {
@@ -176,29 +173,6 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                 },
               ]
             }
-          }
-        },
-
-        # monitoring
-        {
-          apiVersion = "monitoring.coreos.com/v1"
-          kind       = "ServiceMonitor"
-          metadata = {
-            name      = "k8s-gateway"
-            namespace = "kube-system"
-          }
-          spec = {
-            selector = {
-              matchLabels = {
-                app = "k8s-gateway"
-              }
-            }
-            endpoints = [
-              {
-                path       = "/metrics"
-                targetPort = local.service_ports.coredns_metrics
-              },
-            ]
           }
         },
 
