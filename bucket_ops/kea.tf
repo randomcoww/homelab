@@ -5,7 +5,7 @@ module "kea" {
   images = {
     kea = {
       repository = "zot.cluster.internal/randomcoww/kea"
-      tag        = "v3.3.2.1791852001@sha256:4d5e471340229a61c1c7b02695cb2e0683b7f9d129db39706a1c208c6faa5119" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kea
+      tag        = "v3.3.2.1791863027@sha256:2b3994d01cda065cc69f361c8dccce348f399499b0317df22f5c5680bd8c2525" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kea
     }
     ipxe = {
       repository = "zot.cluster.internal/randomcoww/ipxe"
