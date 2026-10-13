@@ -291,6 +291,13 @@ locals {
           "mt7925_common.disable_clc=1",          # TODO: workaround for mt7925e stability
           "swiotlb=65536",                        # TODO: workaround for mt7925e stability
         ]
+        node_taints = [
+          {
+            key    = "deschedule"
+            value  = "true"
+            effect = "PreferNoSchedule"
+          },
+        ]
       }
     } :
     key => merge(config, {

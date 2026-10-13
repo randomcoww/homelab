@@ -98,6 +98,7 @@ resource "helm_release" "cilium-crs" {
   ]
   depends_on = [
     kubernetes_labels.labels,
+    kubernetes_node_taint.taints,
     helm_release.cilium,
   ]
 }

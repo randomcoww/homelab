@@ -29,6 +29,7 @@ module "minio" {
 
   depends_on = [
     kubernetes_labels.labels,
+    kubernetes_node_taint.taints,
     helm_release.cert-manager-crds,
     helm_release.prometheus-crds,
   ]

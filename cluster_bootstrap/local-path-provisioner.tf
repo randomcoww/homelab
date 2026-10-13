@@ -39,5 +39,6 @@ resource "helm_release" "local-path-provisioner" {
   ]
   depends_on = [
     kubernetes_labels.labels,
+    kubernetes_node_taint.taints,
   ]
 }
