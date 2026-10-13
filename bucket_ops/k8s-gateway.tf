@@ -138,7 +138,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
                     },
                     {
                       name        = "k8s_gateway"
-                      parameters  = local.domains.public
+                      parameters  = "${local.domains.kubernetes} ${local.domains.public}"
                       configBlock = <<-EOF
                       resources Service HTTPRoute
                       fallthrough
