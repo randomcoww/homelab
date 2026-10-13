@@ -43,11 +43,6 @@ resource "helm_release" "cilium-crs" {
               name = "cilium-bgp"
             }
             spec = {
-              nodeSelector = {
-                matchLabels = {
-                  # "node-role.kubernetes.io/control-plane" = "true"
-                }
-              }
               bgpInstances = [
                 {
                   name     = "instance-${local.bgp.host_as}"
@@ -97,7 +92,6 @@ resource "helm_release" "cilium-crs" {
     }),
   ]
   depends_on = [
-    kubernetes_labels.labels,
     kubernetes_node_taint.taints,
     helm_release.cilium,
   ]

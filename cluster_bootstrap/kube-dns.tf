@@ -130,7 +130,6 @@ resource "helm_release" "kube-dns" {
     }),
   ]
   depends_on = [
-    kubernetes_labels.labels,
     kubernetes_node_taint.taints,
     helm_release.prometheus-crds,
   ]

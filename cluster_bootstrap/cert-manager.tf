@@ -79,7 +79,6 @@ resource "helm_release" "cert-manager" {
     }),
   ]
   depends_on = [
-    kubernetes_labels.labels,
     kubernetes_node_taint.taints,
   ]
 }
@@ -114,7 +113,6 @@ resource "helm_release" "cert-manager-csi-driver" {
     }),
   ]
   depends_on = [
-    kubernetes_labels.labels,
     kubernetes_node_taint.taints,
   ]
 }
