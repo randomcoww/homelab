@@ -55,7 +55,7 @@ resource "helm_release" "cilium" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "1.20.2"
+  version          = "1.20.3"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
