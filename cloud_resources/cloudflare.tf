@@ -24,22 +24,22 @@ resource "cloudflare_zone_dnssec" "dnssec" {
   status  = "active"
 }
 
-data "cloudflare_api_token_permission_groups_list" "r2_read" {
+data "cloudflare_api_token_permission_groups_list" "r2-read" {
   scope = urlencode("com.cloudflare.edge.r2.bucket")
   name  = urlencode("Workers R2 Storage Bucket Item Read")
 }
 
-data "cloudflare_api_token_permission_groups_list" "r2_write" {
+data "cloudflare_api_token_permission_groups_list" "r2-write" {
   scope = urlencode("com.cloudflare.edge.r2.bucket")
   name  = urlencode("Workers R2 Storage Bucket Item Write")
 }
 
-data "cloudflare_api_token_permission_groups_list" "zone_read" {
+data "cloudflare_api_token_permission_groups_list" "zone-read" {
   scope = urlencode("com.cloudflare.api.account.zone")
   name  = urlencode("Zone Read")
 }
 
-data "cloudflare_api_token_permission_groups_list" "dns_write" {
+data "cloudflare_api_token_permission_groups_list" "dns-write" {
   scope = urlencode("com.cloudflare.api.account.zone")
   name  = urlencode("DNS Write")
 }
@@ -63,10 +63,10 @@ resource "cloudflare_api_token" "r2_bucket" {
       effect = "allow"
       permission_groups = [
         {
-          id = data.cloudflare_api_token_permission_groups_list.r2_read.result[0].id
+          id = data.cloudflare_api_token_permission_groups_list.r2-read.result[0].id
         },
         {
-          id = data.cloudflare_api_token_permission_groups_list.r2_write.result[0].id
+          id = data.cloudflare_api_token_permission_groups_list.r2-write.result[0].id
         },
       ]
       resources = jsonencode({
@@ -85,10 +85,10 @@ resource "cloudflare_api_token" "dns" {
       effect = "allow"
       permission_groups = [
         {
-          id = data.cloudflare_api_token_permission_groups_list.zone_read.result[0].id
+          id = data.cloudflare_api_token_permission_groups_list.zone-read.result[0].id
         },
         {
-          id = data.cloudflare_api_token_permission_groups_list.dns_write.result[0].id
+          id = data.cloudflare_api_token_permission_groups_list.dns-write.result[0].id
         },
       ]
       resources = jsonencode({
