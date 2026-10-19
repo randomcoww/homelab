@@ -1,4 +1,4 @@
-resource "random_bytes" "apiserver_encryption_key" {
+resource "random_bytes" "apiserver-encryption-key" {
   length = 32
 }
 
@@ -64,7 +64,7 @@ module "kubernetes-master" {
     for _, network in each.value.networks :
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
-  apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
+  apiserver_encryption_key = random_bytes.apiserver-encryption-key.base64
   apiserver_ip             = local.networks.service.vips.apiserver
   apiserver_service_label  = local.services.apiserver.name
   cluster_apiserver_ip     = local.networks.kubernetes_service.vips.apiserver
