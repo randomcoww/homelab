@@ -40,7 +40,7 @@ variable "peer_ca" {
 
 variable "images" {
   type = object({
-    etcd_wrapper = object({
+    etcd-wrapper = object({
       repository = string
       tag        = string
     })
@@ -67,9 +67,12 @@ variable "members" {
   type = map(string)
 }
 
-variable "initial_startup_delay_seconds" {
-  type    = number
-  default = 240
+variable "s3_endpoint" {
+  type = string
+}
+
+variable "s3_bucket" {
+  type = string
 }
 
 variable "s3_resource_prefix" {
@@ -81,6 +84,10 @@ variable "s3_access_key_id" {
 }
 
 variable "s3_secret_access_key" {
+  type = string
+}
+
+variable "snapshot_encryption_key" {
   type = string
 }
 

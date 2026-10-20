@@ -1,3 +1,8 @@
+resource "random_password" "etcd-snapshot-encryption-key" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "etcd" {
   for_each = local.members.etcd
   source   = "./modules/etcd"
@@ -23,9 +28,9 @@ module "etcd" {
       repository = "registry.k8s.io/etcd"
       tag        = "v3.7.2@sha256:7c6c239825d00e3f6328a69caafd54be92063acf0c2ce78b8394699f52b75dc3" # renovate: datasource=docker depName=registry.k8s.io/etcd
     }
-    etcd_wrapper = {
+    etcd-wrapper = {
       repository = "ghcr.io/randomcoww/etcd-wrapper"
-      tag        = "v0.6.1@sha256:a572094dcdf7af50c880fceb15eaeee45dbf7a356cf2b2e1694c52f1eae8104a" # renovate: datasource=docker depName=ghcr.io/randomcoww/etcd-wrapper
+      tag        = "v0.6.5@sha256:a8007f0627d585e26da29553dd81a99dd6dcdee5f2889b5154b05f0511a04e6e" # renovate: datasource=docker depName=ghcr.io/randomcoww/etcd-wrapper
     }
   }
   ports = {
@@ -38,10 +43,13 @@ module "etcd" {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
-  s3_resource_prefix   = "https://${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url}/${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}-"
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.secret_access_key
-  config_base_path     = local.kubernetes.kubernetes_config_path
-  static_pod_path      = local.kubernetes.static_pod_manifest_path
-  data_storage_path    = "${local.kubernetes.containers_path}/etcd"
+  s3_endpoint             = "https://${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url}"
+  s3_bucket               = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket
+  s3_resource_prefix      = "${local.kubernetes.cluster_name}/snapshot-"
+  s3_access_key_id        = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id
+  s3_secret_access_key    = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.secret_access_key
+  snapshot_encryption_key = random_password.etcd-snapshot-encryption-key.result
+  config_base_path        = local.kubernetes.kubernetes_config_path
+  static_pod_path         = local.kubernetes.static_pod_manifest_path
+  data_storage_path       = "${local.kubernetes.containers_path}/etcd"
 }

@@ -3,7 +3,7 @@ output "ignition_snippet" {
     variant = "fcos"
     version = var.butane_version
     storage = {
-      files = concat(
+      files = concat(values(local.config_files),
         values(local.pki_files), [
           for key, f in {
             "etcd.yaml" = module.etcd-wrapper.manifest

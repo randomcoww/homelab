@@ -1,6 +1,59 @@
 locals {
-  config_path       = "${var.config_base_path}/${var.name}"
-  etcd_wrapper_path = "/etcd-wrapper"
+  config_path                  = "${var.config_base_path}/${var.name}"
+  etcd_wrapper_path            = "/etcd-wrapper"
+  check_quorum_timeout_seconds = 240
+
+  env_config = {
+    "ETCD_NAME"                        = var.host_key
+    "ETCD_DATA_DIR"                    = "${var.data_storage_path}/data"
+    "ETCD_LISTEN_PEER_URLS"            = "https://127.0.0.1:${var.ports.etcd_peer},https://${var.node_ip}:${var.ports.etcd_peer}"
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" = "https://${var.node_ip}:${var.ports.etcd_peer}"
+    "ETCD_LISTEN_CLIENT_URLS"          = "https://127.0.0.1:${var.ports.etcd_client},https://${var.node_ip}:${var.ports.etcd_client}"
+    "ETCD_ADVERTISE_CLIENT_URLS"       = "https://${var.node_ip}:${var.ports.etcd_client}"
+    "ETCD_INITIAL_CLUSTER" = join(",", [
+      for host_key, ip in var.members :
+      "${host_key}=https://${ip}:${var.ports.etcd_peer}"
+    ])
+    "ETCD_INITIAL_CLUSTER_TOKEN" = var.cluster_token
+    "ETCD_TRUSTED_CA_FILE"       = local.pki_files["ca.crt"].path
+    "ETCD_CERT_FILE"             = local.pki_files["etcd.crt"].path
+    "ETCD_KEY_FILE"              = local.pki_files["etcd.key"].path
+    "ETCD_PEER_TRUSTED_CA_FILE"  = local.pki_files["etcd-peer-ca.crt"].path
+    "ETCD_PEER_CERT_FILE"        = local.pki_files["etcd-peer.crt"].path
+    "ETCD_PEER_KEY_FILE"         = local.pki_files["etcd-peer.key"].path
+    "ETCD_LOG_LEVEL"             = "info"
+    "ETCD_LOG_OUTPUTS"           = "stdout"
+    "ETCD_LISTEN_METRICS_URLS"   = "http://127.0.0.1:${var.ports.etcd_metrics},http://$(POD_IP):${var.ports.etcd_metrics}"
+    "ETCD_STRICT_RECONFIG_CHECK" = true
+    "ETCD_SOCKET_REUSE_PORT"     = true
+    "ETCD_SOCKET_REUSE_ADDRESS"  = true
+  }
+
+  config_files = {
+    for key, f in {
+      "etcd-wrapper-config.yaml" = yamlencode({
+        etcdBinaryFile         = "/usr/local/bin/etcd"
+        s3Endpoint             = var.s3_endpoint
+        s3Bucket               = var.s3_bucket
+        s3AccessKeyID          = var.s3_access_key_id
+        s3SecretAccessKey      = var.s3_secret_access_key
+        snapshotObjectPrefix   = var.s3_resource_prefix
+        snapshotEncryptionKey  = var.snapshot_encryption_key
+        checkQuorumTimeout     = "${local.check_quorum_timeout_seconds}s"
+        backupInterval         = "10m"
+        restoreSnapshotTimeout = "4m"
+        uploadSnapshotTimeout  = "4m"
+        snapshotTimeout        = "4m"
+      })
+    } :
+    key => {
+      mode = 384
+      path = "${local.config_path}/${key}"
+      contents = {
+        inline = f
+      }
+    }
+  }
 
   pki_files = {
     for key, f in {
@@ -32,16 +85,9 @@ module "etcd-wrapper" {
         image = "${var.images.etcd.repository}:${var.images.etcd.tag}"
         command = [
           "${local.etcd_wrapper_path}/bin/etcd-wrapper",
-          "-local-client-url",
-          "https://127.0.0.1:${var.ports.etcd_client}",
-          "-etcd-binary-file",
-          "/usr/local/bin/etcd",
-          "-etcdutl-binary-file",
-          "/usr/local/bin/etcdutl",
-          "-s3-backup-resource-prefix",
-          var.s3_resource_prefix,
-          "-initial-cluster-timeout",
-          "${var.initial_startup_delay_seconds}s",
+          "init",
+          "-config",
+          local.config_files["etcd-wrapper-config.yaml"].path,
         ]
         env = concat([
           {
@@ -53,32 +99,7 @@ module "etcd-wrapper" {
             }
           },
           ], [
-          for k, v in {
-            "ETCD_NAME"                        = var.host_key
-            "ETCD_DATA_DIR"                    = "${var.data_storage_path}/data"
-            "ETCD_LISTEN_PEER_URLS"            = "https://127.0.0.1:${var.ports.etcd_peer},https://${var.node_ip}:${var.ports.etcd_peer}"
-            "ETCD_INITIAL_ADVERTISE_PEER_URLS" = "https://${var.node_ip}:${var.ports.etcd_peer}"
-            "ETCD_LISTEN_CLIENT_URLS"          = "https://127.0.0.1:${var.ports.etcd_client},https://${var.node_ip}:${var.ports.etcd_client}"
-            "ETCD_ADVERTISE_CLIENT_URLS"       = "https://${var.node_ip}:${var.ports.etcd_client}"
-            "ETCD_INITIAL_CLUSTER" = join(",", [
-              for host_key, ip in var.members :
-              "${host_key}=https://${ip}:${var.ports.etcd_peer}"
-            ])
-            "ETCD_INITIAL_CLUSTER_TOKEN" = var.cluster_token
-            "ETCD_TRUSTED_CA_FILE"       = local.pki_files["ca.crt"].path
-            "ETCD_CERT_FILE"             = local.pki_files["etcd.crt"].path
-            "ETCD_KEY_FILE"              = local.pki_files["etcd.key"].path
-            "ETCD_PEER_TRUSTED_CA_FILE"  = local.pki_files["etcd-peer-ca.crt"].path
-            "ETCD_PEER_CERT_FILE"        = local.pki_files["etcd-peer.crt"].path
-            "ETCD_PEER_KEY_FILE"         = local.pki_files["etcd-peer.key"].path
-            "ETCD_STRICT_RECONFIG_CHECK" = true
-            "ETCD_LOG_LEVEL"             = "info"
-            "ETCD_LISTEN_METRICS_URLS"   = "http://127.0.0.1:${var.ports.etcd_metrics},http://$(POD_IP):${var.ports.etcd_metrics}"
-            "ETCD_SOCKET_REUSE_PORT"     = true
-            "ETCD_SOCKET_REUSE_ADDRESS"  = true
-            "AWS_ACCESS_KEY_ID"          = var.s3_access_key_id
-            "AWS_SECRET_ACCESS_KEY"      = var.s3_secret_access_key
-          } :
+          for k, v in local.env_config :
           {
             name  = tostring(k)
             value = tostring(v)
@@ -118,7 +139,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/readyz"
           }
-          failureThreshold = 12 + ceil(var.initial_startup_delay_seconds / 10)
+          failureThreshold = 12 + ceil(local.check_quorum_timeout_seconds / 10)
         }
         volumeMounts = [
           {
@@ -135,12 +156,48 @@ module "etcd-wrapper" {
           },
         ]
       },
+      {
+        name  = "backup"
+        image = "${var.images.etcd-wrapper.repository}:${var.images.etcd-wrapper.tag}"
+        args = [
+          "backup",
+          "-config",
+          local.config_files["etcd-wrapper-config.yaml"].path,
+        ]
+        env = concat([
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
+          ], [
+          for k, v in local.env_config :
+          {
+            name  = tostring(k)
+            value = tostring(v)
+          }
+        ])
+        resources = {
+          requests = {
+            memory = "128Mi"
+          }
+        }
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.config_path
+          },
+        ]
+      },
     ]
     volumes = [
       {
         name = "etcd-wrapper"
         image = {
-          reference = "${var.images.etcd_wrapper.repository}:${var.images.etcd_wrapper.tag}"
+          reference = "${var.images.etcd-wrapper.repository}:${var.images.etcd-wrapper.tag}"
         }
       },
       {
