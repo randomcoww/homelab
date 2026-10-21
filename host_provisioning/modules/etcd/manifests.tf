@@ -182,7 +182,7 @@ module "etcd-wrapper" {
         ])
         resources = {
           requests = {
-            memory = "128Mi"
+            memory = "512Mi"
           }
         }
         volumeMounts = [
