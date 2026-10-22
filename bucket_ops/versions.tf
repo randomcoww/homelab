@@ -17,7 +17,7 @@ terraform {
     }
     tls = {
       source  = "opentofu/tls"
-      version = "4.4.1"
+      version = "4.4.2"
     }
     random = {
       source  = "opentofu/random"
