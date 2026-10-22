@@ -30,7 +30,7 @@ module "etcd" {
     }
     etcd-wrapper = {
       repository = "ghcr.io/randomcoww/etcd-wrapper"
-      tag        = "v0.6.5@sha256:a8007f0627d585e26da29553dd81a99dd6dcdee5f2889b5154b05f0511a04e6e" # renovate: datasource=docker depName=ghcr.io/randomcoww/etcd-wrapper
+      tag        = "v0.6.6@sha256:c6ca2efb08ff63a121d9c9a7a0fbe72d642a991088fc4b1be29f8ff2bd940ced" # renovate: datasource=docker depName=ghcr.io/randomcoww/etcd-wrapper
     }
   }
   ports = {
