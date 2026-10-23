@@ -26,7 +26,7 @@ module "etcd" {
   images = {
     etcd = {
       repository = "registry.k8s.io/etcd"
-      tag        = "v3.7.2@sha256:7c6c239825d00e3f6328a69caafd54be92063acf0c2ce78b8394699f52b75dc3" # renovate: datasource=docker depName=registry.k8s.io/etcd
+      tag        = "v3.7.3@sha256:0d27b9478551f431f82d1e0ddb6c87ad07ebae8b904c637f3a99213349523910" # renovate: datasource=docker depName=registry.k8s.io/etcd
     }
     etcd-wrapper = {
       repository = "ghcr.io/randomcoww/etcd-wrapper"

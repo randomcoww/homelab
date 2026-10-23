@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-node-feature-discovery" {
             chart = {
               spec = {
                 chart   = "node-feature-discovery"
-                version = "0.20.0" # renovate: datasource=helm depName=node-feature-discovery registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts
+                version = "0.20.1" # renovate: datasource=helm depName=node-feature-discovery registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "node-feature-discovery"
