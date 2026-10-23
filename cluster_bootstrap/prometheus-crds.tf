@@ -2,7 +2,7 @@
 resource "helm_release" "prometheus-crds" {
   name             = "prometheus-crds"
   namespace        = "monitoring"
-  repository       = "https://prometheus-community.github.io/helm-charts"
+  repository       = "oci://ghcr.io/prometheus-community/charts"
   chart            = "prometheus-operator-crds"
   create_namespace = true
   wait             = true
