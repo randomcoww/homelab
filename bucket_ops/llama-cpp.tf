@@ -46,15 +46,15 @@ module "llama-cpp" {
         ]
       },
       {
-        repository = "zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl"
-        tag        = "v1790288239@sha256:75c1e3d012fa0bcdc777c458daa950a18916690c29e8f81fd377931053341747" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
+        repository = "zot.cluster.internal/randomcoww/swift-1.5-qwen3.8-27b-q8-0"
+        tag        = "v1792737723@sha256:2472446b83daa38c422554d3a57db74234e07cdbe2425b7e44609632cd0f1882" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
         files = [
           {
-            file = "Qwen3.8-27B-UD-Q8_K_XL.gguf"
+            file = "Swift-1.5-Qwen3.8-27B-Q8_0.gguf"
             path = "qwen-3-8-27b"
           },
           {
-            file = "mmproj-BF16.gguf"
+            file = "mmproj-Swift-1.5-Qwen3.8-27B-F16.gguf"
             path = "qwen-3-8-27b-mmproj"
           },
         ]
@@ -184,7 +184,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "qwen-3-8-flash-next",
+          "qwen-3-8-27b",
         ]
       }
     }

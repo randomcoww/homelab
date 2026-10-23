@@ -75,7 +75,7 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default        = "qwen-3-8-flash-next"
+      default        = "qwen-3-8-27b"
       provider       = "custom"
       base_url       = "$${OPENAI_BASE_URL}"
       api_key        = "$${OPENAI_API_KEY}"
@@ -143,7 +143,7 @@ module "hermes-agent" {
       t => {
         timeout  = 900
         provider = "custom"
-        model    = "qwen-3-8-flash-next-none" # TODO: offload to smaller model
+        model    = "qwen-3-8-27b-none"
       }
       }, {
       for _, t in [
