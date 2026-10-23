@@ -4,14 +4,17 @@ resource "minio_s3_object" "fluxcd-kubelet-csr-approver" {
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
+          kind       = "OCIRepository"
           metadata = {
             name      = "kubelet-csr-approver"
             namespace = "kube-system"
           }
           spec = {
             interval = "15m"
-            url      = "https://postfinance.github.io/kubelet-csr-approver"
+            url      = "oci://ghcr.io/postfinance/charts/kubelet-csr-approver"
+            ref = {
+              tag = "1.2.15" # renovate: datasource=docker depName=ghcr.io/postfinance/charts/kubelet-csr-approver depType=helm_regex
+            }
           }
         },
         {
@@ -24,16 +27,10 @@ resource "minio_s3_object" "fluxcd-kubelet-csr-approver" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "kubelet-csr-approver"
-                version = "1.2.15" # renovate: datasource=helm depName=kubelet-csr-approver registryUrl=https://postfinance.github.io/kubelet-csr-approver
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "kubelet-csr-approver"
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = "kubelet-csr-approver"
+              namespace = "kube-system"
             }
             releaseName = "kubelet-csr-approver"
             install = {

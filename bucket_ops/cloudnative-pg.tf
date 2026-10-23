@@ -4,14 +4,21 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
+          kind       = "OCIRepository"
           metadata = {
             name      = "cloudnative-pg"
             namespace = "cnpg-system"
           }
           spec = {
             interval = "15m"
-            url      = "https://cloudnative-pg.github.io/charts"
+            url      = "oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg"
+            ref = {
+              tag = "0.29.1" # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/charts/cloudnative-pg depType=helm_regex
+            }
+            layerSelector = {
+              mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+              operation = "copy"
+            }
           }
         },
         {
@@ -24,16 +31,10 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "cloudnative-pg"
-                version = "0.29.1" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "cloudnative-pg"
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = "cloudnative-pg"
+              namespace = "cnpg-system"
             }
             releaseName = "cloudnative-pg"
             install = {

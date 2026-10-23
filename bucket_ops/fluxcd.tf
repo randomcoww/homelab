@@ -48,7 +48,7 @@ module "minio-user-secret-fluxcd" {
 resource "helm_release" "fluxcd" {
   name             = local.fluxcd_name
   namespace        = local.fluxcd_namespace
-  repository       = "https://fluxcd-community.github.io/helm-charts"
+  repository       = "oci://ghcr.io/fluxcd-community/charts"
   chart            = "flux2"
   create_namespace = true
   wait             = true

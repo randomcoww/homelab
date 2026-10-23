@@ -5,14 +5,17 @@ output "manifests" {
     for _, m in [
       {
         apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "HelmRepository"
+        kind       = "OCIRepository"
         metadata = {
           name      = var.name
           namespace = var.namespace
         }
         spec = {
           interval = "15m"
-          url      = "https://kubereboot.github.io/charts"
+          url      = "oci://ghcr.io/kubereboot/charts/kured"
+          ref = {
+            tag = "6.1.0" # renovate: datasource=docker depName=ghcr.io/kubereboot/charts/kured depType=helm_regex
+          }
         }
       },
       {
@@ -25,16 +28,10 @@ output "manifests" {
         spec = {
           interval = "15m"
           timeout  = "5m"
-          chart = {
-            spec = {
-              chart   = "kured"
-              version = "6.1.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
-              sourceRef = {
-                kind = "HelmRepository"
-                name = var.name
-              }
-              interval = "5m"
-            }
+          chartRef = {
+            kind      = "OCIRepository"
+            name      = var.name
+            namespace = var.namespace
           }
           releaseName = var.name
           install = {

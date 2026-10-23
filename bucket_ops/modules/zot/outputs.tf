@@ -5,14 +5,21 @@ output "manifests" {
     for _, m in [
       {
         apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "HelmRepository"
+        kind       = "OCIRepository"
         metadata = {
           name      = var.name
           namespace = var.namespace
         }
         spec = {
           interval = "15m"
-          url      = "http://zotregistry.dev/helm-charts"
+          url      = "oci://ghcr.io/project-zot/helm-charts/zot"
+          ref = {
+            tag = "0.1.128" # renovate: datasource=docker depName=ghcr.io/project-zot/helm-charts/zot depType=helm_regex
+          }
+          layerSelector = {
+            mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+            operation = "copy"
+          }
         }
       },
       {
@@ -25,16 +32,10 @@ output "manifests" {
         spec = {
           interval = "15m"
           timeout  = "5m"
-          chart = {
-            spec = {
-              chart   = "zot"
-              version = "0.1.128" # renovate: datasource=helm depName=zot registryUrl=http://zotregistry.dev/helm-charts
-              sourceRef = {
-                kind = "HelmRepository"
-                name = var.name
-              }
-              interval = "5m"
-            }
+          chartRef = {
+            kind      = "OCIRepository"
+            name      = var.name
+            namespace = var.namespace
           }
           releaseName = var.name
           install = {
