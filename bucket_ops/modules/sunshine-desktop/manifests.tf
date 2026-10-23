@@ -125,6 +125,7 @@ locals {
     AMD_USERQ                  = 1
     ENABLE_LAYER_MESA_ANTI_LAG = 1
     WLR_RENDERER               = "vulkan"
+    RADV_EXPERIMENTAL          = "video_encode"
   }, var.extra_envs)
 }
 
@@ -331,7 +332,7 @@ module "statefulset" {
       {
         name  = var.name
         image = "${var.images.sunshine-desktop.repository}:${var.images.sunshine-desktop.tag}"
-        args = [
+        args = [ # TODO: enable vulkan encoder
           "bash",
           "-c",
           <<-EOF
@@ -382,7 +383,8 @@ module "statefulset" {
             origin_web_ui_allowed=wan \
             port=${local.base_port} \
             file_apps=${local.sunshine_apps_file} \
-            encoder=vulkan \
+            encoder=vaapi \
+            system_tray=disabled \
             csrf_allowed_origins=https://${var.ingress_hostname} \
             upnp=off
           EOT

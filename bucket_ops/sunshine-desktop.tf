@@ -6,7 +6,7 @@ module "sunshine-desktop" {
   images = {
     sunshine-desktop = {
       repository = "zot.cluster.internal/randomcoww/sunshine-desktop"
-      tag        = "v2026.914.233613.1789447566@sha256:41bcb64088b36623cd5bcf61640942c59c21653ff0300efc6a3a616893724cf4" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/sunshine-desktop
+      tag        = "v2026.1017.185028.1792718518@sha256:ba3ff3b4e47af87da735735190af8107c6181623cbc1217c3de4f0d6d8a1845b" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/sunshine-desktop
     }
     nginx = {
       repository = "docker.io/nginxinc/nginx-unprivileged"
