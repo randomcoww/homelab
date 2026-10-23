@@ -91,7 +91,7 @@ resource "helm_release" "cert-manager-csi-driver" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = false
-  version          = "v0.16.0"
+  version          = "v0.16.1"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
