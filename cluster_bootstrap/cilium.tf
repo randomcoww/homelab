@@ -50,7 +50,7 @@ resource "helm_release" "cilium-cert-manager-crs" {
 resource "helm_release" "cilium" {
   name             = local.services.cilium.name
   namespace        = local.services.cilium.namespace
-  repository       = "https://helm.cilium.io"
+  repository       = "oci://quay.io/cilium/charts"
   chart            = "cilium"
   create_namespace = true
   wait             = true

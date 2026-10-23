@@ -1,7 +1,7 @@
 resource "helm_release" "cert-manager" {
   name             = local.services.cert-manager.name
   namespace        = local.services.cert-manager.namespace
-  repository       = "https://charts.jetstack.io"
+  repository       = "oci://quay.io/jetstack/charts"
   chart            = "cert-manager"
   create_namespace = true
   wait             = true
