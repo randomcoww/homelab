@@ -34,6 +34,7 @@ module "searxng" {
         "json",
       ]
     }
+    /*
     outgoing = {
       request_timeout     = 4.0
       extra_proxy_timeout = 10.0
@@ -43,6 +44,7 @@ module "searxng" {
         ]
       }
     }
+    */
   }
 }
 
