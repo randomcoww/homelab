@@ -15,8 +15,9 @@ locals {
 }
 
 data "helm_template" "local-path-provisioner" {
-  name       = var.name
   chart      = "local-path-provisioner"
+  name       = var.name
+  namespace  = var.namespace
   repository = "oci://ghcr.io/rancher/local-path-provisioner/charts"
   version    = "0.0.37" # renovate: datasource=docker depName=ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner depType=helm_regex
   values = [
