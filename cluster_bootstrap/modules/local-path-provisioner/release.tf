@@ -12,12 +12,6 @@ locals {
       }
     })
   }))
-
-  configmap = yamlencode(merge(local.c, {
-    data = merge(local.c.data, {
-      "helperPod.yaml" = local.helperpod_modded
-    })
-  }))
 }
 
 data "helm_template" "local-path-provisioner" {
@@ -65,7 +59,11 @@ resource "helm_release" "wrapper" {
   values = [
     yamlencode({
       manifests = values(merge(data.helm_template.local-path-provisioner.manifests, {
-        "templates/configmap.yaml" = local.configmap
+        "templates/configmap.yaml" = yamlencode(merge(local.c, {
+          data = merge(local.c.data, {
+            "helperPod.yaml" = local.helperpod_modded
+          })
+        }))
       }))
     }),
   ]
