@@ -3,7 +3,7 @@ output "manifests" {
     module.secret.manifest,
     module.statefulset.manifest,
     ], [
-    for _, service in module.service-peer :
+    for _, service in module.peer-service :
     service.manifest
     ], [
     for _, m in [

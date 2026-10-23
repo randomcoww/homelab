@@ -22,7 +22,7 @@ locals {
 
 # Kea peers must know the IP (not DNS name) of all peers
 # Create a service for each pod with a known IP
-module "service-peer" {
+module "peer-service" {
   for_each = {
     for _, member in local.members :
     member.name => member
