@@ -47,7 +47,7 @@ module "llama-cpp" {
       },
       {
         repository = "zot.cluster.internal/randomcoww/swift-1.5-qwen3.8-27b-q8-0"
-        tag        = "v1792737723@sha256:2472446b83daa38c422554d3a57db74234e07cdbe2425b7e44609632cd0f1882" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/qwen3.8-27b-ud-q8-k-xl
+        tag        = "v1792737723@sha256:2472446b83daa38c422554d3a57db74234e07cdbe2425b7e44609632cd0f1882" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/swift-1.5-qwen3.8-27b-q8-0
         files = [
           {
             file = "Swift-1.5-Qwen3.8-27B-Q8_0.gguf"
