@@ -3,6 +3,7 @@ output "manifests" {
     module.secret.manifest,
     module.configmap.manifest,
     module.service.manifest,
+    module.admin-service.manifest,
     module.httproute.manifest,
     module.statefulset.manifest,
     ], [
