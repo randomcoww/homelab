@@ -123,8 +123,6 @@ locals {
     helm_release_timeout        = 600
 
     feature_gates = {
-      ClusterTrustBundle                      = true
-      ClusterTrustBundleProjection            = true
       InPlacePodLevelResourcesVerticalScaling = false # TODO: workaround for kubelet 1.36.x panic with doPodResizeAction
     }
   }
