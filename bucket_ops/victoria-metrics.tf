@@ -517,6 +517,16 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       }
                     }
                   }
+                  node-exporter = {
+                    rules = {
+                      # modify default 90% threshold to 95%
+                      NodeMemoryHighUtilization = {
+                        spec = {
+                          expr = "(100 - ((node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100)) > 95"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
