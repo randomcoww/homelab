@@ -178,6 +178,7 @@ output "ignition_snippet" {
 
                 [crio.runtime]
                 cgroup_manager="systemd"
+                default_ulimits=["nofile=65536:524288"]
 
                 [crio.runtime.runtimes.crun]
                 monitor_cgroup="pod"

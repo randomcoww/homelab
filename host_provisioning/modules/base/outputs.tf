@@ -229,6 +229,7 @@ output "ignition_snippet" {
           contents = {
             inline = <<-EOF
               kernel.printk=4
+              fs.file-max=2097152
               fs.inotify.max_user_watches=524288
               EOF
           }
