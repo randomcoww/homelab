@@ -184,7 +184,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "qwen-3-8-27b",
+          "qwen-3-8-flash-next",
         ]
       }
     }
