@@ -332,10 +332,10 @@ module "litestream-overlay" {
     terminationGracePeriodSeconds = 60
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "3Gi"
       }
       limits = {
-        memory = "3Gi"
+        memory = "5Gi"
       }
     }
     # do not use fsGroup with juicefs
