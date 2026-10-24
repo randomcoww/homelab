@@ -13,14 +13,17 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
+          kind       = "OCIRepository"
           metadata = {
             name      = local.victoria-metrics_name
             namespace = local.victoria-metrics_namespace
           }
           spec = {
             interval = "15m"
-            url      = "https://victoriametrics.github.io/helm-charts"
+            url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack"
+            ref = {
+              tag = "0.96.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack depType=helm_regex
+            }
           }
         },
         {
@@ -33,16 +36,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "victoria-metrics-k8s-stack"
-                version = "0.96.0" # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = local.victoria-metrics_name
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = local.victoria-metrics_name
+              namespace = local.victoria-metrics_namespace
             }
             releaseName = local.victoria-metrics_name
             install = {
@@ -566,7 +563,22 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           }
         },
 
-        # MCP
+        # metrics MCP
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "OCIRepository"
+          metadata = {
+            name      = local.victoria-metrics-mcp_name
+            namespace = local.victoria-metrics_namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-mcp"
+            ref = {
+              tag = "0.4.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-mcp depType=helm_regex
+            }
+          }
+        },
         {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
@@ -577,16 +589,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "victoria-metrics-mcp"
-                version = "0.4.0" # renovate: datasource=helm depName=victoria-metrics-mcp registryUrl=https://victoriametrics.github.io/helm-charts
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = local.victoria-metrics_name
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = local.victoria-metrics-mcp_name
+              namespace = local.victoria-metrics_namespace
             }
             releaseName = local.victoria-metrics-mcp_name
             install = {
@@ -620,8 +626,25 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 }
               }
               scrape = {
-                enabled = false # TODO: enable after release of https://github.com/VictoriaMetrics/helm-charts/pull/3108
+                enabled = true
               }
+            }
+          }
+        },
+
+        # logs MCP
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "OCIRepository"
+          metadata = {
+            name      = local.victoria-logs-mcp_name
+            namespace = local.victoria-metrics_namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-mcp"
+            ref = {
+              tag = "0.2.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-logs-mcp depType=helm_regex
             }
           }
         },
@@ -635,16 +658,10 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "victoria-logs-mcp"
-                version = "0.2.0" # renovate: datasource=helm depName=victoria-logs-mcp registryUrl=https://victoriametrics.github.io/helm-charts
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = local.victoria-metrics_name
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = local.victoria-logs-mcp_name
+              namespace = local.victoria-metrics_namespace
             }
             releaseName = local.victoria-logs-mcp_name
             install = {
