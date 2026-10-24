@@ -13,7 +13,6 @@ locals {
     mic     = local.base_port + 13
   }
   web_port               = local.base_port + 1
-  proxy_web_port         = 8080
   home_path              = "/home/${var.user}"
   sunshine_apps_file     = "/etc/sunshine/apps.json"
   tls_path               = "/etc/sunshine/tls"
@@ -161,25 +160,8 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = {
-    USERNAME     = random_password.username.result
-    PASSWORD     = random_password.password.result
-    "nginx.conf" = <<-EOF
-    server {
-      listen ${local.proxy_web_port};
-      location / {
-        proxy_ssl_verify off;
-        proxy_ssl_server_name on;
-
-        proxy_set_header Authorization "Basic ${base64encode("${random_password.username.result}:${random_password.password.result}")}";
-        proxy_pass https://127.0.0.1:${local.web_port};
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      }
-    }
-    EOF
+    USERNAME = random_password.username.result
+    PASSWORD = random_password.password.result
   }
 }
 
@@ -226,9 +208,9 @@ module "admin-service" {
     ports = [
       {
         name       = "web"
-        port       = local.proxy_web_port
+        port       = local.web_port
         protocol   = "TCP"
-        targetPort = local.proxy_web_port
+        targetPort = local.web_port
       },
     ]
   }
@@ -284,11 +266,22 @@ module "httproute" {
               }
             }
           },
+          {
+            type = "RequestHeaderModifier"
+            requestHeaderModifier = {
+              set = [
+                {
+                  name  = "Authorization"
+                  value = "Basic ${base64encode("${random_password.username.result}:${random_password.password.result}")}"
+                },
+              ]
+            }
+          },
         ]
         backendRefs = [
           {
             name = module.admin-service.name
-            port = local.proxy_web_port
+            port = local.web_port
           },
         ]
       },
@@ -393,7 +386,7 @@ module "statefulset" {
           sleep 1
           done
           exec sunshine \
-            origin_web_ui_allowed=pc \
+            origin_web_ui_allowed=wan \
             port=${local.base_port} \
             file_apps=${local.sunshine_apps_file} \
             encoder=vaapi \
@@ -469,6 +462,11 @@ module "statefulset" {
             containerPort = port
             protocol      = "UDP"
           }
+          ], [
+          {
+            containerPort = local.web_port
+            protocol      = "TCP"
+          },
         ])
         livenessProbe = {
           tcpSocket = {
@@ -510,31 +508,8 @@ module "statefulset" {
           privileged = true # TODO: Try https://github.com/joleuger/vuinputd
         }
       },
-      {
-        name          = "${var.name}-web-proxy"
-        image         = "${var.images.nginx.repository}:${var.images.nginx.tag}"
-        restartPolicy = "Always"
-        ports = [
-          {
-            containerPort = local.proxy_web_port
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "secret"
-            mountPath = "/etc/nginx/conf.d/default.conf"
-            subPath   = "nginx.conf"
-          },
-        ]
-      },
     ]
     volumes = concat([
-      {
-        name = "secret"
-        secret = {
-          secretName = module.secret.name
-        }
-      },
       {
         name = "tls"
         secret = {

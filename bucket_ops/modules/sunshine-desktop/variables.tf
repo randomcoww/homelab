@@ -85,3 +85,7 @@ variable "auth_backend_ref" {
     port      = number
   })
 }
+
+variable "ca_issuer_name" {
+  type = string
+}

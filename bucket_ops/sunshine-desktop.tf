@@ -31,6 +31,7 @@ module "sunshine-desktop" {
     port      = 80
   }
   gpu_resource_claim = local.resource_claims.amd-gpu-gfx1151
+  ca_issuer_name     = local.cert_issuers.ca_internal
 }
 
 resource "minio_s3_object" "sunshine-desktop" {

@@ -8,18 +8,6 @@ output "manifests" {
     module.statefulset.manifest,
     ], [
     for _, m in [
-      {
-        apiVersion = "cert-manager.io/v1"
-        kind       = "Issuer"
-        metadata = {
-          name      = "${var.name}-selfsigned"
-          namespace = var.namespace
-        }
-        spec = {
-          selfSigned = {
-          }
-        }
-      },
       # server cert
       {
         apiVersion = "cert-manager.io/v1"
@@ -36,10 +24,39 @@ output "manifests" {
             algorithm = "RSA"
             size      = 4096
           }
+          dnsNames = [
+            "${var.name}.${var.namespace}",
+          ]
           issuerRef = {
-            name  = "${var.name}-selfsigned"
-            kind  = "Issuer"
-            group = "cert-manager.io"
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      {
+        apiVersion = "gateway.networking.k8s.io/v1"
+        kind       = "BackendTLSPolicy"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          targetRefs = [
+            {
+              group = ""
+              kind  = "Service"
+              name  = module.admin-service.name
+            },
+          ]
+          validation = {
+            hostname = "${var.name}.${var.namespace}"
+            caCertificateRefs = [
+              {
+                group = ""
+                kind  = "ConfigMap"
+                name  = "trust-manager-ca-internal"
+              },
+            ]
           }
         }
       },
