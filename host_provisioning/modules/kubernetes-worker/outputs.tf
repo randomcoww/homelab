@@ -120,7 +120,6 @@ output "ignition_snippet" {
         values(local.kubeconfig_files),
         values(local.pki_files), [
 
-          # TODO: limit access
           {
             path      = "/etc/nftables/${var.name}.nft"
             mode      = 420
@@ -134,17 +133,11 @@ output "ignition_snippet" {
 
                   chain input {
                     type filter hook input priority 0; policy accept;
+                    # Kubelet
                     tcp dport ${var.ports.kubelet} jump mark-for-accept;
                     ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
-                    ip saddr ${var.node_prefix} jump mark-for-accept;
-                    ip daddr ${var.node_prefix} jump mark-for-accept;
-                  }
-
-                  chain forward {
-                    type filter hook forward priority 0; policy accept;
-                    ip saddr ${var.kubernetes_pod_prefix} jump mark-for-accept;
-                    ip saddr ${var.node_prefix} jump mark-for-accept;
-                    ip daddr ${var.node_prefix} jump mark-for-accept;
+                    # Host network pods, Cilium health check
+                    ip saddr ${var.node_prefix} ip daddr ${var.node_prefix} jump mark-for-accept;
                   }
                 }
                 ;

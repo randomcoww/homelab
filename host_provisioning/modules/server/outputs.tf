@@ -287,7 +287,7 @@ EOF
                   type filter hook input priority 20; policy drop;
                   tcp dport ssh accept;
                   # BGP
-                  tcp dport ${var.bgp_port} accept;
+                  tcp dport ${var.bgp_port} ct state new accept;
                   # BFD
                   udp dport {3784, 4784} accept;
                   meta mark & ${var.fw_mark} == ${var.fw_mark} accept;
