@@ -22,7 +22,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             interval = "15m"
             url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack"
             ref = {
-              tag = "0.96.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack depType=helm_regex
+              tag = "0.96.1" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack depType=helm_regex
             }
           }
         },
