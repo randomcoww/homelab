@@ -127,7 +127,13 @@ EOF
         # bird
         {
           path = "${var.bird_path}/gateway.conf"
-          mode = 420
+          mode = 384
+          user = {
+            name = "bird"
+          }
+          group = {
+            name = "bird"
+          }
           contents = {
             inline = <<-EOF
               # Bird peers sharing default gateway and apiserver
@@ -136,6 +142,7 @@ EOF
                 source address ${cidrhost(var.bgp_prefix, var.host_netnum)};
                 local port ${var.bgp_port} as ${var.bgp_as};
                 neighbor range ${var.bgp_prefix} port ${var.bgp_port} internal;
+                password "${var.bgp_password}";
                 graceful restart;
                 direct;
                 rr client;
@@ -155,6 +162,7 @@ EOF
                 source address ${cidrhost(var.service_prefix, var.host_netnum)};
                 local port ${var.bgp_port} as ${var.bgp_as};
                 neighbor range ${var.service_prefix} port ${var.bgp_port} as ${var.bgp_as_peer};
+                password "${var.bgp_password}";
                 graceful restart;
                 direct;
                 bfd {

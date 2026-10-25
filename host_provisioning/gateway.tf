@@ -13,6 +13,7 @@ module "gateway" {
   bgp_as              = local.bgp.host_as
   bgp_as_peer         = local.bgp.cluster_as
   bgp_prefix          = each.value.networks.node.prefix
+  bgp_password        = random_password.bgp-password.result
   service_prefix      = each.value.networks.service.prefix
   keepalived_path     = local.keepalived_config_path
 

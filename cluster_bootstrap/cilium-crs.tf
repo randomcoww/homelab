@@ -11,13 +11,24 @@ resource "helm_release" "cilium-crs" {
       manifests = [
         for _, m in [
           {
+            apiVersion = "v1"
+            kind       = "Secret"
+            metadata = {
+              name = "${local.services.cilium.name}-bgp-auth"
+            }
+            stringData = {
+              password = data.terraform_remote_state.host.outputs.bgp_password
+            }
+          },
+          {
             apiVersion = "cilium.io/v2"
             kind       = "CiliumBGPPeerConfig"
             metadata = {
               name = "cilium-peer"
             }
             spec = {
-              ebgpMultihop = 1
+              ebgpMultihop  = 1
+              authSecretRef = "${local.services.cilium.name}-bgp-auth"
               gracefulRestart = {
                 enabled = true
               }

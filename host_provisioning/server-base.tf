@@ -77,6 +77,7 @@ module "server" {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.value.netnum != host.netnum
   }
-  bgp_as     = local.bgp.host_as
-  bgp_prefix = each.value.networks.node.prefix
+  bgp_as       = local.bgp.host_as
+  bgp_prefix   = each.value.networks.node.prefix
+  bgp_password = random_password.bgp-password.result
 }

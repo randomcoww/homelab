@@ -123,7 +123,13 @@ output "ignition_snippet" {
           },
           {
             path = "${var.bird_path}/apiserver.conf"
-            mode = 420
+            mode = 384
+            user = {
+              name = "bird"
+            }
+            group = {
+              name = "bird"
+            }
             contents = {
               inline = <<-EOF
                 protocol direct {

@@ -128,8 +128,14 @@ output "ignition_snippet" {
           }
         },
         {
-          path      = "/etc/bird.conf"
-          mode      = 420
+          path = "/etc/bird.conf"
+          mode = 384
+          user = {
+            name = "bird"
+          }
+          group = {
+            name = "bird"
+          }
           overwrite = true
           contents = {
             inline = <<-EOF
@@ -170,6 +176,7 @@ protocol pipe {
   debug all;
   local port ${var.bgp_port} as ${var.bgp_as};
   neighbor ${cidrhost(var.bgp_prefix, netnum)} port ${var.bgp_port} internal;
+  password "${var.bgp_password}";
   graceful restart;
   direct;
   bfd {

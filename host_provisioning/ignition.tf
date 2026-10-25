@@ -50,6 +50,11 @@ locals {
   }
 }
 
+resource "random_password" "bgp-password" {
+  length  = 32
+  special = false
+}
+
 resource "local_file" "ignition-snippets" {
   for_each = nonsensitive(merge([
     for key, ignition_set in local.ignition_snippets : {
@@ -69,5 +74,10 @@ output "ignition_snippets" {
     for key, ignition_set in local.ignition_snippets :
     key => values(ignition_set)
   }
+  sensitive = true
+}
+
+output "bgp_password" {
+  value     = random_password.bgp-password.result
   sensitive = true
 }

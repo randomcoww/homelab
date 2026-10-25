@@ -77,6 +77,10 @@ variable "bgp_as" {
   type = number
 }
 
+variable "bgp_password" {
+  type = string
+}
+
 variable "backup_bind_mount_path" {
   type    = string
   default = "/var/devfiles"

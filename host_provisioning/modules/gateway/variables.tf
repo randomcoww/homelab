@@ -45,6 +45,10 @@ variable "bgp_prefix" {
   type = string
 }
 
+variable "bgp_password" {
+  type = string
+}
+
 variable "service_prefix" {
   type = string
 }
