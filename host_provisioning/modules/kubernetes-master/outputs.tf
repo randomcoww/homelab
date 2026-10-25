@@ -64,7 +64,7 @@ output "ignition_snippet" {
           ], [
           {
             path      = "/etc/nftables/${var.name}.nft"
-            mode      = 420
+            mode      = 384
             overwrite = true
             contents = {
               inline = <<-EOF
@@ -88,7 +88,7 @@ output "ignition_snippet" {
           # This works on fresh start where clusterIP isn't up, and during shutdown when CNI is up, but when apiserver is killed early on this node.
           {
             path = "${var.haproxy_path}/${var.name}.cfg"
-            mode = 420
+            mode = 384
             contents = {
               inline = <<-EOF
                 frontend ${var.name}

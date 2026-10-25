@@ -37,7 +37,7 @@ output "ignition_snippet" {
         },
         {
           path      = "/etc/nftables/gateway.nft"
-          mode      = 420
+          mode      = 384
           overwrite = true
           contents = {
             inline = <<-EOF
@@ -88,7 +88,7 @@ output "ignition_snippet" {
         },
         {
           path = "${var.keepalived_path}/gateway.conf"
-          mode = 420
+          mode = 384
           contents = {
             # Use VIP with network netmask as virtual addr to intentionally create a prefix route
             inline = <<-EOF

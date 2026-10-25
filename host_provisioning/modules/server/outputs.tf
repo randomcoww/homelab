@@ -199,7 +199,7 @@ EOF
         # EOF can be tricky: https://stackoverflow.com/questions/68350378/unable-to-start-haproxy-2-4-missing-lf-on-last-line
         {
           path      = "/etc/haproxy/haproxy.cfg"
-          mode      = 420
+          mode      = 384
           overwrite = true
           contents = {
             inline = <<-EOF
@@ -219,7 +219,7 @@ EOF
         # Keepalived configs
         {
           path      = "/etc/keepalived/keepalived.conf"
-          mode      = 420
+          mode      = 384
           overwrite = true
           contents = {
             inline = <<-EOF
@@ -267,7 +267,7 @@ EOF
         },
         {
           path      = "/etc/nftables/base.nft"
-          mode      = 420
+          mode      = 384
           overwrite = true
           contents = {
             inline = <<-EOF

@@ -27,7 +27,7 @@ output "ignition_snippet" {
           },
           {
             path      = "/etc/nftables/${var.name}.nft"
-            mode      = 420
+            mode      = 384
             overwrite = true
             contents = {
               inline = <<-EOF
