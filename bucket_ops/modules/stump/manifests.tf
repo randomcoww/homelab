@@ -1,7 +1,6 @@
 locals {
   envs = merge(var.extra_envs, {
     STUMP_CONFIG_DIR              = "/stump/config"
-    STUMP_DB_PATH                 = "/stump/data"
     STUMP_PORT                    = 8000
     STUMP_OIDC_ENABLED            = true
     STUMP_OIDC_ALLOW_REGISTRATION = true
@@ -14,16 +13,15 @@ locals {
     STUMP_TRUST_PROXY_HEADERS     = true
     STUMP_VERBOSITY               = 0 # disable internal log file
     STUMP_ALLOWED_ORIGINS         = "https://${var.ingress_hostname}"
+    STUMP_DB_NAME                 = "stump"
+    STUMP_DB_USER                 = "stump"
   })
-  db_file         = "${local.envs.STUMP_DB_PATH}/stump.db" # non-configurable
-  data_path       = "/data"
+  data_path       = "/data"                                     # library mount path
   thumbnails_path = "${local.envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
   # juicefs for thumbnails
   juicefs_name              = "${var.name}-juicefs"
   juicefs_postgres_database = "juicefs"
   juicefs_postgres_username = "juicefs"
-
-  litestream_mcp_port = 3001
 }
 
 resource "random_password" "juicefs-postgres-password" {
@@ -79,9 +77,6 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  labels = {
-    litestream-mcp = var.name
-  }
   spec = {
     type      = "ClusterIP"
     clusterIP = "None"
@@ -91,13 +86,6 @@ module "service" {
         port       = local.envs.STUMP_PORT
         protocol   = "TCP"
         targetPort = local.envs.STUMP_PORT
-      },
-      {
-        name        = "mcp"
-        port        = local.litestream_mcp_port
-        protocol    = "TCP"
-        targetPort  = local.litestream_mcp_port
-        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }
@@ -139,53 +127,20 @@ module "httproute" {
   }
 }
 
-module "litestream-overlay" {
-  source = "../litestream_overlay"
+module "deployment" {
+  source = "../../../modules/deployment"
 
   name      = var.name
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  images = {
-    litestream = var.images.litestream
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = {
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
   }
-  litestream_config = {
-    mcp-addr = "0.0.0.0:${local.litestream_mcp_port}"
-    dbs = [
-      {
-        path                = local.db_file
-        monitor-interval    = "1s"
-        checkpoint-interval = "60s"
-        replica = {
-          type          = "s3"
-          endpoint      = var.minio_endpoint
-          bucket        = var.minio_bucket
-          path          = "$POD_NAME/litestream"
-          sync-interval = "1s"
-          part-size     = "50MB"
-          concurrency   = 10
-        }
-      },
-    ]
-  }
-  mount_path            = dirname(local.db_file)
-  mount_path_volume_ref = "${var.name}-litestream-data"
-  s3_access_key_ref = {
-    name = module.minio-user-secret.name
-    key  = "AWS_ACCESS_KEY_ID"
-  }
-  s3_secret_key_ref = {
-    name = module.minio-user-secret.name
-    key  = "AWS_SECRET_ACCESS_KEY"
-  }
-  litestream_container_params = {
-    ports = [
-      {
-        containerPort = local.litestream_mcp_port
-      },
-    ]
-  }
-
   template_spec = {
     resources = {
       requests = {
@@ -208,6 +163,35 @@ module "litestream-overlay" {
           {
             secretRef = {
               name = module.secret.name
+            }
+          },
+        ]
+        env = [
+          {
+            name = "STUMP_DB_HOST"
+            valueFrom = {
+              secretKeyRef = {
+                name = "${var.name}-pg-app"
+                key  = "host"
+              }
+            }
+          },
+          {
+            name = "STUMP_DB_PORT"
+            valueFrom = {
+              secretKeyRef = {
+                name = "${var.name}-pg-app"
+                key  = "port"
+              }
+            }
+          },
+          {
+            name = "STUMP_DB_PASSWORD"
+            valueFrom = {
+              secretKeyRef = {
+                name = "${var.name}-pg-app"
+                key  = "password"
+              }
             }
           },
         ]
@@ -241,12 +225,6 @@ module "litestream-overlay" {
     ]
     volumes = [
       {
-        name = "${var.name}-litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
-      {
         name = "data"
         persistentVolumeClaim = {
           claimName = "${var.name}-${var.minio_data_bucket}"
@@ -260,47 +238,6 @@ module "litestream-overlay" {
       },
     ]
   }
-}
-
-module "statefulset" {
-  source = "../../../modules/statefulset"
-
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
-  annotations = {
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-  }
-  /* persistent path for sqlite
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "${var.name}-litestream-data"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-          storageClassName = "local-path"
-        }
-      },
-    ]
-  }
-  */
-  template_spec = merge(module.litestream-overlay.template_spec, {
-    terminationGracePeriodSeconds = 60
-  })
 }
 
 module "minio-user-secret" {
