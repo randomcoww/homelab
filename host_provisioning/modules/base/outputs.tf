@@ -158,7 +158,7 @@ output "ignition_snippet" {
         # Block password SSH #
         {
           path = "/etc/ssh/sshd_config.d/10-block-password.conf"
-          mode = 420
+          mode = 384
           contents = {
             inline = <<-EOF
               PasswordAuthentication no

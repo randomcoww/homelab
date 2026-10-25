@@ -326,7 +326,7 @@ EOF
         # SSHD base
         {
           path = "/etc/ssh/sshd_config.d/90-custom.conf"
-          mode = 420
+          mode = 384
           contents = {
             inline = <<-EOF
               PasswordAuthentication no
