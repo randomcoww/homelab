@@ -55,6 +55,7 @@ resource "random_password" "bgp-password" {
   special = false
 }
 
+/*
 resource "local_file" "ignition-snippets" {
   for_each = nonsensitive(merge([
     for key, ignition_set in local.ignition_snippets : {
@@ -66,6 +67,7 @@ resource "local_file" "ignition-snippets" {
   content  = each.value
   filename = "${path.module}/output/ignition/${each.key}"
 }
+*/
 
 # outputs
 
