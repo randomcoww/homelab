@@ -39,7 +39,7 @@ module "gha-runner" {
   images = {
     gha-runner = {
       repository = "ghcr.io/actions/actions-runner"
-      tag        = "2.338.1@sha256:e275409999c37162649aa050ca573f03eab2eabcb3a1e7fcc47548de6b4f9690" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner
+      tag        = "2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner
     }
   }
   github_username       = var.github_username
