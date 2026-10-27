@@ -5,21 +5,6 @@ output "manifests" {
     ], [
     for _, m in [
       {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = "hindsight"
-          namespace = "ai"
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/vectorize-io/charts/hindsight"
-          ref = {
-            tag = "1.1.0" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
-          }
-        }
-      },
-      {
         apiVersion = "helm.toolkit.fluxcd.io/v2"
         kind       = "HelmRelease"
         metadata = {
@@ -29,10 +14,15 @@ output "manifests" {
         spec = {
           interval = "15m"
           timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = "hindsight"
-            namespace = "ai"
+          chart = {
+            kind = "OCIRepository"
+            spec = {
+              interval = "6h"
+              url      = "oci://ghcr.io/vectorize-io/charts/hindsight"
+              ref = {
+                tag = "1.1.0" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex
+              }
+            }
           }
           releaseName = "hindsight"
           install = {

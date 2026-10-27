@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
             namespace = "kube-system"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://kubernetes-sigs.github.io/metrics-server"
           }
         },
@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
                   kind = "HelmRepository"
                   name = "metrics-server"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "metrics-server"

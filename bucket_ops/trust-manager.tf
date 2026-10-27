@@ -3,21 +3,6 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
     "manifest.yaml" = join("\n---\n", [
       for _, m in [
         {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "OCIRepository"
-          metadata = {
-            name      = "trust-manager"
-            namespace = local.services.cert-manager.namespace
-          }
-          spec = {
-            interval = "15m"
-            url      = "oci://quay.io/jetstack/charts/trust-manager"
-            ref = {
-              tag = "0.26.0" # renovate: datasource=docker depName=quay.io/jetstack/charts/trust-manager depType=helm_regex
-            }
-          }
-        },
-        {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
@@ -27,10 +12,15 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chartRef = {
-              kind      = "OCIRepository"
-              name      = "trust-manager"
-              namespace = local.services.cert-manager.namespace
+            chart = {
+              kind = "OCIRepository"
+              spec = {
+                interval = "6h"
+                url      = "oci://quay.io/jetstack/charts/trust-manager"
+                ref = {
+                  tag = "0.26.0" # renovate: datasource=docker depName=quay.io/jetstack/charts/trust-manager depType=helm_regex
+                }
+              }
             }
             releaseName = "trust-manager"
             install = {

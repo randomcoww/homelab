@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-node-feature-discovery" {
             namespace = "kube-system"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://kubernetes-sigs.github.io/node-feature-discovery/charts"
           }
         },
@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-node-feature-discovery" {
                   kind = "HelmRepository"
                   name = "node-feature-discovery"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "node-feature-discovery"

@@ -17,21 +17,6 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
     "manifest.yaml" = join("\n---\n", [
       for _, m in [
         {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "OCIRepository"
-          metadata = {
-            name      = local.agentgateway_name
-            namespace = local.agentgateway_namespace
-          }
-          spec = {
-            interval = "15m"
-            url      = "oci://ghcr.io/agentgateway/charts/agentgateway"
-            ref = {
-              tag = "v1.7.0" # renovate: datasource=docker depName=ghcr.io/agentgateway/charts/agentgateway depType=helm_regex
-            }
-          }
-        },
-        {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
@@ -41,10 +26,15 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chartRef = {
-              kind      = "OCIRepository"
-              name      = local.agentgateway_name
-              namespace = local.agentgateway_namespace
+            chart = {
+              kind = "OCIRepository"
+              spec = {
+                interval = "6h"
+                url      = "oci://ghcr.io/agentgateway/charts/agentgateway"
+                ref = {
+                  tag = "v1.7.0" # renovate: datasource=docker depName=ghcr.io/agentgateway/charts/agentgateway depType=helm_regex
+                }
+              }
             }
             releaseName = local.agentgateway_name
             install = {

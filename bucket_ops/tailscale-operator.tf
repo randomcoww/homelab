@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
             namespace = "tailscale"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://pkgs.tailscale.com/helmcharts"
           }
         },
@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-tailscale-operator" {
                   kind = "HelmRepository"
                   name = "tailscale-operator"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "tailscale-operator"

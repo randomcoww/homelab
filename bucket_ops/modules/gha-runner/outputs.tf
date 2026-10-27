@@ -16,7 +16,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
           ref = {
             tag = "0.15.1" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set depType=helm_regex
@@ -150,21 +150,6 @@ output "manifests" {
 
       # runner-controller in arc-systems
       {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = "${var.name}-scale-set-controller"
-          namespace = var.controller_namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
-          ref = {
-            tag = "0.15.1" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
-          }
-        }
-      },
-      {
         apiVersion = "helm.toolkit.fluxcd.io/v2"
         kind       = "HelmRelease"
         metadata = {
@@ -174,10 +159,15 @@ output "manifests" {
         spec = {
           interval = "15m"
           timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = "${var.name}-scale-set-controller"
-            namespace = var.controller_namespace
+          chart = {
+            kind = "OCIRepository"
+            spec = {
+              interval = "6h"
+              url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
+              ref = {
+                tag = "0.15.1" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
+              }
+            }
           }
           releaseName = var.name
           install = {

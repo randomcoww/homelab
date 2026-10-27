@@ -186,25 +186,6 @@ output "manifests" {
 
       # authelia helm
       {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = var.name
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/authelia/chartrepo/authelia"
-          ref = {
-            tag = "0.11.22" # renovate: datasource=docker depName=ghcr.io/authelia/chartrepo/authelia depType=helm_regex
-          }
-          layerSelector = {
-            mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
-            operation = "copy"
-          }
-        }
-      },
-      {
         apiVersion = "helm.toolkit.fluxcd.io/v2"
         kind       = "HelmRelease"
         metadata = {
@@ -214,10 +195,19 @@ output "manifests" {
         spec = {
           interval = "15m"
           timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = var.name
-            namespace = var.namespace
+          chart = {
+            kind = "OCIRepository"
+            spec = {
+              interval = "6h"
+              url      = "oci://ghcr.io/authelia/chartrepo/authelia"
+              ref = {
+                tag = "0.11.22" # renovate: datasource=docker depName=ghcr.io/authelia/chartrepo/authelia depType=helm_regex
+              }
+              layerSelector = {
+                mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+                operation = "copy"
+              }
+            }
           }
           releaseName = var.name
           install = {

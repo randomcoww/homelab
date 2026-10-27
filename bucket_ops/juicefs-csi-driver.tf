@@ -14,7 +14,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
             namespace = "juicefs"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://juicedata.github.io/charts"
           }
         },
@@ -36,7 +36,7 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                   kind = "HelmRepository"
                   name = "juicefs-csi-driver"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "juicefs-csi-driver"

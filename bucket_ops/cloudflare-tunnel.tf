@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
             namespace = "cloudflare-tunnel"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://cloudflare.github.io/helm-charts"
           }
         },
@@ -32,7 +32,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
                   kind = "HelmRepository"
                   name = "cloudflare-tunnel"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "cloudflare-tunnel"

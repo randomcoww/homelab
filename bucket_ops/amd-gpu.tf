@@ -11,7 +11,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
             namespace = "kube-amd-gpu"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://rocm.github.io/k8s-gpu-dra-driver"
           }
         },
@@ -33,7 +33,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
                   kind = "HelmRepository"
                   name = "amd-gpu-dra-driver"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "amd-gpu-dra-driver"
@@ -65,7 +65,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
             namespace = "kube-amd-gpu"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "https://rocm.github.io/device-metrics-exporter"
           }
         },
@@ -87,7 +87,7 @@ resource "minio_s3_object" "fluxcd-amd-gpu" {
                   kind = "HelmRepository"
                   name = "amd-gpu-metrics-exporter"
                 }
-                interval = "5m"
+                interval = "6h"
               }
             }
             releaseName = "amd-gpu-metrics-exporter"
