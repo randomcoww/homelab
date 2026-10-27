@@ -4,14 +4,17 @@ resource "minio_s3_object" "fluxcd-reloader" {
       for _, m in [
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
+          kind       = "OCIRepository"
           metadata = {
             name      = "reloader"
             namespace = "kube-system"
           }
           spec = {
             interval = "15m"
-            url      = "https://stakater.github.io/stakater-charts"
+            url      = "oci://ghcr.io/stakater/charts/reloader"
+            ref = {
+              tag = "2.2.19" # renovate: datasource=docker depName=ghcr.io/stakater/charts/reloader depType=helm_regex
+            }
           }
         },
         {
@@ -24,16 +27,10 @@ resource "minio_s3_object" "fluxcd-reloader" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "reloader"
-                version = "2.2.19" # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "reloader"
-                }
-                interval = "5m"
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = "reloader"
+              namespace = "kube-system"
             }
             releaseName = "reloader"
             install = {
