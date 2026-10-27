@@ -27,10 +27,6 @@ variable "images" {
       repository = string
       tag        = string
     })
-    litestream = object({
-      repository = string
-      tag        = string
-    })
   })
 }
 

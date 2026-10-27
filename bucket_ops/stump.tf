@@ -48,10 +48,6 @@ module "stump" {
       repository = "docker.io/aaronleopold/stump"
       tag        = "0.1.11@sha256:2d62217aaabb68466d08d8f5275549ba8713b3ff5c1f39a80a742a6e66d8105b" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
     }
-    litestream = {
-      repository = "docker.io/litestream/litestream"
-      tag        = "0.5.17@sha256:4b02b9859a6b6b4087d8b8944e15f7e984bd7957cba322bbeee38b0e27b9656a" # renovate: datasource=docker depName=docker.io/litestream/litestream
-    }
   }
   extra_envs = {
     STUMP_OIDC_ISSUER_URL    = "https://${local.endpoints.authelia.hostname}"
