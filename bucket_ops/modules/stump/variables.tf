@@ -55,17 +55,6 @@ variable "minio_bucket" {
   type = string
 }
 
-variable "minio_user" {
-  type = object({
-    id     = string
-    secret = string
-  })
-}
-
 variable "ca_issuer_name" {
-  type = string
-}
-
-variable "juicefs_client_tls_path" {
   type = string
 }

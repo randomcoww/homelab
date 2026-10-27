@@ -18,15 +18,6 @@ locals {
   })
   data_path       = "/data"                                     # library mount path
   thumbnails_path = "${local.envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
-  # juicefs for thumbnails
-  juicefs_name              = "${var.name}-juicefs"
-  juicefs_postgres_database = "juicefs"
-  juicefs_postgres_username = "juicefs"
-}
-
-resource "random_password" "juicefs-postgres-password" {
-  length  = 32
-  special = false
 }
 
 module "secret" {
@@ -38,36 +29,6 @@ module "secret" {
   data = {
     for k, v in local.envs :
     tostring(k) => tostring(v)
-  }
-}
-
-module "juicefs-secret" {
-  source    = "../../../modules/secret"
-  name      = local.juicefs_name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = {
-    # juicefs params
-    name = var.name
-    metaurl = join("&", [
-      "postgres://${local.juicefs_postgres_username}:${random_password.juicefs-postgres-password.result}@${local.juicefs_name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}?sslmode=verify-full",
-      "sslrootcert=${var.juicefs_client_tls_path}/ca.crt",
-      "sslcert=${var.juicefs_client_tls_path}/tls.crt",
-      "sslkey=${var.juicefs_client_tls_path}/tls.key",
-    ])
-    storage    = "minio"
-    bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
-    access-key = var.minio_user.id
-    secret-key = var.minio_user.secret
-    format-options = join(",", [
-      "trash-days=1", # set to greater than metadata backup period
-      "block-size=4096",
-    ])
-
-    # cngp params
-    username = local.juicefs_postgres_username
-    password = random_password.juicefs-postgres-password.result
   }
 }
 
@@ -137,9 +98,7 @@ module "deployment" {
   affinity  = var.affinity
   replicas  = var.replicas
   annotations = {
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/juicefs-secret"    = sha256(module.juicefs-secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
     resources = {
@@ -238,16 +197,4 @@ module "deployment" {
       },
     ]
   }
-}
-
-module "minio-user-secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-minio-user-secret"
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = merge({
-    AWS_ACCESS_KEY_ID     = var.minio_user.id
-    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
-  })
 }

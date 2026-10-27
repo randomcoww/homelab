@@ -1,3 +1,10 @@
+resource "minio_s3_bucket" "stump" {
+  bucket         = "stump"
+  acl            = "private"
+  force_destroy  = true
+  object_locking = false
+}
+
 resource "minio_iam_user" "mountpoint-s3-csi" {
   name          = "mountpoint-s3-csi"
   force_destroy = true
@@ -19,6 +26,20 @@ resource "minio_iam_policy" "mountpoint-s3-csi" {
           "${minio_s3_bucket.static-bucket["music"].arn}/*",
           minio_s3_bucket.static-bucket["ebooks"].arn,
           "${minio_s3_bucket.static-bucket["ebooks"].arn}/*",
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
+        Resource = [
+          minio_s3_bucket.stump.arn,
+          "${minio_s3_bucket.stump.arn}/*",
         ]
       },
     ]

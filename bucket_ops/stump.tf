@@ -1,43 +1,3 @@
-resource "minio_s3_bucket" "stump" {
-  bucket         = "stump"
-  acl            = "private"
-  force_destroy  = true
-  object_locking = false
-}
-
-resource "minio_iam_user" "stump" {
-  name          = "stump"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "stump" {
-  name = "stump"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.stump.arn,
-          "${minio_s3_bucket.stump.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "stump" {
-  user_name   = minio_iam_user.stump.id
-  policy_name = minio_iam_policy.stump.id
-}
-
 module "stump" {
   source    = "./modules/stump"
   name      = "stump"
@@ -55,7 +15,6 @@ module "stump" {
     STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret
     STUMP_OIDC_SCOPES        = join(",", local.authelia_oidc_clients.stump.scopes)
   }
-  juicefs_client_tls_path = local.juicefs_client_tls_path
 
   ca_issuer_name   = local.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.stump.hostname
@@ -66,7 +25,6 @@ module "stump" {
   minio_endpoint    = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
   minio_data_bucket = "ebooks"
   minio_bucket      = "stump"
-  minio_user        = minio_iam_user.stump
 }
 
 resource "minio_s3_object" "fluxcd-stump" {

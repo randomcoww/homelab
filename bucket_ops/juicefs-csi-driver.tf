@@ -134,7 +134,6 @@ resource "minio_s3_object" "fluxcd-juicefs-csi-driver" {
                     ]
                   },
                   module.hermes-agent.juicefs-mountopts,
-                  module.stump.juicefs-mountopts,
                 ]
               }
             }
