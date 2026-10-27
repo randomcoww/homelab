@@ -27,7 +27,7 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
             chart = {
               spec = {
                 chart   = "trust-manager"
-                version = "v0.25.0" # renovate: datasource=helm depName=trust-manager registryUrl=https://charts.jetstack.io
+                version = "v0.26.0" # renovate: datasource=helm depName=trust-manager registryUrl=https://charts.jetstack.io
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "trust-manager"
