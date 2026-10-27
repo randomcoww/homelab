@@ -31,6 +31,18 @@ variable "smtp_password" {
   type = string
 }
 
+variable "scrape_proxy_server" {
+  type = string
+}
+
+variable "scrape_proxy_username" {
+  type = string
+}
+
+variable "scrape_proxy_password" {
+  type = string
+}
+
 variable "slack_bot_token" {
   type = string
 }
