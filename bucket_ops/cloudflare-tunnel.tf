@@ -53,7 +53,7 @@ resource "minio_s3_object" "fluxcd-cloudflare-tunnel" {
             values = {
               image = {
                 repository = "docker.io/cloudflare/cloudflared"
-                tag        = "2026.10.4@sha256:c6c7ae1d5dfdcb094ad344ed68ccffc26635c9c6be80965664c33baf064b0515" # renovate: datasource=docker depName=docker.io/cloudflare/cloudflared
+                tag        = "2026.10.5@sha256:1b1d34d0a9c0bfca9de72db8460d328db3f19edd2b96169114e3e893a97bbe53" # renovate: datasource=docker depName=docker.io/cloudflare/cloudflared
               }
               cloudflare = {
                 account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.account_id
