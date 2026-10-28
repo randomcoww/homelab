@@ -77,7 +77,7 @@ resource "minio_s3_object" "fluxcd-descheduler" {
                             memory = 60
                           }
                           targetThresholds = {
-                            memory = 80
+                            memory = 70
                           }
                         }
                       },
