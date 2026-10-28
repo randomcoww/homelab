@@ -200,10 +200,9 @@ module "deployment" {
         livenessProbe = {
           exec = {
             command = [
-              "/app/lldap",
-              "healthcheck",
-              "--config-file",
-              "/data/lldap_config.toml",
+              "sh",
+              "-c",
+              "/app/lldap healthcheck --config-file /data/lldap_config.toml > /dev/null 2>&1",
             ]
           }
           initialDelaySeconds = 10
@@ -212,10 +211,9 @@ module "deployment" {
         readinessProbe = {
           exec = {
             command = [
-              "/app/lldap",
-              "healthcheck",
-              "--config-file",
-              "/data/lldap_config.toml",
+              "sh",
+              "-c",
+              "/app/lldap healthcheck --config-file /data/lldap_config.toml > /dev/null 2>&1",
             ]
           }
         }
