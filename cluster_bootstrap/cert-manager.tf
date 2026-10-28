@@ -27,6 +27,7 @@ resource "helm_release" "cert-manager" {
           enabled = true
         }
       }
+      replicaCount = 2
       webhook = {
         replicaCount = 2
         resources = {

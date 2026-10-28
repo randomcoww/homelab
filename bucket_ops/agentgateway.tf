@@ -63,6 +63,7 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
             }
             values = {
               controller = {
+                replicaCount = 2
                 extraEnv = {
                   CLUSTER_DOMAIN = local.domains.kubernetes
                   TRUST_DOMAIN   = local.domains.kubernetes

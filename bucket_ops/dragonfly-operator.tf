@@ -48,6 +48,7 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
               enable = false
             }
             values = {
+              replicaCount = 2
               podDisruptionBudget = {
                 enabled      = true
                 minAvailable = 1
