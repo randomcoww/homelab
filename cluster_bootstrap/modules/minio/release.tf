@@ -284,6 +284,23 @@ locals {
         }
       },
 
+      {
+        apiVersion = "policy/v1"
+        kind       = "PodDisruptionBudget"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          maxUnavailable = 1
+          selector = {
+            matchLabels = {
+              app = var.name
+            }
+          }
+        }
+      },
+
       # cert issuer
       {
         apiVersion = "cert-manager.io/v1"

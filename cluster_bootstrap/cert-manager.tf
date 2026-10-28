@@ -58,6 +58,10 @@ resource "helm_release" "cert-manager" {
           }
         }
       }
+      podDisruptionBudget = {
+        enabled      = true
+        minAvailable = 1
+      }
       startupapicheck = {
         enabled = true
       }

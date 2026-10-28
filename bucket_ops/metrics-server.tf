@@ -62,6 +62,10 @@ resource "minio_s3_object" "fluxcd-metrics-server" {
               podLabels = {
                 app = "metrics-server"
               }
+              podDisruptionBudget = {
+                enabled      = true
+                minAvailable = 1
+              }
               resources = {
                 requests = {
                   memory = "128Mi"

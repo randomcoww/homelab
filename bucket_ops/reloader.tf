@@ -67,6 +67,10 @@ resource "minio_s3_object" "fluxcd-reloader" {
                 podMonitor = {
                   enabled = true
                 }
+                podDisruptionBudget = {
+                  enabled      = true
+                  minAvailable = 1
+                }
               }
             }
           }

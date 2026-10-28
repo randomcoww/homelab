@@ -67,6 +67,9 @@ resource "minio_s3_object" "fluxcd-agentgateway" {
                   CLUSTER_DOMAIN = local.domains.kubernetes
                   TRUST_DOMAIN   = local.domains.kubernetes
                 }
+                podDisruptionBudget = {
+                  minAvailable = 1
+                }
               }
               agentgatewayModels = {
                 enabled = false

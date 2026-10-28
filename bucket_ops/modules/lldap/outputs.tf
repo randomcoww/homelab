@@ -188,6 +188,23 @@ output "manifests" {
         }
       },
 
+      {
+        apiVersion = "policy/v1"
+        kind       = "PodDisruptionBudget"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          minAvailable = 1
+          selector = {
+            matchLabels = {
+              app = var.name
+            }
+          }
+        }
+      },
+
       # NS
       {
         apiVersion = "v1"

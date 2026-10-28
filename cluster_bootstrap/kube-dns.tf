@@ -30,6 +30,9 @@ resource "helm_release" "kube-dns" {
       service = {
         clusterIP = local.networks.kubernetes_service.vips.kube-dns
       }
+      podDisruptionBudget = {
+        minAvailable = 1
+      }
       resources = {
         requests = {
           memory = "128Mi"

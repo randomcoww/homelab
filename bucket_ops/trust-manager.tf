@@ -49,6 +49,10 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
             }
             values = {
               replicaCount = 1
+              podDisruptionBudget = {
+                enabled      = true
+                minAvailable = 1
+              }
               app = {
                 trust = {
                   namespace = local.services.cert-manager.namespace

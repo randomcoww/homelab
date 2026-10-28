@@ -48,6 +48,10 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
               enable = false
             }
             values = {
+              podDisruptionBudget = {
+                enabled      = true
+                minAvailable = 1
+              }
               serviceMonitor = {
                 enabled = true
               }

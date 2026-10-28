@@ -128,6 +128,10 @@ resource "helm_release" "cilium" {
         extraArgs = [
           "--proxy-stream-idle-timeout-seconds=14400", # avoids hermes agent <-> llama.cpp timeout
         ]
+        podDisruptionBudget = {
+          enabled        = true
+          maxUnavailable = 1
+        }
         prometheus = {
           enabled = true
           serviceMonitor = {

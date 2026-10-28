@@ -83,6 +83,10 @@ output "manifests" {
                 mountPath  = local.tls_path
               },
             ]
+            podDisruptionBudget = {
+              enabled      = true
+              minAvailable = 1
+            }
             configFiles = {
               "config.json" = jsonencode({
                 http = {

@@ -35,6 +35,10 @@ locals {
         enabled = false
       }
     }
+    podDisruptionBudget = {
+      enabled      = true
+      minAvailable = 1
+    }
     pod = {
       replicas = var.replicas
       kind     = "Deployment"
