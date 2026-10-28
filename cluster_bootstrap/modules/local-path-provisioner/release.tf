@@ -36,6 +36,10 @@ data "helm_template" "local-path-provisioner" {
           paths = var.volume_paths
         },
       ]
+      podDisruptionBudget = {
+        enabled      = true
+        minAvailable = 1
+      }
       resources = {
         requests = {
           memory = "64Mi"
