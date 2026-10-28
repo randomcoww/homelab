@@ -193,7 +193,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/authelia/chartrepo/authelia"
           ref = {
             tag = "0.11.22" # renovate: datasource=docker depName=ghcr.io/authelia/chartrepo/authelia depType=helm_regex

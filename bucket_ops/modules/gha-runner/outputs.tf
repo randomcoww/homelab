@@ -16,7 +16,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
           ref = {
             tag = "0.15.1" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set depType=helm_regex
@@ -157,7 +157,7 @@ output "manifests" {
           namespace = var.controller_namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
           ref = {
             tag = "0.15.1" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex

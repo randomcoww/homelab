@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-agentgateway-crds" {
             namespace = local.agentgateway_namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://ghcr.io/agentgateway/charts/agentgateway-crds"
             ref = {
               tag = "v1.7.0" # renovate: datasource=docker depName=ghcr.io/agentgateway/charts/agentgateway-crds depType=helm_regex

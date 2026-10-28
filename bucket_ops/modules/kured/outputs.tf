@@ -11,7 +11,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/kubereboot/charts/kured"
           ref = {
             tag = "6.1.0" # renovate: datasource=docker depName=ghcr.io/kubereboot/charts/kured depType=helm_regex

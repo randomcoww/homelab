@@ -12,7 +12,7 @@ output "manifests" {
           namespace = "ai"
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/vectorize-io/charts/hindsight"
           ref = {
             tag = "1.1.0" # renovate: datasource=docker depName=ghcr.io/vectorize-io/charts/hindsight depType=helm_regex

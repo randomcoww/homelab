@@ -11,7 +11,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "15m"
+          interval = "6h"
           url      = "oci://ghcr.io/project-zot/helm-charts/zot"
           ref = {
             tag = "0.1.128" # renovate: datasource=docker depName=ghcr.io/project-zot/helm-charts/zot depType=helm_regex

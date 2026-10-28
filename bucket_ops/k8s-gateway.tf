@@ -15,7 +15,7 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
             namespace = local.k8s-gateway_namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://codeberg.org/k8s-gateway/charts/k8s-gateway"
             ref = {
               tag = "4.0.1" # renovate: datasource=docker depName=codeberg.org/k8s-gateway/charts/k8s-gateway depType=helm_regex

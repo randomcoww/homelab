@@ -19,7 +19,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             namespace = local.victoria-metrics_namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack"
             ref = {
               tag = "0.97.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack depType=helm_regex
@@ -572,7 +572,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             namespace = local.victoria-metrics_namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-mcp"
             ref = {
               tag = "0.4.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-metrics-mcp depType=helm_regex
@@ -641,7 +641,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             namespace = local.victoria-metrics_namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://ghcr.io/victoriametrics/helm-charts/victoria-logs-mcp"
             ref = {
               tag = "0.2.0" # renovate: datasource=docker depName=ghcr.io/victoriametrics/helm-charts/victoria-logs-mcp depType=helm_regex

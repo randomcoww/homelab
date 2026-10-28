@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
             namespace = "dragonflydb"
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator"
             ref = {
               tag = "v1.7.1" # renovate: datasource=docker depName=ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator depType=helm_regex

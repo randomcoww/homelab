@@ -10,7 +10,7 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
             namespace = local.services.cert-manager.namespace
           }
           spec = {
-            interval = "15m"
+            interval = "6h"
             url      = "oci://quay.io/jetstack/charts/trust-manager"
             ref = {
               tag = "0.26.0" # renovate: datasource=docker depName=quay.io/jetstack/charts/trust-manager depType=helm_regex
