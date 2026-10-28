@@ -11,7 +11,7 @@ output "manifests" {
           namespace = var.namespace
         }
         spec = {
-          interval = "6h"
+          interval = "15m"
           url      = "https://awslabs.github.io/mountpoint-s3-csi-driver"
         }
       },
@@ -33,7 +33,7 @@ output "manifests" {
                 kind = "HelmRepository"
                 name = var.name
               }
-              interval = "6h"
+              interval = "5m"
             }
           }
           releaseName = var.name

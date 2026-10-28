@@ -3,6 +3,21 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
     "manifest.yaml" = join("\n---\n", [
       for _, m in [
         {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "OCIRepository"
+          metadata = {
+            name      = "dragonfly-operator"
+            namespace = "dragonflydb"
+          }
+          spec = {
+            interval = "15m"
+            url      = "oci://ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator"
+            ref = {
+              tag = "v1.7.1" # renovate: datasource=docker depName=ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator depType=helm_regex
+            }
+          }
+        },
+        {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
@@ -12,15 +27,10 @@ resource "minio_s3_object" "fluxcd-dragonfly-operator" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              kind = "OCIRepository"
-              spec = {
-                interval = "6h"
-                url      = "oci://ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator"
-                ref = {
-                  tag = "v1.7.1" # renovate: datasource=docker depName=ghcr.io/dragonflydb/dragonfly-operator/helm/dragonfly-operator depType=helm_regex
-                }
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = "dragonfly-operator"
+              namespace = "dragonflydb"
             }
             releaseName = "dragonfly-operator"
             install = {

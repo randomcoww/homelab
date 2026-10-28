@@ -8,6 +8,21 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
     "manifest.yaml" = join("\n---\n", [
       for _, m in [
         {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "OCIRepository"
+          metadata = {
+            name      = local.k8s-gateway_name
+            namespace = local.k8s-gateway_namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "oci://codeberg.org/k8s-gateway/charts/k8s-gateway"
+            ref = {
+              tag = "4.0.1" # renovate: datasource=docker depName=codeberg.org/k8s-gateway/charts/k8s-gateway depType=helm_regex
+            }
+          }
+        },
+        {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
@@ -17,15 +32,10 @@ resource "minio_s3_object" "fluxcd-k8s-gateway" {
           spec = {
             interval = "15m"
             timeout  = "5m"
-            chart = {
-              kind = "OCIRepository"
-              spec = {
-                interval = "6h"
-                url      = "oci://codeberg.org/k8s-gateway/charts/k8s-gateway"
-                ref = {
-                  tag = "4.0.1" # renovate: datasource=docker depName=codeberg.org/k8s-gateway/charts/k8s-gateway depType=helm_regex
-                }
-              }
+            chartRef = {
+              kind      = "OCIRepository"
+              name      = local.k8s-gateway_name
+              namespace = local.k8s-gateway_namespace
             }
             releaseName = local.k8s-gateway_name
             install = {
