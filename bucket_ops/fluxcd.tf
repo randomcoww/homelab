@@ -156,6 +156,7 @@ resource "helm_release" "fluxcd-bucket" {
           trust-manager-crs      = ["trust-manager"]
           k8s-gateway            = []
           metrics-server         = []
+          descheduler            = []
           amd-gpu                = []
           resource-claims        = ["amd-gpu"]
           device-plugin          = []
