@@ -499,6 +499,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       kube_statefulset_replicas{job="kube-state-metrics",namespace=~".*"} != kube_statefulset_status_replicas_updated{job="kube-state-metrics",namespace=~".*"}
                       in max by (namespace, statefulset, job, cluster) to handle dupes that may occur from time to time
                       */
+                      /*
                       KubeStatefulSetUpdateNotRolledOut = {
                         spec = {
                           expr = <<-EOF
@@ -522,6 +523,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                           EOF
                         }
                       }
+                      */
                     }
                   }
                   vmcluster = {
