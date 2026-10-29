@@ -11,9 +11,8 @@ module "kured" {
   kured_config = {
     prometheusUrl = "https://${local.endpoints.victoria-metrics.hostname}/select/prometheus"
     alertFilterRegexp = "^(${join("|", sort([
-      "Watchdog",             # always on, severity: none
-      "InfoInhibitor",        # severity: none
-      "RecordingRulesNoData", # can fail if no pods have cycled for some time (i.e. healthy)
+      "Watchdog",      # always on, severity: none
+      "InfoInhibitor", # severity: none
     ]))})$"
     blockingPodSelector = [
       "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
