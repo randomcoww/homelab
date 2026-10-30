@@ -69,6 +69,20 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
             }
           }
         },
+
+        # TODO: migrate internal + well known CA bundle to ClusterTrustBundle
+        {
+          apiVersion = "certificates.k8s.io/v1"
+          kind       = "ClusterTrustBundle"
+          metadata = {
+            name = "trust-bundle-ca-internal"
+          }
+          spec = {
+            trustBundle = <<-EOF
+            ${chomp(data.terraform_remote_state.host.outputs.internal_ca.cert_pem)}
+            EOF
+          }
+        },
       ] :
       yamlencode(m)
     ])

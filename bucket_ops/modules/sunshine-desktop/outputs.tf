@@ -52,6 +52,14 @@ output "manifests" {
             hostname = "${var.name}.${var.namespace}"
             caCertificateRefs = [
               {
+                /*
+                TODO: migrate to ClusterTrustBundle
+                GEP-5075 mentioned here https://github.com/cilium/cilium/issues/47759
+
+                group = "certificates.k8s.io"
+                kind  = "ClusterTrustBundle"
+                name  = "trust-bundle-ca-internal"
+                */
                 group = ""
                 kind  = "ConfigMap"
                 name  = "trust-manager-ca-internal"
