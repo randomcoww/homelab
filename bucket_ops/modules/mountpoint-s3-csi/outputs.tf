@@ -28,7 +28,7 @@ output "manifests" {
           chart = {
             spec = {
               chart   = "aws-mountpoint-s3-csi-driver"
-              version = "2.9.1" # renovate: datasource=helm depName=aws-mountpoint-s3-csi-driver registryUrl=https://awslabs.github.io/mountpoint-s3-csi-driver
+              version = "2.9.2" # renovate: datasource=helm depName=aws-mountpoint-s3-csi-driver registryUrl=https://awslabs.github.io/mountpoint-s3-csi-driver
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
