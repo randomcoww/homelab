@@ -55,7 +55,7 @@ module "hermes-agent" {
     }
     hermes-webui = {
       repository = "ghcr.io/nesquena/hermes-webui"
-      tag        = "0.52.578@sha256:ac3bb983530bd5b50353ea0d64d8a3d9efc30a7b2cfa2ae5c92c0abfb88e0bde" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
+      tag        = "0.52.588@sha256:8f7fb44c7daa7faba950156125675846c434a34edc4ef4c79a7d6354ebe06321" # renovate: datasource=docker depName=ghcr.io/nesquena/hermes-webui
     }
     litestream = {
       repository = "docker.io/litestream/litestream"
