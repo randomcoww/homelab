@@ -33,6 +33,21 @@ locals {
       ]
       consent_mode = "implicit"
     }
+    kagent = {
+      client_name = "kagent"
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+        "groups",
+      ]
+      require_pkce          = false
+      pkce_challenge_method = ""
+      redirect_uris = [
+        "https://${local.endpoints.kagent.hostname}/oauth2/callback",
+      ]
+      consent_mode = "implicit"
+    }
   }
 
   authelia_oidc_clients = {

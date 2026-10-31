@@ -193,6 +193,9 @@ locals {
     agentgateway = {
       hostname = "agentgateway.${local.domains.kubernetes}"
     }
+    kagent = {
+      hostname = "kagent.${local.domains.public}"
+    }
   }
 
   # All host exposed ports - do not overlap! #
