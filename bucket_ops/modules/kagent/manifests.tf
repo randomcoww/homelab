@@ -15,7 +15,7 @@ locals {
           "sslcert=${local.pg_tls_path}/tls.crt",
           "sslkey=${local.pg_tls_path}/tls.key",
         ])
-        vectorEnabled = false
+        vectorEnabled = true
         bundled = {
           enabled = false
         }

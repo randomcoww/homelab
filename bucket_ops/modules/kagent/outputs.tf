@@ -152,9 +152,6 @@ output "manifests" {
               secret = {
                 name = module.postgres-secret.name
               }
-              postInitSQL = [
-                "CREATE EXTENSION IF NOT EXISTS vector",
-              ]
             }
           }
           postgresql = {
@@ -178,6 +175,27 @@ output "manifests" {
               memory = "256Mi"
             }
           }
+        }
+      },
+      {
+        apiVersion = "postgresql.cnpg.io/v1"
+        kind       = "Database"
+        metadata = {
+          name      = "${var.name}-pg-${local.postgres_database}"
+          namespace = var.namespace
+        }
+        spec = {
+          name  = local.postgres_database
+          owner = local.postgres_username
+          cluster = {
+            name = "${var.name}-pg"
+          }
+          extensions = [
+            {
+              name   = "vector"
+              ensure = "present"
+            },
+          ]
         }
       },
       {
