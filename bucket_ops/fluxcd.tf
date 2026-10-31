@@ -177,17 +177,19 @@ resource "helm_release" "fluxcd-bucket" {
           searxng                = []
           kubernetes-mcp         = []
           hindsight              = ["trust-manager-crs", "gateway-api-crds", "cloudnative-pg"] # uses gateway-api externalAuth
-          hermes-agent           = ["trust-manager-crs", "juicefs-csi-driver"]
-          stump                  = ["trust-manager-crs", "mountpoint-s3-csi"]
-          hostapd                = ["gateway-api-crds", "node-feature-discovery", "device-plugin"]               # uses gateway-api externalAuth
-          sunshine-desktop       = ["trust-manager-crs", "gateway-api-crds", "device-plugin", "resource-claims"] # uses gateway-api externalAuth
+          hermes-agent           = ["trust-manager-crs", "juicefs-csi-driver", "authelia"]
+          stump                  = ["trust-manager-crs", "mountpoint-s3-csi", "authelia"]
+          hostapd                = ["gateway-api-crds", "node-feature-discovery", "device-plugin"]                           # uses gateway-api externalAuth
+          sunshine-desktop       = ["trust-manager-crs", "gateway-api-crds", "device-plugin", "resource-claims", "authelia"] # uses gateway-api externalAuth
           generate-backup-disk   = ["trust-manager-crs"]
           zot                    = ["trust-manager-crs"]
           gateway-api-crds       = []
           agentgateway-crds      = []
           agentgateway           = ["agentgateway-crds"]
           agentgateway-crs       = ["agentgateway-crds"]
-          navidrome              = ["trust-manager-crs", "gateway-api-crds", "mountpoint-s3-csi"] # uses gateway-api externalAuth
+          navidrome              = ["trust-manager-crs", "gateway-api-crds", "mountpoint-s3-csi", "authelia"] # uses gateway-api externalAuth
+          kagent-crds            = []
+          kagent                 = ["kagent-crds", "authelia"]
           # inference-extension-crds = []
         } :
         yamlencode({
