@@ -6,7 +6,7 @@ module "stump" {
   images = {
     stump = {
       repository = "docker.io/aaronleopold/stump"
-      tag        = "0.1.11@sha256:2d62217aaabb68466d08d8f5275549ba8713b3ff5c1f39a80a742a6e66d8105b" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
+      tag        = "0.1.12@sha256:96789cc49986d6508d7fe5fa79d4c2e31012b6d710999fab1a09b8514f308adc" # renovate: datasource=docker depName=docker.io/aaronleopold/stump
     }
   }
   extra_envs = {
