@@ -1,7 +1,7 @@
 locals {
   searxng_name      = "searxng"
-  searxng_namespace = "default"
-  searxng_port      = 8080
+  searxng_namespace = "ai"
+  searxng_port      = 3000
 }
 
 module "searxng" {
@@ -14,9 +14,13 @@ module "searxng" {
       repository = "ghcr.io/searxng/searxng"
       tag        = "latest@sha256:f4aa660c54d062dedb268be84e821ea24e39f48c7a496af8dd02cc9eedb93847" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
     }
+    searxng-mcp = {
+      repository = "docker.io/isokoliuk/mcp-searxng"
+      tag        = "2.9.0@sha256:8f1dd92a9e2875cb4e8df7036785ec4c088b7600cefb611de472a352a3dcba60" # renovate: datasource=docker depName=docker.io/isokoliuk/mcp-searxng
+    }
   }
-  extra_envs = {
-    SEARXNG_PORT = local.searxng_port
+  extra_mcp_envs = {
+    MCP_HTTP_PORT = local.searxng_port
   }
   searxng_settings = {
     use_default_settings = true

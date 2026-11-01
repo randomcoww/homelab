@@ -1,12 +1,19 @@
 
 locals {
-  envs = merge(var.extra_envs, {
+  envs = {
     SEARXNG_SETTINGS_PATH   = "/etc/searxng/settings.yml"
     SEARXNG_LIMITER         = false
     SEARXNG_PUBLIC_INSTANCE = false
     SEARXNG_IMAGE_PROXY     = false
     SEARXNG_BIND_ADDRESS    = "0.0.0.0"
+    SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
+  }
+
+  mcp_envs = merge(var.extra_mcp_envs, {
+    SEARXNG_URL                = "http://127.0.0.1:${local.envs.SEARXNG_PORT}"
+    SEARXNG_DEFAULT_SAFESEARCH = 0
+    MCP_HTTP_HOST              = "0.0.0.0"
   })
 }
 
@@ -25,6 +32,9 @@ module "secret" {
     for k, v in local.envs :
     tostring(k) => tostring(v)
     }, {
+    for k, v in local.mcp_envs :
+    tostring(k) => tostring(v)
+    }, {
     basename(local.envs.SEARXNG_SETTINGS_PATH) = yamlencode(var.searxng_settings)
   })
 }
@@ -40,9 +50,9 @@ module "service" {
     ports = [
       {
         name       = "searxng"
-        port       = local.envs.SEARXNG_PORT
+        port       = local.mcp_envs.MCP_HTTP_PORT
         protocol   = "TCP"
-        targetPort = local.envs.SEARXNG_PORT
+        targetPort = local.mcp_envs.MCP_HTTP_PORT
       },
     ]
   }
@@ -84,11 +94,6 @@ module "deployment" {
             }
           }
         ]
-        ports = [
-          {
-            containerPort = local.envs.SEARXNG_PORT
-          },
-        ]
         volumeMounts = [
           {
             name      = "config"
@@ -111,6 +116,27 @@ module "deployment" {
           }
           timeoutSeconds = 4
         }
+      },
+      {
+        name  = "${var.name}-mcp"
+        image = "${var.images.searxng-mcp.repository}:${var.images.searxng-mcp.tag}"
+        env = [
+          for k, v in local.mcp_envs :
+          {
+            name = tostring(k)
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = tostring(k)
+              }
+            }
+          }
+        ]
+        ports = [
+          {
+            containerPort = local.mcp_envs.MCP_HTTP_PORT
+          },
+        ]
       },
     ]
     volumes = [

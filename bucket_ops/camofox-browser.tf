@@ -1,12 +1,7 @@
 locals {
   camofox-browser_name      = "camofox"
-  camofox-browser_namespace = "default"
-  camofox-browser_port      = 9377
-}
-
-resource "random_password" "camofox-browser-auth-token" {
-  length           = 32
-  override_special = "-_"
+  camofox-browser_namespace = "ai"
+  camofox-browser_port      = 3000
 }
 
 module "camofox-browser" {
@@ -18,6 +13,10 @@ module "camofox-browser" {
       repository = "ghcr.io/jo-inc/camofox-browser"
       tag        = "1.18.1@sha256:cff2c1432b609bde9c9d0b91e5b924dae0799d3c7bc9d468c0bc949325beaf2a" # renovate: datasource=docker depName=ghcr.io/jo-inc/camofox-browser
     }
+    camofox-browser-mcp = {
+      repository = "ghcr.io/redf0x1/camofox-mcp"
+      tag        = "1.16.0@sha256:499abc6b83a3fc5d34cbb0020a024b7fc0c824bc8a76e25bb28524322cc42ba1" # renovate: datasource=docker depName=ghcr.io/redf0x1/camofox-mcp
+    }
   }
   extra_envs = {
     /*
@@ -26,8 +25,9 @@ module "camofox-browser" {
     PROXY_USERNAME     = var.scrape_proxy_username
     PROXY_PASSWORD     = var.scrape_proxy_password
     */
-    CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
-    CAMOFOX_PORT       = local.camofox-browser_port
+  }
+  extra_mcp_envs = {
+    CAMOFOX_HTTP_PORT = local.camofox-browser_port
   }
 }
 

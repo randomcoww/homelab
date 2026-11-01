@@ -27,6 +27,10 @@ variable "images" {
       repository = string
       tag        = string
     })
+    searxng-mcp = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 
@@ -35,7 +39,7 @@ variable "searxng_settings" {
   default = {}
 }
 
-variable "extra_envs" {
+variable "extra_mcp_envs" {
   type    = any
   default = {}
 }

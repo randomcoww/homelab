@@ -399,29 +399,21 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                   }
                 },
                 {
-                  name = local.kubernetes-mcp_name
+                  name = local.searxng_name
                   static = {
-                    host     = "${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}"
-                    port     = local.kubernetes-mcp_port
+                    host     = "${local.searxng_name}.${local.searxng_namespace}"
+                    port     = local.searxng_port
                     path     = "/mcp"
                     protocol = "StreamableHTTP"
-                    policies = {
-                      tls = {
-                        sni = "${local.kubernetes-mcp_name}.${local.kubernetes-mcp_namespace}"
-                        caCertificateRefs = [
-                          {
-                            kind = "Secret"
-                            name = "${local.agentgateway_name}-mcp-client-tls"
-                          },
-                        ]
-                        mtlsCertificateRef = [
-                          {
-                            kind = "Secret"
-                            name = "${local.agentgateway_name}-mcp-client-tls"
-                          },
-                        ]
-                      }
-                    }
+                  }
+                },
+                {
+                  name = local.camofox-browser_name
+                  static = {
+                    host     = "${local.camofox-browser_name}.${local.camofox-browser_namespace}"
+                    port     = local.camofox-browser_port
+                    path     = "/mcp"
+                    protocol = "StreamableHTTP"
                   }
                 },
                 {

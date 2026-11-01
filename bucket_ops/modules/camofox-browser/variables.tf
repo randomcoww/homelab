@@ -27,10 +27,19 @@ variable "images" {
       repository = string
       tag        = string
     })
+    camofox-browser-mcp = object({
+      repository = string
+      tag        = string
+    })
   })
 }
 
 variable "extra_envs" {
+  type    = any
+  default = {}
+}
+
+variable "extra_mcp_envs" {
   type    = any
   default = {}
 }
