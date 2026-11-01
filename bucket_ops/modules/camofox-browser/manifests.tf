@@ -148,7 +148,7 @@ module "deployment" {
         name = "dev-shm"
         emptyDir = {
           medium    = "Memory"
-          sizeLimit = "2Gi"
+          sizeLimit = "512Mi"
         }
       },
     ]
