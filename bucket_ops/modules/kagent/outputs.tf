@@ -6,7 +6,7 @@ output "manifests" {
     module.postgres-secret.manifest,
     module.openai-secret.manifest,
     ], [
-    for _, m in concat([
+    for _, m in [
       # not working with OCIRepository and tag
       {
         apiVersion = "source.toolkit.fluxcd.io/v1"
@@ -192,8 +192,7 @@ output "manifests" {
           }
           extensions = [
             {
-              name   = "vector"
-              ensure = "present"
+              name = "vector"
             },
           ]
         }
@@ -315,7 +314,7 @@ output "manifests" {
           }
         }
       },
-    ], local.crs) :
+    ] :
     yamlencode(m)
   ])
 }

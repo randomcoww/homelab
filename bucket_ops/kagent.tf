@@ -4,17 +4,17 @@ locals {
 }
 
 module "kagent" {
-  source                = "./modules/kagent"
-  name                  = local.kagent_name
-  namespace             = local.kagent_namespace
-  ca_issuer_name        = local.cert_issuers.ca_internal
-  oidc_client_id        = local.authelia_oidc_clients.kagent.client_id
-  oidc_client_secret    = local.authelia_oidc_clients.kagent.client_secret
-  oidc_scopes           = local.authelia_oidc_clients.kagent.scopes
-  oidc_issuer_url       = "https://${local.endpoints.authelia.hostname}"
-  ingress_hostname      = local.endpoints.kagent.hostname
-  agentgateway_endpoint = local.endpoints.agentgateway.hostname
-  openai_apikey         = random_password.llama-cpp-api-key.result
+  source             = "./modules/kagent"
+  name               = local.kagent_name
+  namespace          = local.kagent_namespace
+  ca_issuer_name     = local.cert_issuers.ca_internal
+  oidc_client_id     = local.authelia_oidc_clients.kagent.client_id
+  oidc_client_secret = local.authelia_oidc_clients.kagent.client_secret
+  oidc_scopes        = local.authelia_oidc_clients.kagent.scopes
+  oidc_issuer_url    = "https://${local.endpoints.authelia.hostname}"
+  ingress_hostname   = local.endpoints.kagent.hostname
+  openai_endpoint    = local.endpoints.agentgateway.hostname
+  openai_apikey      = random_password.llama-cpp-api-key.result
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
