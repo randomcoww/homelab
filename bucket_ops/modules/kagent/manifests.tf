@@ -67,13 +67,16 @@ locals {
         apiKeySecretRef = module.openai-secret.name
         apiKeySecretKey = "OPENAI_API_KEY"
         config = {
-          baseUrl = "https://${var.openai_endpoint}/v1"
+          baseUrl = "https://${var.agentgateway_endpoint}/v1"
         }
         tls = {
           caCertSecretRef = "${var.name}-pg-client-tls" # CA is same as one used for postgres access
           caCertSecretKey = "ca.crt"
         }
       }
+    }
+    kgateway-agent = {
+      enabled = false
     }
     argo-rollouts-agent = {
       enabled = false
@@ -153,6 +156,102 @@ locals {
     extraObjects = [
     ]
   }
+
+  crs = [
+    {
+      apiVersion = "kagent.dev/v1alpha2"
+      kind       = "RemoteMCPServer"
+      metadata = {
+        name      = "${var.name}-agentgateway"
+        namespace = var.namespace
+      }
+      spec = {
+        url            = "https://${var.agentgateway_endpoint}/mcp"
+        protocol       = "STREAMABLE_HTTP"
+        timeout        = "30s"
+        sseReadTimeout = "5m0s"
+        description    = "Agentgateway aggregate MCP tools"
+        tls = {
+          caCertSecretRef = "${var.name}-pg-client-tls" # CA is same as one used for postgres access
+          caCertSecretKey = "ca.crt"
+        }
+      }
+    },
+    {
+      apiVersion = "kagent.dev/v1alpha2"
+      kind       = "Agent"
+      metadata = {
+        name      = "websearch-agent"
+        namespace = var.namespace
+      }
+      spec = {
+        type = "Declarative"
+        declarative = {
+          modelConfig = "default-model-config"
+          promptTemplate = {
+            dataSources = [
+              {
+                kind  = "ConfigMap"
+                name  = "kagent-builtin-prompts"
+                alias = "builtin"
+              },
+            ]
+          }
+          systemMessage = <<-EOF
+            You are a pragmatic senior engineer.
+            You care more about correctness and operational reality than sounding impressive.
+
+            ## Style
+            - Be direct
+            - Be concise unless complexity requires depth
+            - Say when something is a bad idea
+            - Prefer practical tradeoffs over idealized abstractions
+
+            ## Avoid
+            - Sycophancy
+            - Hype language
+            - Overexplaining obvious things
+            EOF
+          tools = [
+            {
+              type = "McpServer"
+              mcpServer = {
+                name     = "${var.name}-agentgateway"
+                kind     = "RemoteMCPServer"
+                apiGroup = "kagent.dev"
+                toolNames = [
+                  "searxng_searxng_instance_info",
+                  "searxng_searxng_search_suggestions",
+                  "searxng_searxng_web_search",
+                  "camofox_camofox_close_session",
+                  "camofox_camofox_evaluate_js",
+                  "camofox_camofox_get_page_html",
+                  "camofox_camofox_scroll_element",
+                  "camofox_camofox_scroll_element_and_snapshot",
+                  "camofox_camofox_wait_for",
+                  "camofox_camofox_wait_for_selector",
+                  "camofox_camofox_wait_for_text",
+                  "camofox_click",
+                  "camofox_close_tab",
+                  "camofox_create_tab",
+                  "camofox_extract_resources",
+                  "camofox_extract_structured",
+                  "camofox_list_tabs",
+                  "camofox_navigate",
+                  "camofox_navigate_and_snapshot",
+                  "camofox_resolve_blobs",
+                  "camofox_scroll",
+                  "camofox_scroll_and_snapshot",
+                  "camofox_snapshot",
+                  "camofox_youtube_transcript",
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+  ]
 }
 
 resource "random_password" "postgres-password" {

@@ -35,7 +35,7 @@ variable "ingress_hostname" {
   type = string
 }
 
-variable "openai_endpoint" {
+variable "agentgateway_endpoint" {
   type = string
 }
 
