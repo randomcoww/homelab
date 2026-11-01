@@ -175,9 +175,7 @@ resource "helm_release" "fluxcd-bucket" {
           llama-cpp-small        = ["resource-claims"]
           camofox-browser        = []
           searxng                = []
-          kubernetes-mcp         = []
           hindsight              = ["trust-manager-crs", "gateway-api-crds", "cloudnative-pg"] # uses gateway-api externalAuth
-          hermes-agent           = ["trust-manager-crs", "juicefs-csi-driver", "authelia"]
           stump                  = ["trust-manager-crs", "mountpoint-s3-csi", "authelia"]
           hostapd                = ["gateway-api-crds", "node-feature-discovery", "device-plugin"]                           # uses gateway-api externalAuth
           sunshine-desktop       = ["trust-manager-crs", "gateway-api-crds", "device-plugin", "resource-claims", "authelia"] # uses gateway-api externalAuth
