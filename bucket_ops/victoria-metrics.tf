@@ -2,15 +2,13 @@ locals {
   victoria-metrics_name      = "vm"
   victoria-metrics_namespace = "monitoring"
   victoria-metrics-mcp_name  = "${local.victoria-metrics_name}mcp"
-  victoria-metrics-mcp_port  = 8080
   victoria-logs-mcp_name     = "vlmcp"
-  victoria-logs-mcp_port     = 8080
 }
 
 resource "minio_s3_object" "fluxcd-victoria-metrics" {
   for_each = {
     "manifest.yaml" = join("\n---\n", [
-      for _, m in [
+      for _, m in concat([
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "OCIRepository"
@@ -648,9 +646,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 type       = "cluster"
                 entrypoint = "https://${local.endpoints.victoria-metrics.hostname}"
               }
-              service = {
-                port = local.victoria-metrics-mcp_port
-              }
               resources = {
                 requests = {
                   memory = "640Mi"
@@ -716,9 +711,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
               vl = {
                 entrypoint = "https://${local.endpoints.victoria-logs.hostname}"
               }
-              service = {
-                port = local.victoria-logs-mcp_port
-              }
               resources = {
                 requests = {
                   memory = "640Mi"
@@ -745,7 +737,48 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             }
           }
         },
-      ] :
+        ], [
+
+        # MCP service for agentgateway
+        # needs appProtocol: agentgateway.dev/mcp
+        for _, c in [
+          {
+            name     = "victoria-metrics-mcp"
+            instance = local.victoria-metrics-mcp_name
+          },
+          {
+            name     = "victoria-logs-mcp"
+            instance = local.victoria-logs-mcp_name
+          },
+        ] :
+        {
+          apiVersion = "v1"
+          kind       = "Service"
+          metadata = {
+            name      = "${c.instance}-agentgateway"
+            namespace = local.victoria-metrics_namespace
+            labels = {
+              agentgateway-mcp = c.instance
+            }
+          }
+          spec = {
+            type      = "ClusterIP"
+            clusterIP = "None"
+            selector = {
+              "app.kubernetes.io/instance" = c.instance
+              "app.kubernetes.io/name"     = c.name
+            }
+            ports = [
+              {
+                protocol    = "TCP"
+                port        = 8080
+                targetPort  = "http"
+                appProtocol = "agentgateway.dev/mcp"
+              },
+            ]
+          }
+        }
+      ]) :
       yamlencode(m)
     ])
     "kustomization.yaml" = yamlencode({
