@@ -1,23 +1,12 @@
-locals {
-  hindsight_name      = "hindsight"
-  hindsight_namespace = "ai"
-  hindsight_port      = 8888
-}
-
 resource "random_password" "hindsight-api-key" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "hindsight-cp-api-key" {
   length  = 30
   special = false
 }
 
 module "hindsight" {
   source    = "./modules/hindsight"
-  name      = local.hindsight_name
-  namespace = local.hindsight_namespace
+  name      = "hindsight"
+  namespace = "ai"
 
   extra_api_envs = {
     HINDSIGHT_API_LLM_MODEL              = "qwen-3-8-flash-next-none"
@@ -25,8 +14,9 @@ module "hindsight" {
     HINDSIGHT_API_REFLECT_LLM_MODEL      = "qwen-3-8-flash-next-medium"
     HINDSIGHT_API_REFLECT_WALL_TIMEOUT   = "1800" # default 300
     HINDSIGHT_API_REFLECT_MAX_ITERATIONS = "4"    # default 10
-    HINDSIGHT_API_MCP_ENABLED            = "true"
     HINDSIGHT_API_TENANT_EXTENSION       = "hindsight_api.extensions.builtin.tenant:ApiKeyTenantExtension"
+    HINDSIGHT_API_MCP_ENABLED            = "true"
+    HINDSIGHT_API_MCP_STATELESS          = "true"
   }
   extra_api_secrets = {
     HINDSIGHT_API_LLM_API_KEY    = random_password.llama-cpp-api-key.result
@@ -34,16 +24,19 @@ module "hindsight" {
     HINDSIGHT_API_TENANT_API_KEY = random_password.hindsight-api-key.result
   }
   extra_controlplane_secrets = {
-    HINDSIGHT_CP_ACCESS_KEY        = random_password.hindsight-cp-api-key.result
     HINDSIGHT_CP_DATAPLANE_API_KEY = random_password.hindsight-api-key.result
   }
   ca_issuer_name = local.cert_issuers.ca_internal
-  service_port   = local.hindsight_port
 
   ingress_hostname = local.endpoints.hindsight.hostname
   gateway_ref = {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
+  }
+  auth_backend_ref = {
+    name      = local.authelia_name
+    namespace = local.authelia_namespace
+    port      = 80
   }
 }
 
@@ -67,11 +60,4 @@ resource "minio_s3_object" "fluxcd-hindsight" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
-}
-
-# hindsight apikey
-
-output "hindsight" {
-  value     = random_password.hindsight-cp-api-key.result
-  sensitive = true
 }

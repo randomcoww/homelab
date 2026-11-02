@@ -53,7 +53,7 @@ output "manifests" {
             api = {
               replicaCount = 2
               service = {
-                targetPort = var.service_port
+                targetPort = local.api_port
               }
               env = merge({
                 SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt"

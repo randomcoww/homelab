@@ -3,6 +3,7 @@ locals {
   postgres_database = "hindsight"
   postgres_username = "hindsight"
   controlplane_port = 3000
+  api_port          = 8888
 }
 
 resource "random_password" "postgres-password" {
@@ -44,7 +45,49 @@ module "httproute" {
           {
             path = {
               type  = "PathPrefix"
+              value = "/mcp"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = "${var.name}-api"
+            port = local.api_port
+          },
+        ]
+      },
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
               value = "/"
+            }
+          },
+        ]
+        filters = [
+          {
+            type = "ExternalAuth"
+            externalAuth = {
+              protocol   = "HTTP"
+              backendRef = var.auth_backend_ref
+              http = {
+                path = "/api/authz/ext-authz/"
+                allowedHeaders = [
+                  "accept",
+                  "cookie",
+                  "location",
+                  "authorization",
+                  "proxy-authorization",
+                  "x-forwarded-proto",
+                ]
+                allowedResponseHeaders = [
+                  "Remote-User",
+                  "Remote-Email",
+                  "Remote-Name",
+                  "Remote-Groups",
+                ]
+              }
             }
           },
         ]

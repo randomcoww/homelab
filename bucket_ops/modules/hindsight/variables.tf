@@ -16,10 +16,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "service_port" {
-  type = number
-}
-
 variable "extra_api_envs" {
   type    = map(string)
   default = {}
@@ -45,4 +41,12 @@ variable "ingress_hostname" {
 
 variable "gateway_ref" {
   type = any
+}
+
+variable "auth_backend_ref" {
+  type = object({
+    name      = string
+    namespace = string
+    port      = number
+  })
 }
