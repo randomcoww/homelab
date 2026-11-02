@@ -52,7 +52,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name        = "searxng"
+        name        = "mcp"
         port        = local.mcp_envs.MCP_HTTP_PORT
         protocol    = "TCP"
         targetPort  = local.mcp_envs.MCP_HTTP_PORT

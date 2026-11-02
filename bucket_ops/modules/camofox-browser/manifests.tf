@@ -51,7 +51,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name        = var.name
+        name        = "mcp"
         port        = local.mcp_envs.CAMOFOX_HTTP_PORT
         protocol    = "TCP"
         targetPort  = local.mcp_envs.CAMOFOX_HTTP_PORT
