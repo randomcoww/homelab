@@ -44,14 +44,18 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  labels = {
+    agentgateway-mcp = var.name
+  }
   spec = {
     type = "ClusterIP"
     ports = [
       {
-        name       = var.name
-        port       = local.mcp_envs.CAMOFOX_HTTP_PORT
-        protocol   = "TCP"
-        targetPort = local.mcp_envs.CAMOFOX_HTTP_PORT
+        name        = var.name
+        port        = local.mcp_envs.CAMOFOX_HTTP_PORT
+        protocol    = "TCP"
+        targetPort  = local.mcp_envs.CAMOFOX_HTTP_PORT
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }

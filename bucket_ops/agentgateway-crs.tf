@@ -215,6 +215,24 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                   },
                 ]
               },
+              {
+                matches = [
+                  {
+                    path = {
+                      type  = "PathPrefix"
+                      value = "/metrics-mcp"
+                    }
+                  },
+                ]
+                backendRefs = [
+                  {
+                    name      = "${local.agentgateway_name}-metrics-mcp"
+                    namespace = local.agentgateway_namespace
+                    group     = "agentgateway.dev"
+                    kind      = "AgentgatewayBackend"
+                  },
+                ]
+              },
             ])
           }
         },
@@ -346,34 +364,10 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
 
         # MCP
         {
-          apiVersion = "cert-manager.io/v1"
-          kind       = "Certificate"
-          metadata = {
-            name      = "${local.agentgateway_name}-mcp-client-tls"
-            namespace = local.agentgateway_namespace
-          }
-          spec = {
-            secretName = "${local.agentgateway_name}-mcp-client-tls"
-            isCA       = false
-            privateKey = {
-              algorithm = "ECDSA"
-              size      = 521
-            }
-            commonName = "${local.agentgateway_name}-mcp"
-            usages = [
-              "client auth",
-            ]
-            issuerRef = {
-              name = local.cert_issuers.ca_internal
-              kind = "ClusterIssuer"
-            }
-          }
-        },
-        {
           apiVersion = "agentgateway.dev/v1alpha1"
           kind       = "AgentgatewayBackend"
           metadata = {
-            name      = "${local.agentgateway_name}-mcp"
+            name      = "${local.agentgateway_name}-metrics-mcp"
             namespace = local.agentgateway_namespace
           }
           spec = {
@@ -398,26 +392,23 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                     protocol = "StreamableHTTP"
                   }
                 },
+              ]
+            }
+          }
+        },
+        {
+          apiVersion = "agentgateway.dev/v1alpha1"
+          kind       = "AgentgatewayBackend"
+          metadata = {
+            name      = "${local.agentgateway_name}-mcp"
+            namespace = local.agentgateway_namespace
+          }
+          spec = {
+            mcp = {
+              failureMode = "FailOpen"
+              targets = [
                 {
-                  name = local.searxng_name
-                  static = {
-                    host     = "${local.searxng_name}.${local.searxng_namespace}"
-                    port     = local.searxng_port
-                    path     = "/mcp"
-                    protocol = "StreamableHTTP"
-                  }
-                },
-                {
-                  name = local.camofox-browser_name
-                  static = {
-                    host     = "${local.camofox-browser_name}.${local.camofox-browser_namespace}"
-                    port     = local.camofox-browser_port
-                    path     = "/mcp"
-                    protocol = "StreamableHTTP"
-                  }
-                },
-                {
-                  name = "litestream"
+                  name = "labeled"
                   selector = {
                     namespaces = {
                       matchExpressions = [
@@ -426,6 +417,7 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                           operator = "In"
                           values = [
                             "default",
+                            "ai",
                           ]
                         },
                       ]
@@ -433,7 +425,7 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                     services = {
                       matchExpressions = [
                         {
-                          key      = "litestream-mcp"
+                          key      = "agentgateway-mcp"
                           operator = "In"
                           operator = "Exists"
                         },

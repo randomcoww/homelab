@@ -34,7 +34,7 @@ module "service" {
   app       = var.name
   release   = var.release
   labels = {
-    litestream-mcp = var.name
+    agentgateway-mcp = var.name
   }
   spec = {
     type      = "ClusterIP"

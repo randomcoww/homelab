@@ -45,14 +45,18 @@ module "service" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  labels = {
+    agentgateway-mcp = var.name
+  }
   spec = {
     type = "ClusterIP"
     ports = [
       {
-        name       = "searxng"
-        port       = local.mcp_envs.MCP_HTTP_PORT
-        protocol   = "TCP"
-        targetPort = local.mcp_envs.MCP_HTTP_PORT
+        name        = "searxng"
+        port        = local.mcp_envs.MCP_HTTP_PORT
+        protocol    = "TCP"
+        targetPort  = local.mcp_envs.MCP_HTTP_PORT
+        appProtocol = "agentgateway.dev/mcp"
       },
     ]
   }

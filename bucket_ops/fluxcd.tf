@@ -188,6 +188,7 @@ resource "helm_release" "fluxcd-bucket" {
           navidrome              = ["trust-manager-crs", "gateway-api-crds", "mountpoint-s3-csi", "authelia"] # uses gateway-api externalAuth
           kagent-crds            = []
           kagent                 = ["kagent-crds", "authelia"]
+          kagent-crs             = ["kagent-crds", "agentgateway-crs"]
           # inference-extension-crds = []
         } :
         yamlencode({
