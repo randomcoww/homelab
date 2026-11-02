@@ -755,7 +755,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
           apiVersion = "v1"
           kind       = "Service"
           metadata = {
-            name      = "${c.instance}-agentgateway"
+            name      = c.instance
             namespace = local.victoria-metrics_namespace
             labels = {
               agentgateway-mcp = c.instance
@@ -770,6 +770,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
             }
             ports = [
               {
+                name        = "mcp"
                 protocol    = "TCP"
                 port        = 8080
                 targetPort  = "http"
