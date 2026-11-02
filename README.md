@@ -222,12 +222,6 @@ Agentgateway API key:
 tofu -chdir=bucket_ops output llama-cpp-api-key
 ```
 
-Hermes Agent API key:
-
-```bash
-tofu -chdir=bucket_ops output hermes-agent-api-key
-```
-
 Internal registry:
 
 ```bash
