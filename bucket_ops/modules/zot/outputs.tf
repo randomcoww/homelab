@@ -14,7 +14,7 @@ output "manifests" {
           interval = "6h"
           url      = "oci://ghcr.io/project-zot/helm-charts/zot"
           ref = {
-            tag = "0.1.128" # renovate: datasource=docker depName=ghcr.io/project-zot/helm-charts/zot depType=helm_regex
+            tag = "0.1.130" # renovate: datasource=docker depName=ghcr.io/project-zot/helm-charts/zot depType=helm_regex
           }
           layerSelector = {
             mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
