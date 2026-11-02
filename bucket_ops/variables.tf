@@ -72,3 +72,7 @@ variable "alpaca_api_key" {
 variable "alpaca_secret_key" {
   type = string
 }
+
+variable "gemini_api_key" {
+  type = string
+}

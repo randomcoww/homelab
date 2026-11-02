@@ -1,15 +1,6 @@
 locals {
   agentgateway_name      = "agentgateway"
   agentgateway_namespace = "agentgateway-system"
-  agentgateway_chat_models = [
-    "qwen-3-8-flash-next",
-    "qwen-3-8-flash-next-medium",
-    "qwen-3-8-flash-next-none",
-    "qwen-3-8-27b",
-    "qwen-3-8-27b-medium",
-    "qwen-3-8-27b-none",
-  ]
-  agentgateway_audio_model = "whisper-large-v3-turbo"
 }
 
 resource "minio_s3_object" "fluxcd-agentgateway" {

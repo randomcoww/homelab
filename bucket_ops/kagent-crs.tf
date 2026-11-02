@@ -137,25 +137,6 @@ resource "minio_s3_object" "fluxcd-kagent-crs" {
           apiVersion = "kagent.dev/v1alpha2"
           kind       = "RemoteMCPServer"
           metadata = {
-            name      = "${local.kagent_name}-agentgateway-metrics"
-            namespace = local.kagent_namespace
-          }
-          spec = {
-            url            = "https://${local.endpoints.agentgateway.hostname}/metrics-mcp"
-            protocol       = "STREAMABLE_HTTP"
-            timeout        = "30s"
-            sseReadTimeout = "5m0s"
-            description    = "Agentgateway aggregate metrics MCP"
-            tls = {
-              caCertSecretRef = "${local.kagent_name}-mcp-client-tls"
-              caCertSecretKey = "ca.crt"
-            }
-          }
-        },
-        {
-          apiVersion = "kagent.dev/v1alpha2"
-          kind       = "RemoteMCPServer"
-          metadata = {
             name      = "${local.kagent_name}-hindsight"
             namespace = local.kagent_namespace
           }
@@ -179,10 +160,6 @@ resource "minio_s3_object" "fluxcd-kagent-crs" {
                 value = local.kagent_name
               },
             ]
-            tls = {
-              caCertSecretRef = "${local.kagent_name}-mcp-client-tls"
-              caCertSecretKey = "ca.crt"
-            }
           }
         },
 
