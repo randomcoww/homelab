@@ -20,13 +20,18 @@ variable "service_port" {
   type = number
 }
 
-variable "extra_envs" {
-  type    = any
+variable "extra_api_envs" {
+  type    = map(string)
   default = {}
 }
 
-variable "extra_secrets" {
-  type    = any
+variable "extra_api_secrets" {
+  type    = map(string)
+  default = {}
+}
+
+variable "extra_controlplane_secrets" {
+  type    = map(string)
   default = {}
 }
 
@@ -40,12 +45,4 @@ variable "ingress_hostname" {
 
 variable "gateway_ref" {
   type = any
-}
-
-variable "auth_backend_ref" {
-  type = object({
-    name      = string
-    namespace = string
-    port      = number
-  })
 }

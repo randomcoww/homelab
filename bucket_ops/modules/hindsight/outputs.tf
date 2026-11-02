@@ -57,9 +57,9 @@ output "manifests" {
               }
               env = merge({
                 SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt"
-              }, var.extra_envs)
+              }, var.extra_api_envs)
               secrets = merge({
-              }, var.extra_secrets)
+              }, var.extra_api_secrets)
               extraVolumeMounts = [
                 {
                   name      = "pg-tls"
@@ -125,6 +125,8 @@ output "manifests" {
               service = {
                 targetPort = local.controlplane_port
               }
+              secrets = merge({
+              }, var.extra_controlplane_secrets)
             }
             postgresql = {
               enabled = false
