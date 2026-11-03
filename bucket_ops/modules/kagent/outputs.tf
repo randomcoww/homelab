@@ -60,6 +60,92 @@ output "manifests" {
         }
       },
 
+      # tools server
+      {
+        apiVersion = "source.toolkit.fluxcd.io/v1"
+        kind       = "HelmRepository"
+        metadata = {
+          name      = "${var.name}-tools"
+          namespace = var.namespace
+        }
+        spec = {
+          type     = "oci"
+          interval = "15m"
+          url      = "oci://ghcr.io/kagent-dev/tools/helm"
+        }
+      },
+      {
+        apiVersion = "helm.toolkit.fluxcd.io/v2"
+        kind       = "HelmRelease"
+        metadata = {
+          name      = "${var.name}-tools"
+          namespace = var.namespace
+        }
+        spec = {
+          interval = "15m"
+          timeout  = "5m"
+          chart = {
+            spec = {
+              chart = "kagent-tools"
+              sourceRef = {
+                kind = "HelmRepository"
+                name = "${var.name}-tools"
+              }
+              version = "0.3.0" # renovate: datasource=docker depName=ghcr.io/kagent-dev/tools/helm/kagent-tools depType=helm_regex
+            }
+          }
+          releaseName = "${var.name}-tools"
+          install = {
+            createNamespace = true
+            remediation = {
+              retries = -1
+            }
+          }
+          upgrade = {
+            remediation = {
+              retries = -1
+            }
+          }
+          test = {
+            enable = false
+          }
+          values = {
+            tools = {
+              metrics = {
+                port = 8085
+                servicemonitor = {
+                  enabled = true
+                }
+              }
+            }
+            service = {
+              ports = {
+                tools = {
+                  port = local.tools_port
+                  # targetPort = local.tools_port
+                }
+              }
+            }
+          }
+        }
+      },
+      # create kagent-tools here to set custom timeout
+      {
+        apiVersion = "kagent.dev/v1alpha2"
+        kind       = "RemoteMCPServer"
+        metadata = {
+          name      = "${var.name}-tool-server"
+          namespace = var.namespace
+        }
+        spec = {
+          url            = "http://${var.name}-tools.${var.namespace}:${local.tools_port}/mcp"
+          protocol       = "STREAMABLE_HTTP"
+          timeout        = "60m"
+          sseReadTimeout = "60m"
+          description    = "Official KAgent tool server"
+        }
+      },
+
       # postgres
       {
         apiVersion = "cert-manager.io/v1"

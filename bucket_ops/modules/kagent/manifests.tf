@@ -5,6 +5,7 @@ locals {
   postgres_username = "kagent"
   redis_port        = 6379 # not configurable
   ui_port           = 8080
+  tools_port        = 8084
 
   values = {
     database = {
@@ -40,6 +41,12 @@ locals {
           name      = "pg-client-tls"
           mountPath = local.pg_tls_path
         },
+        {
+          name      = "ca-trust-bundle"
+          mountPath = "/etc/ssl/certs/ca-certificates.crt"
+          subPath   = "ca.crt"
+          readOnly  = true
+        },
       ]
       volumes = [
         {
@@ -48,17 +55,51 @@ locals {
             secretName = "${var.name}-pg-client-tls"
           }
         },
+        {
+          name = "ca-trust-bundle"
+          configMap = {
+            name = "trust-manager-ca-internal-bundle"
+          }
+        },
       ]
+    }
+    kagent-tools = {
+      enabled = false # create this as an extra object to override timeout
     }
     ui = {
       externalUrl = "https://${var.ingress_hostname}"
-      replicas    = 2
+      replicas    = 1
       service = {
         ports = {
           port       = local.ui_port
           targetPort = local.ui_port
         }
       }
+      image = {
+        registry   = "zot.cluster.internal"
+        repository = "randomcoww/kagent-ui-patched"
+        tag        = "v0.10.4.1793739582"
+      }
+      streamTimeoutSeconds = "3600"
+      nginx = {
+        proxyReadTimeout = "3600s"
+        proxySendTimeout = "3600s"
+        proxyBuffering   = "off"
+      }
+      env = [
+        {
+          name  = "UNDICI_BODY_TIMEOUT" # custom hack in UI image picks up these values
+          value = "3600000"
+        },
+        {
+          name  = "UNDICI_HEADERS_TIMEOUT" # custom hack in UI image picks up these values
+          value = "3600000"
+        },
+        {
+          name  = "KEEP_ALIVE_TIMEOUT"
+          value = "3600000"
+        },
+      ]
     }
     providers = {
       default = "openAI"
@@ -94,7 +135,7 @@ locals {
       enabled = false
     }
     oauth2-proxy = {
-      replicaCount = 2
+      replicaCount = 1
       enabled      = true
       sessionStorage = {
         type = "redis"
