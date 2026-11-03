@@ -3,6 +3,11 @@ resource "random_password" "hindsight-api-key" {
   special = false
 }
 
+resource "random_password" "hindsight-cp-api-key" {
+  length  = 30
+  special = false
+}
+
 module "hindsight" {
   source    = "./modules/hindsight"
   name      = "hindsight"
@@ -25,19 +30,9 @@ module "hindsight" {
   }
   extra_controlplane_secrets = {
     HINDSIGHT_CP_DATAPLANE_API_KEY = random_password.hindsight-api-key.result
+    HINDSIGHT_CP_ACCESS_KEY        = random_password.hindsight-cp-api-key.result
   }
   ca_issuer_name = local.cert_issuers.ca_internal
-
-  ingress_hostname = local.endpoints.hindsight.hostname
-  gateway_ref = {
-    name      = local.services.cilium.name
-    namespace = local.services.cilium.namespace
-  }
-  auth_backend_ref = {
-    name      = local.authelia_name
-    namespace = local.authelia_namespace
-    port      = 80
-  }
 }
 
 resource "minio_s3_object" "fluxcd-hindsight" {
@@ -60,4 +55,11 @@ resource "minio_s3_object" "fluxcd-hindsight" {
   depends_on = [
     minio_s3_bucket.static-bucket["fluxcd"],
   ]
+}
+
+# hindsight admin
+
+output "hindsight" {
+  value     = random_password.hindsight-cp-api-key.result
+  sensitive = true
 }
