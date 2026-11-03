@@ -48,9 +48,9 @@ resource "minio_s3_object" "fluxcd-trust-manager" {
               enable = false
             }
             values = {
-              replicaCount = 2
+              replicaCount = 1
               podDisruptionBudget = {
-                enabled      = true
+                enabled      = false
                 minAvailable = 1
               }
               app = {

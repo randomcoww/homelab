@@ -27,7 +27,7 @@ resource "helm_release" "cert-manager" {
           enabled = true
         }
       }
-      replicaCount = 2
+      replicaCount = 1
       webhook = {
         replicaCount = 2
         resources = {
@@ -60,7 +60,7 @@ resource "helm_release" "cert-manager" {
         }
       }
       podDisruptionBudget = {
-        enabled      = true
+        enabled      = false
         minAvailable = 1
       }
       startupapicheck = {
