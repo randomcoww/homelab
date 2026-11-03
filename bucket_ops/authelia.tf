@@ -19,20 +19,6 @@ locals {
       claims_policy = "stump_policy" # defined and used under oidc_claims_policies
       consent_mode  = "implicit"
     }
-    hermes-dashboard = {
-      client_name = "hermes-dashboard"
-      scopes = [
-        "openid",
-        "email",
-        "profile",
-      ]
-      require_pkce          = false
-      pkce_challenge_method = ""
-      redirect_uris = [
-        "https://${local.endpoints.hermes-agent.hostname}/auth/callback",
-      ]
-      consent_mode = "implicit"
-    }
     kagent = {
       client_name = "kagent"
       scopes = [
