@@ -165,7 +165,6 @@ resource "helm_release" "fluxcd-bucket" {
           victoria-metrics       = []
           kea                    = []
           ipxe-presign           = []
-          juicefs-csi-driver     = ["cloudnative-pg"]
           mountpoint-s3-csi      = []
           cloudflare-tunnel      = []
           lldap                  = ["cloudnative-pg"]
@@ -189,7 +188,6 @@ resource "helm_release" "fluxcd-bucket" {
           kagent-crds            = []
           kagent                 = ["kagent-crds", "authelia"]
           kagent-crs             = ["kagent-crds", "agentgateway-crs"]
-          # inference-extension-crds = []
         } :
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
