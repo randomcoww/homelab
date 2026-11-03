@@ -5,9 +5,6 @@ locals {
     "qwen-3-8-flash-next-none",
   ]
   agentgateway_audio_model = "whisper-large-v3-turbo"
-  agentgateway_cloud_chat_models = [
-    "gemini-3.5-flash-lite",
-  ]
 }
 
 resource "minio_s3_object" "fluxcd-agentgateway-crs" {
@@ -207,34 +204,6 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
                   },
                 ]
               }
-              ], [
-
-              for _, model in local.agentgateway_cloud_chat_models :
-              {
-                matches = [
-                  {
-                    path = {
-                      type  = "PathPrefix"
-                      value = "/v1/chat"
-                    }
-                    headers = [
-                      {
-                        type  = "Exact"
-                        name  = "x-model"
-                        value = model
-                      },
-                    ]
-                  },
-                ]
-                backendRefs = [
-                  {
-                    name      = model
-                    namespace = local.agentgateway_namespace
-                    group     = "agentgateway.dev"
-                    kind      = "AgentgatewayBackend"
-                  },
-                ]
-              }
 
               ], [
               {
@@ -378,44 +347,6 @@ resource "minio_s3_object" "fluxcd-agentgateway-crs" {
               auth = {
                 secretRef = {
                   name = "${local.agentgateway_name}-api-key"
-                }
-              }
-            }
-          }
-        },
-
-        # Gemini
-        {
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name      = "${local.agentgateway_name}-gemini-api-key"
-            namespace = local.agentgateway_namespace
-          }
-          type = "Opaque"
-          stringData = {
-            Authorization = var.gemini_api_key
-          }
-        },
-        {
-          apiVersion = "agentgateway.dev/v1alpha1"
-          kind       = "AgentgatewayBackend"
-          metadata = {
-            name      = "gemini-3.5-flash-lite"
-            namespace = local.agentgateway_namespace
-          }
-          spec = {
-            ai = {
-              provider = {
-                gemini = {
-                  model = "gemini-3.5-flash-lite"
-                }
-              }
-            }
-            policies = {
-              auth = {
-                secretRef = {
-                  name = "${local.agentgateway_name}-gemini-api-key"
                 }
               }
             }
