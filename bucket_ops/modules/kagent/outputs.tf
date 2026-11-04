@@ -38,7 +38,7 @@ output "manifests" {
                 kind = "HelmRepository"
                 name = var.name
               }
-              version = "0.10.4" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent depType=helm_regex
+              version = "0.10.5" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent depType=helm_regex
             }
           }
           releaseName = var.name
@@ -91,7 +91,7 @@ output "manifests" {
                 kind = "HelmRepository"
                 name = "${var.name}-tools"
               }
-              version = "0.3.0" # renovate: datasource=docker depName=ghcr.io/kagent-dev/tools/helm/kagent-tools depType=helm_regex
+              version = "0.3.1" # renovate: datasource=docker depName=ghcr.io/kagent-dev/tools/helm/kagent-tools depType=helm_regex
             }
           }
           releaseName = "${var.name}-tools"
