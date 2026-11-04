@@ -11,7 +11,7 @@ module "kubernetes-mcp" {
   images = {
     kubernetes-mcp = {
       repository = "ghcr.io/containers/kubernetes-mcp-server"
-      tag        = "v0.1.1@sha256:d616331a99184d42f7471eac5ae257192e7065bb684ad115cc95c2e76cfbc2d1" # renovate: datasource=docker depName=ghcr.io/containers/kubernetes-mcp-server
+      tag        = "v0.1.2@sha256:c289505b06079d7f265a6fef977ce1abbfbbb4271772db17db5b58edbf44c255" # renovate: datasource=docker depName=ghcr.io/containers/kubernetes-mcp-server
     }
   }
   service_port   = local.kubernetes-mcp_port
