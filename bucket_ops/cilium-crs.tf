@@ -65,6 +65,52 @@ resource "minio_s3_object" "fluxcd-cilium-crs" {
             ]
           }
         },
+        {
+          apiVersion = "gateway.networking.k8s.io/v1"
+          kind       = "Gateway"
+          metadata = {
+            name      = "${local.services.cilium.name}-cluster"
+            namespace = local.services.cilium.namespace
+            annotations = {
+              "cert-manager.io/cluster-issuer" = local.cert_issuers.ca_internal
+            }
+          }
+          spec = {
+            gatewayClassName = "cilium"
+            listeners = [
+              {
+                allowedRoutes = {
+                  namespaces = {
+                    from = "Same"
+                  }
+                }
+                name     = "web"
+                port     = 80
+                protocol = "HTTP"
+              },
+              {
+                allowedRoutes = {
+                  namespaces = {
+                    from = "All"
+                  }
+                }
+                hostname = "*.${local.domains.kubernetes}"
+                name     = "websecure"
+                port     = 443
+                protocol = "HTTPS"
+                tls = {
+                  mode = "Terminate"
+                  certificateRefs = [
+                    {
+                      group = ""
+                      name  = "${local.domains.kubernetes}-tls"
+                    },
+                  ]
+                }
+              },
+            ]
+          }
+        },
       ] :
       yamlencode(m)
     ])

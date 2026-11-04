@@ -185,7 +185,7 @@ locals {
       hostname = "zot.${local.domains.kubernetes}"
     }
     hindsight = {
-      hostname = "hindsight.${local.domains.public}"
+      hostname = "hindsight.${local.domains.kubernetes}"
     }
     agentgateway = {
       hostname = "agentgateway.${local.domains.kubernetes}"

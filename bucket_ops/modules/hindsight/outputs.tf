@@ -1,7 +1,6 @@
 output "manifests" {
   value = concat([
     module.cnpg-secret.manifest,
-    module.httproute.manifest,
     ], [
     for _, m in [
       {
@@ -141,6 +140,31 @@ output "manifests" {
                 ])
                 password = random_password.postgres-password.result
               }
+            }
+            gatewayApi = {
+              enabled = true
+              parentRefs = [
+                merge({
+                  kind = "Gateway"
+                }, var.gateway_ref)
+              ]
+              hostnames = [
+                var.ingress_hostname,
+              ]
+              paths = [
+                {
+                  path    = "/"
+                  service = "controlPlane"
+                },
+                {
+                  path    = "/v1"
+                  service = "api"
+                },
+                {
+                  path    = "/mcp"
+                  service = "api"
+                },
+              ]
             }
             metrics = {
               serviceMonitor = {

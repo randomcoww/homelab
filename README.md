@@ -222,6 +222,12 @@ Agentgateway API key:
 tofu -chdir=bucket_ops output llama-cpp-api-key
 ```
 
+Hindsight API key:
+
+```bash
+tofu -chdir=bucket_ops output hindsight
+```
+
 Internal registry:
 
 ```bash

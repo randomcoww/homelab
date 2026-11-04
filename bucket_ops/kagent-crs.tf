@@ -161,6 +161,10 @@ resource "minio_s3_object" "fluxcd-kagent-crs" {
                 value = local.kagent_name
               },
             ]
+            tls = {
+              caCertSecretRef = "${local.kagent_name}-mcp-client-tls"
+              caCertSecretKey = "ca.crt"
+            }
           }
         },
 

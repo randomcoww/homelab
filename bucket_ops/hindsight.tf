@@ -33,6 +33,11 @@ module "hindsight" {
     HINDSIGHT_CP_ACCESS_KEY        = random_password.hindsight-cp-api-key.result
   }
   ca_issuer_name = local.cert_issuers.ca_internal
+  gateway_ref = {
+    name      = "${local.services.cilium.name}-cluster"
+    namespace = local.services.cilium.namespace
+  }
+  ingress_hostname = local.endpoints.hindsight.hostname
 }
 
 resource "minio_s3_object" "fluxcd-hindsight" {
