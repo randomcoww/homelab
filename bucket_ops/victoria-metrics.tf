@@ -64,6 +64,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                 enabled = true
                 operator = {
                   enable_converter_ownership = true # delete VM CRD when equivalent prometheus CRD is removed
+                  gateway_support            = true
                 }
               }
               defaultDashboards = {
@@ -186,20 +187,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                   }
                 }
-                route = {
-                  vlselect = {
-                    enabled = true
-                    hostnames = [
-                      local.endpoints.victoria-logs.hostname,
-                    ]
-                    parentRefs = [
-                      {
-                        name      = local.services.cilium.name
-                        namespace = local.services.cilium.namespace
-                      },
-                    ]
-                  }
-                }
               }
               vlagent = {
                 enabled = true
@@ -300,22 +287,6 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     }
                   }
                 }
-                route = {
-                  select = {
-                    enabled = true
-                    # UI at /select/vmui
-                    # query at /select/prometheus/api/*
-                    hostnames = [
-                      local.endpoints.victoria-metrics.hostname,
-                    ]
-                    parentRefs = [
-                      {
-                        name      = local.services.cilium.name
-                        namespace = local.services.cilium.namespace
-                      },
-                    ]
-                  }
-                }
               }
               vmalert = {
                 enabled = true
@@ -398,6 +369,59 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       verbs           = ["get"]
                     },
                   ]
+                }
+              }
+              vmauth = {
+                enabled = true
+                spec = {
+                  selectAllByDefault = true
+                  httpRoute = {
+                    parentRefs = [
+                      {
+                        name      = local.services.cilium.name
+                        namespace = local.services.cilium.namespace
+                      },
+                    ]
+                    hostnames = [
+                      local.endpoints.victoria-metrics.hostname,
+                      local.endpoints.victoria-logs.hostname,
+                    ]
+                  }
+                  unauthorizedUserAccessSpec = {
+                    discover_backend_ips = true
+                    targetRefs = [
+                      {
+                        crd = {
+                          kind      = "VMCluster/vmselect"
+                          name      = "${local.victoria-metrics_name}-victoria-metrics-k8s-stack"
+                          namespace = local.victoria-metrics_namespace
+                        }
+                        hosts = [
+                          local.endpoints.victoria-metrics.hostname,
+                        ]
+                        # UI at /select/vmui
+                        # query at /select/prometheus/api/*
+                        paths = [
+                          "/select/.*",
+                          "/admin/.*",
+                        ]
+                      },
+                      {
+                        crd = {
+                          kind      = "VLCluster/vlselect"
+                          name      = "${local.victoria-metrics_name}-victoria-metrics-k8s-stack"
+                          namespace = local.victoria-metrics_namespace
+                        }
+                        hosts = [
+                          local.endpoints.victoria-logs.hostname,
+                        ]
+                        # UI at /select/vmui
+                        paths = [
+                          "/select/.*",
+                        ]
+                      },
+                    ]
+                  }
                 }
               }
               grafana = {
