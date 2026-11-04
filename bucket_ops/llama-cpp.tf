@@ -73,7 +73,7 @@ module "llama-cpp" {
           --spec-draft-n-max 3 \
           --batch-size 4096 \
           --ubatch-size 1024 \
-          --mmproj $${qwen-3-8-flash-next-mmproj} \
+          # --mmproj $${qwen-3-8-flash-next-mmproj} \
           --parallel 1
         EOF
         filters = {
