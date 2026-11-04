@@ -582,6 +582,53 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   }
                 }
               }
+              extraObjects = [
+                # TODO: this should be applied as an extraRules entry in vmauth/httproute but it is not working currently
+                {
+                  apiVersion = "gateway.networking.k8s.io/v1"
+                  kind       = "HTTPRoute"
+                  metadata = {
+                    name      = "vmui"
+                    namespace = local.victoria-metrics_namespace
+                  }
+                  spec = {
+                    parentRefs = [
+                      {
+                        name      = local.services.cilium.name
+                        namespace = local.services.cilium.namespace
+                      },
+                    ]
+                    hostnames = [
+                      local.endpoints.victoria-metrics.hostname,
+                      local.endpoints.victoria-logs.hostname,
+                    ]
+                    rules = [
+                      {
+                        matches = [
+                          {
+                            path = {
+                              type  = "Exact"
+                              value = "/"
+                            }
+                          },
+                        ]
+                        filters = [
+                          {
+                            type = "RequestRedirect"
+                            requestRedirect = {
+                              path = {
+                                type            = "ReplaceFullPath"
+                                replaceFullPath = "/select/vmui/"
+                              }
+                              statusCode = 302
+                            }
+                          },
+                        ]
+                      },
+                    ]
+                  }
+                },
+              ]
             }
           }
         },
