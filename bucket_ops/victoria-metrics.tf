@@ -385,6 +385,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                     hostnames = [
                       local.endpoints.victoria-metrics.hostname,
                       local.endpoints.victoria-logs.hostname,
+                      local.endpoints.prometheus.hostname,
                     ]
                   }
                   unauthorizedUserAccessSpec = {
@@ -418,6 +419,19 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                         # UI at /select/vmui
                         paths = [
                           "/select/.*",
+                        ]
+                      },
+                      {
+                        crd = {
+                          kind      = "VMCluster/vmselect"
+                          name      = "${local.victoria-metrics_name}-victoria-metrics-k8s-stack"
+                          namespace = local.victoria-metrics_namespace
+                        }
+                        hosts = [
+                          local.endpoints.prometheus.hostname, # expose prometheus compatible endpoint for kured
+                        ]
+                        paths = [
+                          "/select/prometheus/.*",
                         ]
                       },
                     ]
@@ -588,7 +602,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                   apiVersion = "gateway.networking.k8s.io/v1"
                   kind       = "HTTPRoute"
                   metadata = {
-                    name      = "vmui"
+                    name      = "${local.victoria-metrics_name}-vmui-redirect"
                     namespace = local.victoria-metrics_namespace
                   }
                   spec = {

@@ -175,6 +175,9 @@ locals {
     victoria-logs = {
       hostname = "vl.${local.domains.public}"
     }
+    prometheus = {
+      hostname = "prometheus.${local.domains.public}"
+    }
     sunshine = {
       hostname = "sunshine.${local.domains.public}"
     }

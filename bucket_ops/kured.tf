@@ -9,7 +9,7 @@ module "kured" {
     }
   }
   kured_config = {
-    prometheusUrl = "https://${local.endpoints.victoria-metrics.hostname}/select/prometheus"
+    prometheusUrl = "https://${local.endpoints.prometheus.hostname}/select/prometheus"
     alertFilterRegexp = "^(${join("|", sort([
       "Watchdog",      # always on, severity: none
       "InfoInhibitor", # severity: none
