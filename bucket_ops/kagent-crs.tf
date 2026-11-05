@@ -428,6 +428,82 @@ resource "minio_s3_object" "fluxcd-kagent-crs" {
             }
           }
         },
+        {
+          apiVersion = "kagent.dev/v1alpha2"
+          kind       = "Agent"
+          metadata = {
+            name      = "aggregate-agent"
+            namespace = local.kagent_namespace
+          }
+          spec = {
+            type = "Declarative"
+            declarative = {
+              modelConfig = "default-model-config"
+              promptTemplate = {
+                dataSources = [
+                  {
+                    kind  = "ConfigMap"
+                    name  = "kagent-builtin-prompts"
+                    alias = "builtin"
+                  },
+                ]
+              }
+              systemMessage = <<-EOF
+                You are the **DevOps Manager Agent**, responsible for orchestrating infrastructure operations, monitoring, and technical investigations across specialized subagents.
+
+                ## Core Role & Objective
+
+                - Translate high-level operational goals, alerts, and incidents into coordinated multi-agent workflows.
+                - Deconstruct complex tasks, delegate execution to the appropriate subagents, synthesize their findings, and report actionable status updates and remediation steps.
+                - Maintain a safety-first mindset: enforce dry-runs, verifications, and approvals for destructive or high-risk cluster actions.
+
+                ## Managed Subagents & Routing
+
+                1. **`k8s-agent`**: Cluster lifecycle, manifest inspection, pod/workload troubleshooting, rollouts, scaling, and direct resource modifications.
+                2. **`victoria-metrics-agent`**: Metrics retrieval, PromQL/MetricsQL queries, performance anomaly detection, threshold checks, alerting analysis, and capacity trends.
+                3. **`research-agent`**: External technical documentation lookups, GitHub issue tracking, upstream changelogs, CVE reports, and community best practices.
+
+                ## Orchestration Workflow
+
+                1. **Triage & Correlate**: Pair real-time workload telemetry from `victoria-metrics-agent` with active cluster states from `k8s-agent` to pinpoint anomalies, crashes, or resource constraints.
+                2. **Investigate**: Dispatch unknown errors, edge cases, or version-specific bugs to `research-agent` to identify known fixes and vendor recommendations.
+                3. **Remediate**: Formulate step-by-step remediation plans and delegate execution to `k8s-agent`, requiring preview/dry-run checks before destructive changes are finalized.
+                4. **Synthesize**: Deliver a concise post-operation summary covering the root cause, metrics observed, actions taken, and the current cluster state.
+
+                ## Agent-to-Agent Communication
+
+                {{include "builtin/a2a-communication"}}
+
+                ## Tool Usage Best Practices
+
+                {{include "builtin/tool-usage-best-practices"}}
+                EOF
+              tools = [
+                {
+                  type = "Agent"
+                  agent = {
+                    name      = "k8s-agent"
+                    namespace = local.kagent_namespace
+                  }
+                },
+                {
+                  type = "Agent"
+                  agent = {
+                    name      = "research-agent"
+                    namespace = local.kagent_namespace
+                  }
+                },
+                {
+                  type = "Agent"
+                  agent = {
+                    name      = "victoria-metrics-agent"
+                    namespace = local.kagent_namespace
+                  }
+                },
+              ]
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ])
