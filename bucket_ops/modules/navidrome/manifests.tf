@@ -83,30 +83,7 @@ module "httproute" {
           },
         ]
         filters = [
-          {
-            type = "ExternalAuth"
-            externalAuth = {
-              protocol   = "HTTP"
-              backendRef = var.auth_backend_ref
-              http = {
-                path = "/api/authz/ext-authz/"
-                allowedHeaders = [
-                  "accept",
-                  "cookie",
-                  "location",
-                  "authorization",
-                  "proxy-authorization",
-                  "x-forwarded-proto",
-                ]
-                allowedResponseHeaders = [
-                  "Remote-User",
-                  "Remote-Email",
-                  "Remote-Name",
-                  "Remote-Groups",
-                ]
-              }
-            }
-          },
+          var.external_auth_filter,
         ]
         backendRefs = [
           {

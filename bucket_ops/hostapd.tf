@@ -123,11 +123,7 @@ module "hostapd-qrcode" {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
-  auth_backend_ref = {
-    name      = local.authelia_name
-    namespace = local.authelia_namespace
-    port      = 80
-  }
+  external_auth_filter = local.authelia_external_auth_filter
 }
 
 resource "minio_s3_object" "fluxcd-hostapd" {

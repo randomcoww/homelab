@@ -43,6 +43,35 @@ locals {
       client_secret = random_password.authelia-oidc-client-secret[k].result
     })
   }
+
+  authelia_external_auth_filter = {
+    type = "ExternalAuth"
+    externalAuth = {
+      protocol = "HTTP"
+      backendRef = {
+        name      = local.authelia_name
+        namespace = local.authelia_namespace
+        port      = 80
+      }
+      http = {
+        path = "/api/authz/ext-authz/"
+        allowedHeaders = [
+          "accept",
+          "cookie",
+          "location",
+          "authorization",
+          "proxy-authorization",
+          "x-forwarded-proto",
+        ]
+        allowedResponseHeaders = [
+          "Remote-User",
+          "Remote-Email",
+          "Remote-Name",
+          "Remote-Groups",
+        ]
+      }
+    }
+  }
 }
 
 resource "random_string" "authelia-oidc-client-id" {

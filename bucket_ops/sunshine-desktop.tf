@@ -25,13 +25,9 @@ module "sunshine-desktop" {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
-  auth_backend_ref = {
-    name      = local.authelia_name
-    namespace = local.authelia_namespace
-    port      = 80
-  }
-  gpu_resource_claim = local.resource_claims.amd-gpu-gfx1151
-  ca_issuer_name     = local.cert_issuers.ca_internal
+  external_auth_filter = local.authelia_external_auth_filter
+  gpu_resource_claim   = local.resource_claims.amd-gpu-gfx1151
+  ca_issuer_name       = local.cert_issuers.ca_internal
 }
 
 resource "minio_s3_object" "sunshine-desktop" {

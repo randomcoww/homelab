@@ -78,12 +78,8 @@ variable "storage_class_name" {
   type = string
 }
 
-variable "auth_backend_ref" {
-  type = object({
-    name      = string
-    namespace = string
-    port      = number
-  })
+variable "external_auth_filter" {
+  type = any
 }
 
 variable "ca_issuer_name" {

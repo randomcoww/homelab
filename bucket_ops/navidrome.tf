@@ -65,15 +65,11 @@ module "navidrome" {
     name      = local.services.cilium.name
     namespace = local.services.cilium.namespace
   }
-  auth_backend_ref = {
-    name      = local.authelia_name
-    namespace = local.authelia_namespace
-    port      = 80
-  }
-  minio_endpoint    = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
-  minio_data_bucket = "music"
-  minio_bucket      = "navidrome"
-  minio_user        = minio_iam_user.navidrome
+  external_auth_filter = local.authelia_external_auth_filter
+  minio_endpoint       = "https://${local.services.minio.name}.${local.services.minio.namespace}:${local.service_ports.minio}"
+  minio_data_bucket    = "music"
+  minio_bucket         = "navidrome"
+  minio_user           = minio_iam_user.navidrome
 }
 
 resource "minio_s3_object" "fluxcd-navidrome" {
