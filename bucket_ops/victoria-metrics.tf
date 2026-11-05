@@ -388,6 +388,7 @@ resource "minio_s3_object" "fluxcd-victoria-metrics" {
                       local.endpoints.prometheus.hostname,
                     ]
                   }
+                  # TODO: add SSO when this is released https://github.com/VictoriaMetrics/operator/pull/2706
                   unauthorizedUserAccessSpec = {
                     discover_backend_ips = true
                     targetRefs = [
