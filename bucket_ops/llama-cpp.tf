@@ -62,7 +62,7 @@ module "llama-cpp" {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${qwen-3-8-flash-next} \
-          --ctx-size 131072 \
+          --ctx-size 262144 \
           --jinja \
           --reasoning-preserve \
           --no-context-shift \
