@@ -65,6 +65,8 @@ module "llama-cpp" {
           --ctx-size 131072 \
           --jinja \
           --reasoning-preserve \
+          --no-context-shift \
+          --lazy-mode on \
           --image-min-tokens 1024 \
           --spec-draft-model $${qwen-3-8-flash-next-mtp} \
           --cache-type-k q8_0 \
