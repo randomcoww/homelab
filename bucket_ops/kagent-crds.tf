@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-kagent-crds" {
             interval = "6h"
             url      = "oci://ghcr.io/kagent-dev/kagent/helm/kagent-crds"
             ref = {
-              tag = "0.10.5" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent-crds depType=helm_regex
+              tag = "0.10.6" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent-crds depType=helm_regex
             }
           }
         },
