@@ -64,16 +64,18 @@ module "llama-cpp" {
           --model $${qwen-3-8-flash-next} \
           --flash-attn on \
           --ctx-size 262144 \
+          --context-shift \
           --jinja \
           --reasoning-preserve \
           --no-context-shift \
           --image-min-tokens 1024 \
           --spec-draft-model $${qwen-3-8-flash-next-mtp} \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
           --spec-type draft-mtp \
           --spec-draft-n-max 3 \
-          --batch-size 4096 \
-          --ubatch-size 1024 \
-          --mmproj $${qwen-3-8-flash-next-mmproj} \
+          --batch-size 1024 \
+          --ubatch-size 512 \
           --load-mode mmap \
           --override-tensor per_layer_token_embd.weight=CPU \
           --parallel 1
@@ -130,9 +132,10 @@ module "llama-cpp" {
     }
   }
   extra_envs = {
-    "ROCBLAS_USE_HIPBLASLT" = 1
-    "AMD_VULKAN_ICD"        = "RADV"
-    "RADV_PERFTEST"         = "sam"
+    "ROCBLAS_USE_HIPBLASLT"        = 1
+    "AMD_VULKAN_ICD"               = "RADV"
+    "RADV_PERFTEST"                = "sam"
+    "GGML_VK_MAX_NODES_PER_SUBMIT" = 1 # TODO: remove workaround for ring comp_1.2.0 timeout
   }
   service_port = local.llama-cpp_port
   resources = {
