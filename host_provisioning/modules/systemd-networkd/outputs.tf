@@ -93,7 +93,7 @@ output "ignition_snippet" {
 
         # Hardware interfaces
         for _, iface in concat(var.wired_interfaces, var.wireless_interfaces) :
-        # TODO: workaround for r8169 transmit queue timed out issue
+        # TODO: remove workaround for r8169 transmit queue timed out issue
         {
           path = "/etc/systemd/network/09-${iface.interface}-r8169.link"
           mode = 420

@@ -74,7 +74,7 @@ locals {
         boot_args = [
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
-          "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
+          "pcie_aspm=off",                       # TODO: remove workaround for r8169 transmit queue timed out issue
         ]
       }
 
@@ -151,7 +151,7 @@ locals {
         boot_args = [
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
-          "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
+          "pcie_aspm=off",                       # TODO: remove workaround for r8169 transmit queue timed out issue
         ]
       }
 
@@ -213,7 +213,7 @@ locals {
         boot_args = [
           "ttm.pages_limit=${32 * 512 * 512}",   # 32G
           "ttm.page_pool_size=${1 * 512 * 512}", # 1G preallocated
-          "pcie_aspm=off",                       # TODO: workaround for r8169 transmit queue timed out issue
+          "pcie_aspm=off",                       # TODO: remove workaround for r8169 transmit queue timed out issue
         ]
       }
 
@@ -286,10 +286,10 @@ locals {
         boot_args = [
           "ttm.pages_limit=${128 * 512 * 512}",   # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
           "ttm.page_pool_size=${96 * 512 * 512}", # 96G preallocated
-          "pcie_aspm=off",                        # TODO: workaround for r8169 transmit queue timed out issue
-          "mt7925e.disable_aspm=1",               # TODO: workaround for mt7925e stability
-          "mt7925_common.disable_clc=1",          # TODO: workaround for mt7925e stability
-          "swiotlb=65536",                        # TODO: workaround for mt7925e stability
+          "pcie_aspm=off",                        # TODO: remove workaround for r8169 transmit queue timed out issue
+          "mt7925e.disable_aspm=1",               # TODO: remove workaround for mt7925e stability
+          "mt7925_common.disable_clc=1",          # TODO: remove workaround for mt7925e stability
+          "swiotlb=65536",                        # TODO: remove workaround for mt7925e stability
         ]
         node_taints = [
           {
