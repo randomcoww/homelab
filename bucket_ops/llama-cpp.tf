@@ -58,7 +58,7 @@ module "llama-cpp" {
   llama_swap_config = {
     includeAliasesInList = true
     models = {
-      qwen-3-8-flash-next = { # ref https://www.reddit.com/r/unsloth/comments/1vz8zo6/comment/p6556ua/
+      qwen-3-8-flash-next = {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${qwen-3-8-flash-next} \
@@ -77,7 +77,10 @@ module "llama-cpp" {
           --batch-size 1024 \
           --ubatch-size 512 \
           --load-mode mmap \
-          --override-tensor per_layer_token_embd.weight=CPU \
+          --no-host \
+          --no-repack \
+          --fit off \
+          --lazy-mode on \
           --parallel 1
         EOF
         filters = {
