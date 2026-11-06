@@ -15,7 +15,7 @@ module "camofox-browser" {
     }
     camofox-browser-mcp = {
       repository = "ghcr.io/redf0x1/camofox-mcp"
-      tag        = "1.16.0@sha256:499abc6b83a3fc5d34cbb0020a024b7fc0c824bc8a76e25bb28524322cc42ba1" # renovate: datasource=docker depName=ghcr.io/redf0x1/camofox-mcp
+      tag        = "1.17.0@sha256:fc71dfaa3aab937e8ddf87c9cf65d6a997eb3b63b3f8b33e62f4494e43ded17c" # renovate: datasource=docker depName=ghcr.io/redf0x1/camofox-mcp
     }
   }
   extra_envs = {
