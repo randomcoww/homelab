@@ -37,8 +37,7 @@ module "llama-cpp-small" {
       whisper-large-v3-turbo = {
         checkEndpoint = "/v1/audio/transcriptions/"
         cmd           = <<-EOF
-        whisper-server \
-          --port $${PORT} \
+        $${default_whisper_cmd} \
           -m $${whisper-large-v3-turbo} \
           --convert \
           --language auto \

@@ -12,12 +12,14 @@ module "secret" {
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
       macros = merge({
-        model_path  = local.models_path
-        default_cmd = <<-EOF
+        model_path          = local.models_path
+        default_cmd         = <<-EOF
           /unsloth/llama-server \
-          --port $${PORT} \
-          --flash-attn on \
-          --load-mode none
+          --port $${PORT}
+          EOF
+        default_whisper_cmd = <<-EOF
+          whisper-server \
+          --port $${PORT}
           EOF
         }, {
         for _, v in var.image_volumes :
