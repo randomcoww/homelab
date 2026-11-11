@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-reloader" {
             interval = "6h"
             url      = "oci://ghcr.io/stakater/charts/reloader"
             ref = {
-              tag = "2.2.19" # renovate: datasource=docker depName=ghcr.io/stakater/charts/reloader depType=helm_regex
+              tag = "2.2.20" # renovate: datasource=docker depName=ghcr.io/stakater/charts/reloader depType=helm_regex
             }
           }
         },
