@@ -16,7 +16,7 @@ module "minio" {
   images = {
     minio = {
       repository = "docker.io/pgsty/silo"
-      tag        = "RELEASE.2026-11-09T00-00-00Z@sha256:08ce1505b5eacefbad1ca07159b242b9ce045a11c2817e3bc257b25f77bbc02d" # renovate: datasource=docker depName=docker.io/pgsty/silo
+      tag        = "RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329" # renovate: datasource=docker depName=docker.io/pgsty/silo
     }
   }
   service_port = local.service_ports.minio
