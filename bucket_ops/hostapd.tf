@@ -12,7 +12,7 @@ module "hostapd" {
   source    = "./modules/hostapd"
   name      = "hostapd"
   namespace = "hostnet"
-  replicas  = 1
+  replicas  = 0
   images = {
     hostapd = {
       repository = "zot.cluster.internal/randomcoww/hostapd"
