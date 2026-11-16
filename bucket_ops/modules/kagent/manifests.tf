@@ -78,7 +78,7 @@ locals {
       image = {
         registry   = "zot.cluster.internal"
         repository = "randomcoww/kagent-ui-patched"
-        tag        = "v0.10.6.1794260655@sha256:68c923169acdf001be0e04423f5fe843d4a419d9d144b3acb644ff6c833dcff2" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kagent-ui-patched
+        tag        = "v0.10.6.1794864289@sha256:f87d4ea22a0439f40de4f186fa0644575cb7a9d805e0c3115e48f14d1ce49a98" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/kagent-ui-patched
       }
       streamTimeoutSeconds = "3600"
       nginx = {
