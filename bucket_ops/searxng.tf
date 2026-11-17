@@ -12,11 +12,11 @@ module "searxng" {
   images = {
     searxng = {
       repository = "ghcr.io/searxng/searxng"
-      tag        = "latest@sha256:932f69dca010db9880bddebb2171f05d8e1a25d04a59149ff65409993d680024" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
+      tag        = "latest@sha256:0b9f3ddd85efc8df189e6543d65702abfa8f3ed1c32229a53f7707cd12b554ef" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
     }
     searxng-mcp = {
       repository = "docker.io/isokoliuk/mcp-searxng"
-      tag        = "2.10.1@sha256:39176ff787129814aa7fbc96250e35b01ccc1bb6586d98ad3963551ba53e405d" # renovate: datasource=docker depName=docker.io/isokoliuk/mcp-searxng
+      tag        = "2.11.0@sha256:5247ef2c87a2e33f5e5a73a9d05001a6415488060f667c32b732159bca55b45d" # renovate: datasource=docker depName=docker.io/isokoliuk/mcp-searxng
     }
   }
   extra_mcp_envs = {

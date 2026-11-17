@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-cloudnative-pg" {
             interval = "6h"
             url      = "oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg"
             ref = {
-              tag = "0.29.1" # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/charts/cloudnative-pg depType=helm_regex
+              tag = "0.29.2" # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/charts/cloudnative-pg depType=helm_regex
             }
             layerSelector = {
               mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
