@@ -12,7 +12,7 @@ module "searxng" {
   images = {
     searxng = {
       repository = "ghcr.io/searxng/searxng"
-      tag        = "latest@sha256:0b9f3ddd85efc8df189e6543d65702abfa8f3ed1c32229a53f7707cd12b554ef" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
+      tag        = "latest@sha256:6012a064924a032969a2e7989d66971803f126a237a2fb6c62f10ae3d82093e1" # renovate: datasource=docker depName=ghcr.io/searxng/searxng
     }
     searxng-mcp = {
       repository = "docker.io/isokoliuk/mcp-searxng"
