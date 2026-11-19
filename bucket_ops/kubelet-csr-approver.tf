@@ -13,7 +13,7 @@ resource "minio_s3_object" "fluxcd-kubelet-csr-approver" {
             interval = "6h"
             url      = "oci://ghcr.io/postfinance/charts/kubelet-csr-approver"
             ref = {
-              tag = "1.2.15" # renovate: datasource=docker depName=ghcr.io/postfinance/charts/kubelet-csr-approver depType=helm_regex
+              tag = "1.2.16" # renovate: datasource=docker depName=ghcr.io/postfinance/charts/kubelet-csr-approver depType=helm_regex
             }
           }
         },
