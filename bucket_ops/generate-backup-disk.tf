@@ -5,7 +5,7 @@ module "generate-backup-disk" {
   images = {
     backup-runner = {
       repository = "zot.cluster.internal/randomcoww/coreos-installer"
-      tag        = "v1.1794866088@sha256:307a68c5a9534bd43d56a0bcd5bfcb64294adfb84713c286fb61ae6610155b56" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/coreos-installer
+      tag        = "v1.1795477530@sha256:0ba09c48892d345f1304ccfad12a4f508b25d3eb4c034ab056b516e9d6ecb7c7" # renovate: datasource=docker depName=zot.cluster.internal/randomcoww/coreos-installer
     }
   }
   cosa_build_tag_karg = local.netboot_custom_kargs.build_tag
