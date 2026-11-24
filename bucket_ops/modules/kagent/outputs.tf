@@ -38,7 +38,7 @@ output "manifests" {
                 kind = "HelmRepository"
                 name = var.name
               }
-              version = "0.10.6" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent depType=helm_regex
+              version = "0.10.7" # renovate: datasource=docker depName=ghcr.io/kagent-dev/kagent/helm/kagent depType=helm_regex
             }
           }
           releaseName = var.name
@@ -91,7 +91,7 @@ output "manifests" {
                 kind = "HelmRepository"
                 name = "${var.name}-tools"
               }
-              version = "0.3.1" # renovate: datasource=docker depName=ghcr.io/kagent-dev/tools/helm/kagent-tools depType=helm_regex
+              version = "0.3.2" # renovate: datasource=docker depName=ghcr.io/kagent-dev/tools/helm/kagent-tools depType=helm_regex
             }
           }
           releaseName = "${var.name}-tools"
@@ -247,7 +247,7 @@ output "manifests" {
                 image = {
                   reference = join(":", [
                     "ghcr.io/cloudnative-pg/pgvector",
-                    "0.8.7-18-trixie@sha256:8c719f4ba8796a39b1e08a450b424577be9fd9821089dfd2c90e8c2d86b7a03c", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
+                    "0.8.7-18-trixie@sha256:eef3dd247157d53acc8e6ac53b5b610474eaedcd93f722c89245a3171b58e10f", # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/pgvector
                   ])
                 }
               },
