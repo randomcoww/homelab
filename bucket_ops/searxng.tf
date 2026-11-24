@@ -16,7 +16,7 @@ module "searxng" {
     }
     searxng-mcp = {
       repository = "docker.io/isokoliuk/mcp-searxng"
-      tag        = "2.11.0@sha256:5247ef2c87a2e33f5e5a73a9d05001a6415488060f667c32b732159bca55b45d" # renovate: datasource=docker depName=docker.io/isokoliuk/mcp-searxng
+      tag        = "2.12.0@sha256:75b5e1d71b2659b6f170bf2ffee7567a68d7d9f16c7ed122b35c29b0f291f330" # renovate: datasource=docker depName=docker.io/isokoliuk/mcp-searxng
     }
   }
   extra_mcp_envs = {
