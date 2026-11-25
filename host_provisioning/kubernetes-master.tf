@@ -37,15 +37,15 @@ module "kubernetes-master" {
   images = {
     apiserver = {
       repository = "registry.k8s.io/kube-apiserver"
-      tag        = "v1.37.2@sha256:3e563afb5cb5b72a10bac7012698dd09f5a42bde7d22de8d7d3c12e654df86b4" # renovate: datasource=docker depName=registry.k8s.io/kube-apiserver
+      tag        = "v1.37.3@sha256:1a00343a748fe98faed757d719c4836465dfc63c96a6d3d07f2fc20397971773" # renovate: datasource=docker depName=registry.k8s.io/kube-apiserver
     }
     controller-manager = {
       repository = "registry.k8s.io/kube-controller-manager"
-      tag        = "v1.37.2@sha256:28e62daf706ed815a8bd1dd27b03294ba09421b2e1674e9a83bbac38e24ceb0c" # renovate: datasource=docker depName=registry.k8s.io/kube-controller-manager
+      tag        = "v1.37.3@sha256:93a91189c9d78dff3143362a1e475a3edd04e8f01b91e621f23fdac3dea7cf8d" # renovate: datasource=docker depName=registry.k8s.io/kube-controller-manager
     }
     scheduler = {
       repository = "registry.k8s.io/kube-scheduler"
-      tag        = "v1.37.2@sha256:028c847fc321b8a7f9787f7b1c0840f832d6b68439be2e5c09279ffb14203d6b" # renovate: datasource=docker depName=registry.k8s.io/kube-scheduler
+      tag        = "v1.37.3@sha256:baff652412202ea98dddc5caa2070800afb267374b3527b344105ae16689f933" # renovate: datasource=docker depName=registry.k8s.io/kube-scheduler
     }
   }
   ports = {
